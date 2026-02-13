@@ -5,8 +5,7 @@ export default defineConfig({
     globals: true,
     include: ['tests/e2e/**/*.spec.ts'],
     testTimeout: 120000,
-    pool: 'forks',
-    maxWorkers: 1,
+    pool: 'threads',
     isolate: false,
     sequence: {
       concurrent: false,

@@ -1,6 +1,11 @@
 import type { StartedServer } from './prepare-backend.js'
 
-export const DATABASE_URL = 'postgresql://test:test@localhost:5432/test'
+const DATABASE_BASE_URL = 'postgresql://test:test@localhost:5432/test'
+
+/** Get a database URL scoped to a specific Postgres schema (for parallel isolation) */
+export function databaseUrl(schema: string): string {
+  return `${DATABASE_BASE_URL}?schema=${schema}`
+}
 
 export interface GqlResponse<T = Record<string, unknown>> {
   data?: T

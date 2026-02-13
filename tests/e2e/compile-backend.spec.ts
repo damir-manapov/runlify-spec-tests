@@ -2,10 +2,10 @@ import fs from 'node:fs'
 import path from 'node:path'
 import { afterAll, beforeAll, describe, expect, it } from 'vitest'
 import {
-  cleanupPrepared,
   type PreparedBackend,
   prepareBackend,
   runOrFail,
+  teardownBackend,
 } from './prepare-backend.js'
 
 describe('e2e: generated backend compiles', () => {
@@ -16,7 +16,7 @@ describe('e2e: generated backend compiles', () => {
   }, 180000)
 
   afterAll(() => {
-    cleanupPrepared(prepared)
+    teardownBackend({ prepared })
   })
 
   it('tsc --noEmit succeeds', () => {

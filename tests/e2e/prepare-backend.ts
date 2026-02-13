@@ -27,12 +27,23 @@ export interface StartedServer {
  * @param fixture - Name of the fixture directory under tests/fixtures/ (default: 'minimal')
  * Returns paths to the created directories for cleanup.
  */
-const prepareCache = new Map<string, PreparedBackend>()
+const prepareCache = new Map<string, Promise<PreparedBackend>>()
+/** Sync side-channel so the process-exit handler can access resolved values */
+const resolvedBackends = new Map<string, PreparedBackend>()
 
-export async function prepareBackend(fixture = 'minimal'): Promise<PreparedBackend> {
+export function prepareBackend(fixture = 'minimal'): Promise<PreparedBackend> {
   const cached = prepareCache.get(fixture)
   if (cached) return cached
 
+  const promise = doPrepare(fixture).then((prepared) => {
+    resolvedBackends.set(fixture, prepared)
+    return prepared
+  })
+  prepareCache.set(fixture, promise)
+  return promise
+}
+
+async function doPrepare(fixture: string): Promise<PreparedBackend> {
   assertRunlifyAvailable()
 
   const fixturesDir = path.join(fixturesBaseDir, fixture)
@@ -112,7 +123,6 @@ export async function prepareBackend(fixture = 'minimal'): Promise<PreparedBacke
   })
 
   const prepared: PreparedBackend = { parentDir, backDir }
-  prepareCache.set(fixture, prepared)
   return prepared
 }
 
@@ -189,7 +199,7 @@ export async function stopServer(server: StartedServer | undefined): Promise<voi
 export function cleanupPrepared(prepared: PreparedBackend | undefined): void {
   if (!prepared?.parentDir) return
   // Skip if this is a cached (shared) backend — cleaned up by cleanupAllPrepared
-  for (const cached of prepareCache.values()) {
+  for (const cached of resolvedBackends.values()) {
     if (cached.parentDir === prepared.parentDir) return
   }
   fs.rmSync(prepared.parentDir, { recursive: true, force: true })
@@ -197,14 +207,67 @@ export function cleanupPrepared(prepared: PreparedBackend | undefined): void {
 
 /** Remove all cached prepared backends. Called at process exit. */
 export function cleanupAllPrepared(): void {
-  for (const prepared of prepareCache.values()) {
+  for (const prepared of resolvedBackends.values()) {
     fs.rmSync(prepared.parentDir, { recursive: true, force: true })
   }
   prepareCache.clear()
+  resolvedBackends.clear()
 }
 
 // Auto-cleanup cached backends when the process exits
 process.on('exit', cleanupAllPrepared)
+
+// ---------------------------------------------------------------------------
+// High-level setup/teardown helpers to reduce boilerplate in spec files
+// ---------------------------------------------------------------------------
+
+export interface SetupBackendResult {
+  prepared: PreparedBackend
+  dbUrl: string
+}
+
+export interface SetupServerResult extends SetupBackendResult {
+  server: StartedServer
+}
+
+/**
+ * Prepare a backend and optionally push the Prisma schema to a DB schema.
+ * Use for specs that need the generated code + DB but no running server.
+ */
+export async function setupBackend(fixture: string, schema: string): Promise<SetupBackendResult> {
+  const { databaseUrl } = await import('./graphql-client.js')
+  const prepared = await prepareBackend(fixture)
+  const dbUrl = databaseUrl(schema)
+
+  runOrFail('prisma db push', 'npx prisma db push --force-reset --accept-data-loss', {
+    cwd: prepared.backDir,
+    timeout: 30000,
+    env: { ...process.env, DATABASE_MAIN_WRITE_URI: dbUrl },
+  })
+
+  return { prepared, dbUrl }
+}
+
+/**
+ * Prepare a backend, push schema, and start the GraphQL server.
+ * Use for specs that test the running API.
+ */
+export async function setupServer(fixture: string, schema: string): Promise<SetupServerResult> {
+  const result = await setupBackend(fixture, schema)
+  const server = await startServer(result.prepared.backDir, result.dbUrl)
+  return { ...result, server }
+}
+
+/** Teardown counterpart for setupServer */
+export async function teardownServer(ctx: Partial<SetupServerResult>): Promise<void> {
+  await stopServer(ctx.server)
+  cleanupPrepared(ctx.prepared)
+}
+
+/** Teardown counterpart for setupBackend */
+export function teardownBackend(ctx: Partial<SetupBackendResult>): void {
+  cleanupPrepared(ctx.prepared)
+}
 
 /** Run a shell command, throwing a descriptive error on failure. */
 export function runOrFail(

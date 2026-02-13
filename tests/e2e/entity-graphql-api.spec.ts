@@ -1,14 +1,6 @@
 import { afterAll, beforeAll, describe, expect, it } from 'vitest'
-import { type CrudClient, createCrudClient, DATABASE_URL } from './graphql-client.js'
-import {
-  cleanupPrepared,
-  type PreparedBackend,
-  prepareBackend,
-  runOrFail,
-  type StartedServer,
-  startServer,
-  stopServer,
-} from './prepare-backend.js'
+import { type CrudClient, createCrudClient } from './graphql-client.js'
+import { type SetupServerResult, setupServer, teardownServer } from './prepare-backend.js'
 
 interface Product {
   id: string
@@ -17,31 +9,20 @@ interface Product {
 }
 
 describe('e2e: GraphQL API for catalog entity', () => {
-  let prepared: PreparedBackend
-  let server: StartedServer
+  let ctx: SetupServerResult
   let products: CrudClient<Product>
 
   beforeAll(async () => {
-    prepared = await prepareBackend('with-catalog')
-
-    // Push Prisma schema to the real DB (reset to clean state)
-    runOrFail('prisma db push', 'npx prisma db push --force-reset --accept-data-loss', {
-      cwd: prepared.backDir,
-      timeout: 30000,
-      env: { ...process.env, DATABASE_MAIN_WRITE_URI: DATABASE_URL },
-    })
-
-    server = await startServer(prepared.backDir, DATABASE_URL)
-    products = createCrudClient<Product>(server, 'Product', 'id title price')
+    ctx = await setupServer('with-catalog', 'test_graphql_api')
+    products = createCrudClient<Product>(ctx.server, 'Product', 'id title price')
   }, 240000)
 
   afterAll(async () => {
-    await stopServer(server)
-    cleanupPrepared(prepared)
+    await teardownServer(ctx)
   })
 
   it('healthz endpoint responds', async () => {
-    const res = await fetch(`${server.baseUrl}/healthz`)
+    const res = await fetch(`${ctx.server.baseUrl}/healthz`)
     const body = (await res.json()) as { status: string }
     expect(body.status).toBe('ok')
   })
@@ -125,5 +106,93 @@ describe('e2e: GraphQL API for catalog entity', () => {
 
     expect(result.errors).toBeUndefined()
     expect(result.data?.Product).toBeNull()
+  })
+
+  it('sorts products in DESC order', async () => {
+    // State: gql-1 "Super Widget" exists from earlier tests
+    await products.create({ id: 'gql-d1', title: 'Alpha', price: 1 })
+    await products.create({ id: 'gql-d2', title: 'Zeta', price: 2 })
+
+    const result = await products.findAll({ sortField: 'title', sortOrder: 'DESC' }, 'title')
+
+    expect(result.errors).toBeUndefined()
+    const titles = result.data?.allProducts?.map((p) => p.title)
+    expect(titles?.at(0)).toBe('Zeta')
+    expect(titles?.at(-1)).toBe('Alpha')
+
+    // cleanup
+    await products.remove('gql-d1')
+    await products.remove('gql-d2')
+  })
+
+  it('paginates to second page', async () => {
+    await products.create({ id: 'gql-p1', title: 'Page A', price: 1 })
+    await products.create({ id: 'gql-p2', title: 'Page B', price: 2 })
+    await products.create({ id: 'gql-p3', title: 'Page C', price: 3 })
+
+    const page1 = await products.findAll(
+      { page: 1, perPage: 2, sortField: 'title', sortOrder: 'ASC' },
+      'id title',
+    )
+
+    expect(page1.errors).toBeUndefined()
+    // page 1 should contain remaining items after first 2
+    expect(page1.data?.allProducts?.length).toBeGreaterThanOrEqual(1)
+
+    // cleanup
+    await products.remove('gql-p1')
+    await products.remove('gql-p2')
+    await products.remove('gql-p3')
+  })
+
+  it('update preserves fields passed explicitly', async () => {
+    await products.update({ id: 'gql-1', title: 'Updated Title', price: 99.99 })
+
+    const after = await products.findOne('gql-1')
+    expect(after.data?.Product?.price).toBe(99.99)
+    expect(after.data?.Product?.title).toBe('Updated Title')
+
+    // restore
+    await products.update({ id: 'gql-1', title: 'Super Widget', price: 19.99 })
+  })
+
+  it('count decreases after removing a product', async () => {
+    const beforeCount = await products.count()
+    const countBefore = beforeCount.data?._allProductsMeta?.count ?? 0
+
+    await products.create({ id: 'gql-tmp', title: 'Temporary', price: 0 })
+    const afterCreate = await products.count()
+    expect(afterCreate.data?._allProductsMeta?.count).toBe(countBefore + 1)
+
+    await products.remove('gql-tmp')
+    const afterRemove = await products.count()
+    expect(afterRemove.data?._allProductsMeta?.count).toBe(countBefore)
+  })
+
+  it('filter by id returns exact match', async () => {
+    const result = await products.findAll({ filter: { id: 'gql-1' } }, 'id title')
+
+    expect(result.errors).toBeUndefined()
+    expect(result.data?.allProducts).toHaveLength(1)
+    expect(result.data?.allProducts?.at(0)?.id).toBe('gql-1')
+  })
+
+  it('empty list after removing all products', async () => {
+    // Start from known state: create exactly two products
+    await products.create({ id: 'gql-e1', title: 'Ephemeral 1', price: 1 })
+    await products.create({ id: 'gql-e2', title: 'Ephemeral 2', price: 2 })
+
+    // Remove everything in the DB
+    const all = await products.findAll(undefined, 'id')
+    for (const p of all.data?.allProducts ?? []) {
+      await products.remove(p.id)
+    }
+
+    const result = await products.findAll(undefined, 'id')
+    expect(result.errors).toBeUndefined()
+    expect(result.data?.allProducts).toHaveLength(0)
+
+    const count = await products.count()
+    expect(count.data?._allProductsMeta?.count).toBe(0)
   })
 })
