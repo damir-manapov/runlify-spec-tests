@@ -22,7 +22,8 @@ runlify-spec-tests/
 │   └── runner/            # Test runner utilities for invoking implementations
 ├── tests/
 │   ├── init/              # Tests for `runlify init` command
-│   └── fixtures/          # Test fixtures and expected outputs
+│   ├── regen/             # Tests for `runlify regen` command
+│   └── fixtures/          # Test fixtures (minimal metadata, options)
 ├── compose/               # Docker Compose for e2e tests (Postgres)
 ├── all-checks.sh          # Run check + health
 ├── check.sh               # Lint, typecheck, tests

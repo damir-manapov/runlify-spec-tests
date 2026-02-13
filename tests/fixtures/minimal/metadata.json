@@ -1,0 +1,33 @@
+{
+  "name": "test",
+  "prefix": "tst",
+  "catalogs": [],
+  "documents": [],
+  "infoRegistries": [],
+  "sumRegistries": [],
+  "languages": [{ "name": "en", "label": "English" }],
+  "defaultLanguage": "en",
+  "roles": [],
+  "menuItems": [],
+  "pages": [],
+  "generalModels": [],
+  "inputModels": [],
+  "outputModels": [],
+  "methods": [],
+  "labels": [],
+  "additionalServices": [],
+  "reports": [],
+  "telegramBots": [],
+  "deployEnvironments": [],
+  "commands": [],
+  "glossary": [],
+  "restApis": [],
+  "integrationClients": [],
+  "workers": [],
+  "configVars": [],
+  "back": {
+    "replicas": 1,
+    "requests": { "memory": "128Mi", "cpu": "100m", "maxOldSpaceSize": 128 },
+    "limits": { "memory": "256Mi", "cpu": "200m", "maxOldSpaceSize": 256 }
+  }
+}
