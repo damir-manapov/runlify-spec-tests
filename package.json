@@ -1,0 +1,25 @@
+{
+  "name": "runlify-spec-tests",
+  "version": "0.0.1",
+  "description": "Conformance test suite for runlify implementations across different languages",
+  "author": "Damir Manapov",
+  "license": "MIT",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "lint": "biome check --write .",
+    "typecheck": "tsc --noEmit",
+    "test": "vitest",
+    "test:run": "vitest run",
+    "test:coverage": "vitest run --coverage",
+    "check": "./check.sh",
+    "health": "./health.sh",
+    "all-checks": "./all-checks.sh"
+  },
+  "devDependencies": {
+    "@biomejs/biome": "^2.0.0",
+    "@types/node": "^22.13.4",
+    "typescript": "^5.7.3",
+    "vitest": "^3.0.5"
+  }
+}
