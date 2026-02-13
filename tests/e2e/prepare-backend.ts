@@ -60,7 +60,6 @@ export async function prepareBackend(fixture = 'minimal'): Promise<PreparedBacke
   // - types/Entity.ts: provides minimal Entity enum
   // - adm/services/types.ts: provides ServiceConfig + Context
   // - adm/services/context.ts: creates real PrismaClient context
-  // - generated/graphql.ts: provides ListMetadata + base types
   // - test-server.ts: starts Apollo GraphQL server
   const forceOverwriteFiles = [
     'src/tracing.ts',
@@ -70,7 +69,6 @@ export async function prepareBackend(fixture = 'minimal'): Promise<PreparedBacke
     'src/types/Entity.ts',
     'src/adm/services/types.ts',
     'src/adm/services/context.ts',
-    'src/generated/graphql.ts',
     'src/test-server.ts',
     'src/init/common/initEntities.ts',
   ]
@@ -96,6 +94,13 @@ export async function prepareBackend(fixture = 'minimal'): Promise<PreparedBacke
     stdio: 'pipe',
     timeout: 30000,
     env: { ...process.env, DATABASE_MAIN_WRITE_URI: 'postgresql://localhost:5432/test' },
+  })
+
+  // Generate GraphQL types via codegen (reads schema from graph/, writes to generated/graphql.ts)
+  execSync('npx tsx src/gen/genGQSchemes.ts', {
+    cwd: backDir,
+    stdio: 'pipe',
+    timeout: 30000,
   })
 
   return { parentDir, backDir }
