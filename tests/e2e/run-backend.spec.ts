@@ -1,4 +1,5 @@
 import { afterAll, beforeAll, describe, expect, it } from 'vitest'
+import { DATABASE_URL } from './graphql-client.js'
 import {
   cleanupPrepared,
   type PreparedBackend,
@@ -8,8 +9,6 @@ import {
   startServer,
   stopServer,
 } from './prepare-backend.js'
-
-const DATABASE_URL = 'postgresql://test:test@localhost:5432/test'
 
 describe('e2e: generated backend runs', () => {
   let prepared: PreparedBackend

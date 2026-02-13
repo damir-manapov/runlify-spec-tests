@@ -21,10 +21,18 @@ export interface StartedServer {
  * Generate a backend with --back-only, overlay scaffold stubs,
  * install dependencies and generate Prisma client.
  *
+ * Results are cached by fixture name so the expensive regen + npm install
+ * only runs once per fixture across all spec files in the same worker.
+ *
  * @param fixture - Name of the fixture directory under tests/fixtures/ (default: 'minimal')
  * Returns paths to the created directories for cleanup.
  */
+const prepareCache = new Map<string, PreparedBackend>()
+
 export async function prepareBackend(fixture = 'minimal'): Promise<PreparedBackend> {
+  const cached = prepareCache.get(fixture)
+  if (cached) return cached
+
   assertRunlifyAvailable()
 
   const fixturesDir = path.join(fixturesBaseDir, fixture)
@@ -103,7 +111,9 @@ export async function prepareBackend(fixture = 'minimal'): Promise<PreparedBacke
     timeout: 30000,
   })
 
-  return { parentDir, backDir }
+  const prepared: PreparedBackend = { parentDir, backDir }
+  prepareCache.set(fixture, prepared)
+  return prepared
 }
 
 /** Start the test server via tsx, return the process and the port it listens on. */
@@ -170,10 +180,31 @@ export async function stopServer(server: StartedServer | undefined): Promise<voi
   })
 }
 
-/** Remove the temp directory created by prepareBackend. */
+/**
+ * Remove the temp directory created by prepareBackend.
+ *
+ * When the backend is cached (shared across spec files) this is a no-op —
+ * cleanup happens via cleanupAllPrepared after all suites finish.
+ */
 export function cleanupPrepared(prepared: PreparedBackend | undefined): void {
-  if (prepared?.parentDir) fs.rmSync(prepared.parentDir, { recursive: true, force: true })
+  if (!prepared?.parentDir) return
+  // Skip if this is a cached (shared) backend — cleaned up by cleanupAllPrepared
+  for (const cached of prepareCache.values()) {
+    if (cached.parentDir === prepared.parentDir) return
+  }
+  fs.rmSync(prepared.parentDir, { recursive: true, force: true })
 }
+
+/** Remove all cached prepared backends. Called at process exit. */
+export function cleanupAllPrepared(): void {
+  for (const prepared of prepareCache.values()) {
+    fs.rmSync(prepared.parentDir, { recursive: true, force: true })
+  }
+  prepareCache.clear()
+}
+
+// Auto-cleanup cached backends when the process exits
+process.on('exit', cleanupAllPrepared)
 
 /** Run a shell command, throwing a descriptive error on failure. */
 export function runOrFail(

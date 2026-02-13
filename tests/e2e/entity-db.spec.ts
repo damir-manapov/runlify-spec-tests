@@ -2,14 +2,13 @@ import { execSync } from 'node:child_process'
 import fs from 'node:fs'
 import path from 'node:path'
 import { afterAll, beforeAll, describe, expect, it } from 'vitest'
+import { DATABASE_URL } from './graphql-client.js'
 import {
   cleanupPrepared,
   type PreparedBackend,
   prepareBackend,
   runOrFail,
 } from './prepare-backend.js'
-
-const DATABASE_URL = 'postgresql://test:test@localhost:5432/test'
 
 /**
  * Run a small JS snippet inside the generated backend
