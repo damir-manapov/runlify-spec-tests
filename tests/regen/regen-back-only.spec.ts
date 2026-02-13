@@ -56,7 +56,6 @@ describe('runlify regen --back-only', () => {
   it('should not generate UI source files', async () => {
     await runRunlify(['regen', '--back-only'], testDir)
 
-    expect(fs.existsSync(path.join(uiDir, 'src'))).toBe(false)
-    expect(fs.existsSync(path.join(uiDir, 'chart'))).toBe(false)
+    expect(fs.existsSync(uiDir)).toBe(false)
   })
 })
