@@ -2,6 +2,17 @@ declare module 'apollo-server' {
   export function gql(strings: TemplateStringsArray, ...args: unknown[]): unknown
 }
 
+declare module 'apollo-server-express' {
+  import type { Express } from 'express'
+  export class ApolloServer {
+    constructor(config: any)
+    start(): Promise<void>
+    stop(): Promise<void>
+    applyMiddleware(opts: { app: Express; path?: string }): void
+  }
+  export function gql(strings: TemplateStringsArray, ...args: unknown[]): unknown
+}
+
 declare module 'graphile-worker' {
   export interface WorkerUtils {
     release(): void

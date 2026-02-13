@@ -4,8 +4,7 @@ import os from 'node:os'
 import path from 'node:path'
 import { assertRunlifyAvailable, runRunlify } from '../../src/runner/index.js'
 
-const fixturesDir = path.resolve(import.meta.dirname, '../fixtures/minimal')
-const scaffoldDir = path.join(fixturesDir, 'scaffold')
+const fixturesBaseDir = path.resolve(import.meta.dirname, '../fixtures')
 
 export interface PreparedBackend {
   parentDir: string
@@ -22,10 +21,14 @@ export interface StartedServer {
  * Generate a backend with --back-only, overlay scaffold stubs,
  * install dependencies and generate Prisma client.
  *
+ * @param fixture - Name of the fixture directory under tests/fixtures/ (default: 'minimal')
  * Returns paths to the created directories for cleanup.
  */
-export async function prepareBackend(): Promise<PreparedBackend> {
+export async function prepareBackend(fixture = 'minimal'): Promise<PreparedBackend> {
   assertRunlifyAvailable()
+
+  const fixturesDir = path.join(fixturesBaseDir, fixture)
+  const scaffoldDir = path.join(fixturesBaseDir, 'minimal', 'scaffold')
 
   const parentDir = fs.mkdtempSync(path.join(os.tmpdir(), 'runlify-e2e-'))
   const workDir = path.join(parentDir, 'project')
@@ -53,10 +56,30 @@ export async function prepareBackend(): Promise<PreparedBackend> {
   // Force-overwrite specific generated files with stubs:
   // - tracing.ts: avoids heavy OpenTelemetry dependencies
   // - config/config.ts: adds infrastructure fields that getPrisma/getQueue expect
-  for (const rel of ['src/tracing.ts', 'src/config/config.ts']) {
+  // - config/index.ts: adds configUtils.getLog() stub
+  // - types/Entity.ts: provides minimal Entity enum
+  // - adm/services/types.ts: provides ServiceConfig + Context
+  // - adm/services/context.ts: creates real PrismaClient context
+  // - generated/graphql.ts: provides ListMetadata + base types
+  // - test-server.ts: starts Apollo GraphQL server
+  const forceOverwriteFiles = [
+    'src/tracing.ts',
+    'src/index.ts',
+    'src/config/config.ts',
+    'src/config/index.ts',
+    'src/types/Entity.ts',
+    'src/adm/services/types.ts',
+    'src/adm/services/context.ts',
+    'src/generated/graphql.ts',
+    'src/test-server.ts',
+    'src/init/common/initEntities.ts',
+  ]
+  for (const rel of forceOverwriteFiles) {
     const src = path.join(scaffoldDir, rel)
     if (fs.existsSync(src)) {
-      fs.copyFileSync(src, path.join(backDir, rel))
+      const dest = path.join(backDir, rel)
+      fs.mkdirSync(path.dirname(dest), { recursive: true })
+      fs.copyFileSync(src, dest)
     }
   }
 
@@ -79,7 +102,7 @@ export async function prepareBackend(): Promise<PreparedBackend> {
 }
 
 /** Start the test server via tsx, return the process and the port it listens on. */
-export function startServer(cwd: string): Promise<StartedServer> {
+export function startServer(cwd: string, databaseUrl?: string): Promise<StartedServer> {
   return new Promise((resolve, reject) => {
     const timeout = setTimeout(() => {
       reject(new Error('Server did not start within 15s'))
@@ -88,7 +111,11 @@ export function startServer(cwd: string): Promise<StartedServer> {
     const proc = spawn('npx', ['tsx', 'src/test-server.ts'], {
       cwd,
       stdio: ['pipe', 'pipe', 'pipe'],
-      env: { ...process.env, NODE_ENV: 'test' },
+      env: {
+        ...process.env,
+        NODE_ENV: 'test',
+        ...(databaseUrl ? { DATABASE_MAIN_WRITE_URI: databaseUrl } : {}),
+      },
     })
 
     let stderr = ''

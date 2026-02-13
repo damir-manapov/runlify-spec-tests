@@ -3,19 +3,29 @@ import {
   cleanupPrepared,
   type PreparedBackend,
   prepareBackend,
+  runOrFail,
   type StartedServer,
   startServer,
   stopServer,
 } from './prepare-backend.js'
+
+const DATABASE_URL = 'postgresql://test:test@localhost:5432/test'
 
 describe('e2e: generated backend runs', () => {
   let prepared: PreparedBackend
   let server: StartedServer
 
   beforeAll(async () => {
-    prepared = await prepareBackend()
-    server = await startServer(prepared.backDir)
-  }, 180000)
+    prepared = await prepareBackend('with-catalog')
+
+    runOrFail('prisma db push', 'npx prisma db push --force-reset --accept-data-loss', {
+      cwd: prepared.backDir,
+      timeout: 30000,
+      env: { ...process.env, DATABASE_MAIN_WRITE_URI: DATABASE_URL },
+    })
+
+    server = await startServer(prepared.backDir, DATABASE_URL)
+  }, 240000)
 
   afterAll(async () => {
     await stopServer(server)

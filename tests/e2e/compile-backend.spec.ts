@@ -12,7 +12,7 @@ describe('e2e: generated backend compiles', () => {
   let prepared: PreparedBackend
 
   beforeAll(async () => {
-    prepared = await prepareBackend()
+    prepared = await prepareBackend('with-catalog')
   }, 180000)
 
   afterAll(() => {

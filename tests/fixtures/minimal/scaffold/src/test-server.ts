@@ -1,32 +1,53 @@
 /**
- * Minimal test entry point for the generated backend.
- * Starts Express with the generated restRouter on a random port
- * and outputs { port } to stdout so the test runner can connect.
+ * Test entry point — starts Express with Apollo GraphQL server.
+ * Outputs { port } to stdout so the test runner can connect.
  */
 import express from 'express';
+import {ApolloServer} from 'apollo-server-express';
+import getSchema from './graph/schema';
+import {createContext} from './adm/services/context';
 import restRouter from './rest/restRouter';
 
-const app = express();
+const start = async () => {
+  const app = express();
 
-app.get('/healthz', (_req, res) => {
-  res.json({ status: 'ok' });
-});
+  app.get('/healthz', (_req, res) => {
+    res.json({status: 'ok'});
+  });
 
-app.use('/api', restRouter);
+  app.use('/api', restRouter);
 
-const server = app.listen(0, () => {
-  const addr = server.address();
-  if (addr && typeof addr === 'object') {
-    // The test runner reads this line to discover the port
-    console.log(JSON.stringify({ port: addr.port }));
-  }
-});
+  const context = await createContext();
+  const schema = await getSchema();
 
-const shutdown = () => {
-  server.close(() => process.exit(0));
-  // Force exit after 3s if connections hang
-  setTimeout(() => process.exit(1), 3000).unref();
+  const apolloServer = new ApolloServer({
+    schema,
+    context: () => ({context}),
+    introspection: true,
+  });
+
+  await apolloServer.start();
+  apolloServer.applyMiddleware({app, path: '/graphql'});
+
+  const server = app.listen(0, () => {
+    const addr = server.address();
+    if (addr && typeof addr === 'object') {
+      console.log(JSON.stringify({port: addr.port}));
+    }
+  });
+
+  const shutdown = async () => {
+    await apolloServer.stop();
+    await context.close();
+    server.close(() => process.exit(0));
+    setTimeout(() => process.exit(1), 3000).unref();
+  };
+
+  process.on('SIGTERM', shutdown);
+  process.on('SIGINT', shutdown);
 };
 
-process.on('SIGTERM', shutdown);
-process.on('SIGINT', shutdown);
+start().catch((err) => {
+  console.error('Failed to start server:', err);
+  process.exit(1);
+});
