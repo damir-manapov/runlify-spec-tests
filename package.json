@@ -11,7 +11,13 @@
     "typecheck": "tsc --noEmit",
     "test": "vitest",
     "test:run": "vitest run",
+    "test:e2e": "vitest run --config vitest.e2e.config.ts",
     "test:coverage": "vitest run --coverage",
+    "compose:pull": "docker compose -f compose/docker-compose.yml pull",
+    "compose:up": "docker compose -f compose/docker-compose.yml up -d --wait",
+    "compose:down": "docker compose -f compose/docker-compose.yml down",
+    "compose:restart": "pnpm compose:down && pnpm compose:up",
+    "compose:reset": "docker compose -f compose/docker-compose.yml down -v --remove-orphans",
     "check": "./check.sh",
     "health": "./health.sh",
     "all-checks": "./all-checks.sh"
