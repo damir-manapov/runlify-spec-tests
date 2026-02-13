@@ -69,18 +69,137 @@ async function doPrepare(fixture: string): Promise<PreparedBackend> {
     throw new Error(`Expected ${backDir} to exist after regen`)
   }
 
-  // Overlay scaffold stubs (don't overwrite generated files)
+  overlayScaffold(scaffoldDir, backDir)
+  installAndGenerate(backDir)
+
+  const prepared: PreparedBackend = { parentDir, backDir }
+  return prepared
+}
+
+// ---------------------------------------------------------------------------
+// Fresh (uncached) prepare + re-regen for schema-change tests
+// ---------------------------------------------------------------------------
+
+export interface FreshBackend extends PreparedBackend {
+  /** The project dir containing src/meta/metadata.json — mutate this for schema changes */
+  workDir: string
+}
+
+/**
+ * Like prepareBackend but always creates a new temp dir (no cache).
+ * Returns the workDir so callers can mutate metadata.json and re-regen.
+ */
+export async function prepareBackendFresh(fixture: string): Promise<FreshBackend> {
+  assertRunlifyAvailable()
+
+  const fixturesDir = path.join(fixturesBaseDir, fixture)
+  const scaffoldDir = path.join(fixturesBaseDir, 'scaffold')
+
+  const parentDir = fs.mkdtempSync(path.join(os.tmpdir(), 'runlify-e2e-'))
+  const workDir = path.join(parentDir, 'project')
+  fs.mkdirSync(workDir)
+
+  const metaDir = path.join(workDir, 'src', 'meta')
+  fs.mkdirSync(metaDir, { recursive: true })
+  fs.copyFileSync(path.join(fixturesDir, 'metadata.json'), path.join(metaDir, 'metadata.json'))
+  fs.copyFileSync(path.join(fixturesDir, 'options.json'), path.join(metaDir, 'options.json'))
+  fs.writeFileSync(path.join(workDir, '.gitignore'), '')
+
+  const result = await runRunlify(['regen', '--back-only'], workDir)
+  if (result.exitCode !== 0) {
+    throw new Error(`runlify regen failed (exit ${result.exitCode}):\n${result.stderr}`)
+  }
+
+  const backDir = path.join(parentDir, 'test-back')
+  if (!fs.existsSync(backDir)) {
+    throw new Error(`Expected ${backDir} to exist after regen`)
+  }
+
+  overlayScaffold(scaffoldDir, backDir)
+  installAndGenerate(backDir)
+
+  return { parentDir, backDir, workDir }
+}
+
+/**
+ * Re-run runlify regen + prisma generate + genGQSchemes on an already-prepared
+ * fresh backend. Call after mutating metadata.json in workDir.
+ */
+export async function regenBackend(fresh: FreshBackend): Promise<void> {
+  const scaffoldDir = path.join(fixturesBaseDir, 'scaffold')
+
+  const result = await runRunlify(['regen', '--back-only'], fresh.workDir)
+  if (result.exitCode !== 0) {
+    throw new Error(`runlify regen failed (exit ${result.exitCode}):\n${result.stderr}`)
+  }
+
+  overlayScaffold(scaffoldDir, fresh.backDir)
+  patchEntityEnum(fresh)
+
+  execSync('npx prisma generate', {
+    cwd: fresh.backDir,
+    stdio: 'pipe',
+    timeout: 30000,
+    env: { ...process.env, DATABASE_MAIN_WRITE_URI: 'postgresql://localhost:5432/test' },
+  })
+  execSync('npx tsx src/gen/genGQSchemes.ts', {
+    cwd: fresh.backDir,
+    stdio: 'pipe',
+    timeout: 30000,
+  })
+}
+
+/** Clean up a fresh (uncached) backend — always removes the temp dir. */
+export function cleanupFresh(fresh: FreshBackend | undefined): void {
+  if (!fresh?.parentDir) return
+  fs.rmSync(fresh.parentDir, { recursive: true, force: true })
+}
+
+/**
+ * Patch Entity.ts enum so it includes every entity from metadata.json.
+ * The scaffold stub has a fixed set of names; after adding a new entity via
+ * schema mutation the generated service references Entity.<Name> which must
+ * exist in the enum.
+ */
+function patchEntityEnum(fresh: FreshBackend): void {
+  const metaPath = path.join(fresh.workDir, 'src/meta/metadata.json')
+  const metadata = JSON.parse(fs.readFileSync(metaPath, 'utf-8'))
+
+  const names = new Set<string>()
+  for (const c of (metadata.catalogs ?? []) as { title: { en: { singular: string } } }[]) {
+    names.add(c.title.en.singular)
+  }
+  for (const d of (metadata.documents ?? []) as { title: { en: { singular: string } } }[]) {
+    names.add(d.title.en.singular)
+  }
+
+  // Merge with the hardcoded scaffold entities so existing fixtures keep working
+  for (const n of [
+    'Article',
+    'Category',
+    'Counter',
+    'Entry',
+    'Item',
+    'Order',
+    'Product',
+    'Ticket',
+  ]) {
+    names.add(n)
+  }
+
+  const sorted = [...names].sort()
+  const entries = sorted.map((n) => `  ${n} = '${n.toLowerCase()}'`).join(',\n')
+  const content = `/* Auto-patched Entity enum */\nenum Entity {\n${entries},\n}\n\nexport default Entity;\n`
+
+  const entityPath = path.join(fresh.backDir, 'src/types/Entity.ts')
+  fs.mkdirSync(path.dirname(entityPath), { recursive: true })
+  fs.writeFileSync(entityPath, content)
+}
+
+/** Overlay scaffold stubs and force-overwrite key files. */
+function overlayScaffold(scaffoldDir: string, backDir: string): void {
   copyDirRecursive(scaffoldDir, backDir, false)
 
-  // Force-overwrite specific generated files with stubs:
-  // - tracing.ts: avoids heavy OpenTelemetry dependencies
-  // - config/config.ts: adds infrastructure fields that getPrisma/getQueue expect
-  // - config/index.ts: adds configUtils.getLog() stub
-  // - types/Entity.ts: provides minimal Entity enum
-  // - adm/services/types.ts: provides ServiceConfig + DocumentConfig + Context
-  // - adm/services/context.ts: creates real PrismaClient context
-  // - adm/services/utils/class/DocumentBaseService.ts: abstract base for document entities
-  // - test-server.ts: starts Apollo GraphQL server
   const forceOverwriteFiles = [
     'src/tracing.ts',
     'src/index.ts',
@@ -101,31 +220,18 @@ async function doPrepare(fixture: string): Promise<PreparedBackend> {
       fs.copyFileSync(src, dest)
     }
   }
+}
 
-  // Install dependencies
-  execSync('npm install --ignore-scripts', {
-    cwd: backDir,
-    stdio: 'pipe',
-    timeout: 120000,
-  })
-
-  // Generate Prisma client
+/** Install deps + generate Prisma client + generate GQL schemes. */
+function installAndGenerate(backDir: string): void {
+  execSync('npm install --ignore-scripts', { cwd: backDir, stdio: 'pipe', timeout: 120000 })
   execSync('npx prisma generate', {
     cwd: backDir,
     stdio: 'pipe',
     timeout: 30000,
     env: { ...process.env, DATABASE_MAIN_WRITE_URI: 'postgresql://localhost:5432/test' },
   })
-
-  // Generate GraphQL types via codegen (reads schema from graph/, writes to generated/graphql.ts)
-  execSync('npx tsx src/gen/genGQSchemes.ts', {
-    cwd: backDir,
-    stdio: 'pipe',
-    timeout: 30000,
-  })
-
-  const prepared: PreparedBackend = { parentDir, backDir }
-  return prepared
+  execSync('npx tsx src/gen/genGQSchemes.ts', { cwd: backDir, stdio: 'pipe', timeout: 30000 })
 }
 
 /** Start the test server via tsx, return the process and the port it listens on. */
