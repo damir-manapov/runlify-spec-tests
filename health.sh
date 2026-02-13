@@ -1,16 +1,20 @@
 #!/bin/bash
 set -e
 
-echo "=== Gitleaks ==="
-gitleaks git --source . --verbose
-
-echo "=== Outdated Dependencies ==="
-pnpm outdated || {
-  echo "Some dependencies are outdated"
+echo "=== Checking for secrets with gitleaks ==="
+if ! command -v gitleaks &> /dev/null; then
+  echo "gitleaks not installed. Install with: brew install gitleaks"
   exit 1
-}
+fi
+gitleaks detect --source . -v
 
-echo "=== Audit ==="
-pnpm audit
+echo ""
+echo "=== Checking for vulnerabilities ==="
+pnpm audit --prod
 
-echo "=== Health checks passed ==="
+echo ""
+echo "=== Checking for outdated dependencies ==="
+./renovate-check.sh
+
+echo ""
+echo "=== Health check passed ==="

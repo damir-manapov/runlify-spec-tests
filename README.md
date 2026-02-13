@@ -24,6 +24,8 @@ runlify-spec-tests/
 │   ├── init/            # Tests for `runlify init` command
 │   └── fixtures/        # Test fixtures and expected outputs
 ├── compose/             # Docker Compose for e2e tests (Postgres)
+├── renovate.json        # Renovate config for dependency updates
+├── renovate-check.sh    # Local Renovate outdated check
 ```
 
 ## Usage
