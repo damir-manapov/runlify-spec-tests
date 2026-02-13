@@ -23,6 +23,7 @@ runlify-spec-tests/
 ├── tests/
 │   ├── init/            # Tests for `runlify init` command
 │   └── fixtures/        # Test fixtures and expected outputs
+├── compose/             # Docker Compose for e2e tests (Postgres)
 ```
 
 ## Usage
@@ -45,6 +46,11 @@ RUNLIFY_IMPL=go pnpm test
 pnpm check       # Lint, typecheck, test
 pnpm health      # Security and dependency checks
 pnpm all-checks  # Run all checks
+
+# Docker Compose (for future e2e tests)
+pnpm compose:up      # Start Postgres
+pnpm compose:down    # Stop containers
+pnpm compose:reset   # Stop and remove volumes
 ```
 
 ## Adding Tests
