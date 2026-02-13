@@ -28,7 +28,7 @@ export async function prepareBackend(fixture = 'minimal'): Promise<PreparedBacke
   assertRunlifyAvailable()
 
   const fixturesDir = path.join(fixturesBaseDir, fixture)
-  const scaffoldDir = path.join(fixturesBaseDir, 'minimal', 'scaffold')
+  const scaffoldDir = path.join(fixturesBaseDir, 'scaffold')
 
   const parentDir = fs.mkdtempSync(path.join(os.tmpdir(), 'runlify-e2e-'))
   const workDir = path.join(parentDir, 'project')

@@ -37,8 +37,8 @@ runlify-spec-tests/
 │   │   ├── entity-graphql-api.spec.ts # GraphQL CRUD against running Apollo
 │   │   └── entity-db.spec.ts          # Direct Prisma DB operations
 │   └── fixtures/
-│       ├── minimal/       # Empty project (no entities), with scaffold/
-│       │   └── scaffold/  # Base service classes, Apollo server, codegen
+│       ├── scaffold/      # Common base: service classes, Apollo server, codegen
+│       ├── minimal/       # Empty project (no entities)
 │       └── with-catalog/  # Products entity for GraphQL e2e tests
 ├── compose/               # Docker Compose for e2e tests (Postgres)
 ├── all-checks.sh          # Run check + health
