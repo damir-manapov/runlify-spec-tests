@@ -1,0 +1,5 @@
+{
+  "projectPrefix": "test",
+  "projectName": "test",
+  "graphGeneratorCommand": "echo skip"
+}
