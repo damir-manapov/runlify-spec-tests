@@ -6,7 +6,7 @@
     "useIgnoreFile": true
   },
   "files": {
-    "includes": ["**/*.ts", "**/*.json", "**/*.md"]
+    "includes": ["**/*.ts", "**/*.json", "**/*.md", "!tests/fixtures/**/scaffold"]
   },
   "formatter": {
     "enabled": true,

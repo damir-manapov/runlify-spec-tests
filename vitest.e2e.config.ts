@@ -3,8 +3,7 @@ import { defineConfig } from 'vitest/config'
 export default defineConfig({
   test: {
     globals: true,
-    include: ['tests/**/*.spec.ts'],
-    exclude: ['tests/e2e/**'],
-    testTimeout: 30000,
+    include: ['tests/e2e/**/*.spec.ts'],
+    testTimeout: 120000,
   },
 })

@@ -1,0 +1,17 @@
+{
+  "name": "test-back-scaffold",
+  "private": true,
+  "dependencies": {
+    "express": "^4.21.0",
+    "express-rate-limit": "^7.5.0",
+    "ramda": "^0.30.0"
+  },
+  "devDependencies": {
+    "@types/express": "^5.0.0",
+    "@types/node": "^22.0.0",
+    "@types/ramda": "^0.30.0",
+    "prisma": "^6.9.0",
+    "@prisma/client": "^6.9.0",
+    "typescript": "^5.7.0"
+  }
+}
