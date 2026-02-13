@@ -61,10 +61,10 @@ export interface FindAllOptions {
 
 export interface CrudClient<T> {
   create(data: Record<string, unknown>, fields?: string): Promise<GqlResponse<{ [k: string]: T }>>
-  findOne(id: string, fields?: string): Promise<GqlResponse<{ [k: string]: T | null }>>
+  findOne(id: string | number, fields?: string): Promise<GqlResponse<{ [k: string]: T | null }>>
   findAll(opts?: FindAllOptions, fields?: string): Promise<GqlResponse<{ [k: string]: T[] }>>
   update(data: Record<string, unknown>, fields?: string): Promise<GqlResponse<{ [k: string]: T }>>
-  remove(id: string, fields?: string): Promise<GqlResponse<{ [k: string]: T }>>
+  remove(id: string | number, fields?: string): Promise<GqlResponse<{ [k: string]: T }>>
   count(): Promise<GqlResponse<{ [k: string]: { count: number } }>>
 }
 
@@ -86,7 +86,10 @@ export function createCrudClient<T>(
   server: StartedServer,
   entity: string,
   defaultFields: string,
+  /** Override the plural form used in allXxx / _allXxxMeta queries (default: entity + 's') */
+  plural?: string,
 ): CrudClient<T> {
+  const p = plural ?? `${entity}s`
   return {
     create(data, fields = defaultFields) {
       return gql(server, `mutation { create${entity}${buildArgs(data)} { ${fields} } }`)
@@ -97,7 +100,7 @@ export function createCrudClient<T>(
     },
 
     findAll(opts, fields = defaultFields) {
-      return gql(server, `query { all${entity}s${buildArgs(opts)} { ${fields} } }`)
+      return gql(server, `query { all${p}${buildArgs(opts)} { ${fields} } }`)
     },
 
     update(data, fields = defaultFields) {
@@ -109,7 +112,7 @@ export function createCrudClient<T>(
     },
 
     count() {
-      return gql(server, `query { _all${entity}sMeta { count } }`)
+      return gql(server, `query { _all${p}Meta { count } }`)
     },
   }
 }

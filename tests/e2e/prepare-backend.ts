@@ -77,8 +77,9 @@ async function doPrepare(fixture: string): Promise<PreparedBackend> {
   // - config/config.ts: adds infrastructure fields that getPrisma/getQueue expect
   // - config/index.ts: adds configUtils.getLog() stub
   // - types/Entity.ts: provides minimal Entity enum
-  // - adm/services/types.ts: provides ServiceConfig + Context
+  // - adm/services/types.ts: provides ServiceConfig + DocumentConfig + Context
   // - adm/services/context.ts: creates real PrismaClient context
+  // - adm/services/utils/class/DocumentBaseService.ts: abstract base for document entities
   // - test-server.ts: starts Apollo GraphQL server
   const forceOverwriteFiles = [
     'src/tracing.ts',
@@ -88,6 +89,7 @@ async function doPrepare(fixture: string): Promise<PreparedBackend> {
     'src/types/Entity.ts',
     'src/adm/services/types.ts',
     'src/adm/services/context.ts',
+    'src/adm/services/utils/class/DocumentBaseService.ts',
     'src/test-server.ts',
     'src/init/common/initEntities.ts',
   ]

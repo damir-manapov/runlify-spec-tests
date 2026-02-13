@@ -30,6 +30,12 @@ export interface ServiceConfig {
   auditableOnlyByUser?: boolean
 }
 
+export interface DocumentConfig extends ServiceConfig {
+  registries: string[]
+  registrarDependedRegistries: string[]
+  externalSearchDeps?: Partial<Record<string, string>>
+}
+
 export type BaseServiceConstrictors = {
   [K in keyof BaseServices]: (ctx: Context) => BaseServices[K]
 }
