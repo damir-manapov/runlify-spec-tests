@@ -64,7 +64,7 @@ describe('e2e: auto-generated string id entity (with-auto-string-id)', () => {
     )
     const createMatch = typeDefs.match(/createTicket\(([^)]+)\)/s)
     expect(createMatch).toBeTruthy()
-    const createArgs = createMatch![1]
+    const createArgs = createMatch?.[1]
     expect(createArgs).not.toMatch(/\bid\s*:/)
   })
 

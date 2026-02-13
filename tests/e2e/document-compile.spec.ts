@@ -85,7 +85,7 @@ describe('e2e: document entity type (with-document)', () => {
     )
     const createMatch = typeDefs.match(/createOrder\(([^)]+)\)/s)
     expect(createMatch).toBeTruthy()
-    const createArgs = createMatch![1]
+    const createArgs = createMatch?.[1]
     expect(createArgs).toContain('date:')
   })
 

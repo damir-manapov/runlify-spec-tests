@@ -65,7 +65,7 @@ describe('e2e: manual int id entity (with-manual-int-id)', () => {
     )
     const createMatch = typeDefs.match(/createEntry\(([^)]+)\)/s)
     expect(createMatch).toBeTruthy()
-    const createArgs = createMatch![1]
+    const createArgs = createMatch?.[1]
     expect(createArgs).toMatch(/\bid\s*:\s*Int!/)
   })
 

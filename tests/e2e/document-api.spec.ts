@@ -32,7 +32,7 @@ describe('e2e: GraphQL API for document entity', () => {
   async function createOk(data: Record<string, unknown>): Promise<Order> {
     const r = await orders.create(data)
     expect(r.errors).toBeUndefined()
-    return r.data!.createOrder!
+    return r.data?.createOrder as Order
   }
 
   async function removeQuiet(id: string): Promise<void> {
@@ -93,7 +93,7 @@ describe('e2e: GraphQL API for document entity', () => {
       expect(r.errors).toBeUndefined()
 
       const check = await orders.findOne('ord-4')
-      expect(check.data!.Order).toBeNull()
+      expect(check.data?.Order).toBeNull()
     })
   })
 

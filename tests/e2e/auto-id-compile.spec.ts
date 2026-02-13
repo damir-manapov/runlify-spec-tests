@@ -74,7 +74,7 @@ describe('e2e: auto-generated int id entity (with-auto-id)', () => {
     // createItem should NOT have id as required arg
     const createMatch = typeDefs.match(/createItem\(([^)]+)\)/s)
     expect(createMatch).toBeTruthy()
-    const createArgs = createMatch![1]
+    const createArgs = createMatch?.[1]
     expect(createArgs).not.toMatch(/\bid\s*:\s*Int!/)
   })
 

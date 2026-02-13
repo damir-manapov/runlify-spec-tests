@@ -64,7 +64,7 @@ describe('e2e: auto-generated bigint id entity (with-bigint-id)', () => {
     )
     const createMatch = typeDefs.match(/createCounter\(([^)]+)\)/s)
     expect(createMatch).toBeTruthy()
-    const createArgs = createMatch![1]
+    const createArgs = createMatch?.[1]
     expect(createArgs).not.toMatch(/\bid\s*:\s*BigInt!/)
   })
 

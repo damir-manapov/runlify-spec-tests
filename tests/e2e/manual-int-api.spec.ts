@@ -13,12 +13,7 @@ describe('e2e: GraphQL API for manual int id entity', () => {
 
   beforeAll(async () => {
     ctx = await setupServer('with-manual-int-id', 'test_manual_int_api')
-    entries = createCrudClient<Entry>(
-      ctx.server,
-      'Entry',
-      'id label',
-      'Entries',
-    )
+    entries = createCrudClient<Entry>(ctx.server, 'Entry', 'id label', 'Entries')
   }, 240000)
 
   afterAll(async () => {
@@ -32,7 +27,7 @@ describe('e2e: GraphQL API for manual int id entity', () => {
   async function createOk(data: Record<string, unknown>): Promise<Entry> {
     const r = await entries.create(data)
     expect(r.errors).toBeUndefined()
-    return r.data!.createEntry!
+    return r.data?.createEntry as Entry
   }
 
   async function removeQuiet(id: number): Promise<void> {
@@ -88,7 +83,7 @@ describe('e2e: GraphQL API for manual int id entity', () => {
       expect(r.errors).toBeUndefined()
 
       const check = await entries.findOne(500)
-      expect(check.data!.Entry).toBeNull()
+      expect(check.data?.Entry).toBeNull()
     })
   })
 

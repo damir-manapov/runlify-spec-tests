@@ -35,13 +35,13 @@ describe('e2e: GraphQL API for linked entities', () => {
   async function createCategory(data: Record<string, unknown>): Promise<Category> {
     const r = await categories.create(data)
     expect(r.errors).toBeUndefined()
-    return r.data!.createCategory!
+    return r.data?.createCategory as Category
   }
 
   async function createArticle(data: Record<string, unknown>): Promise<Article> {
     const r = await articles.create(data)
     expect(r.errors).toBeUndefined()
-    return r.data!.createArticle!
+    return r.data?.createArticle as Article
   }
 
   async function cleanup(

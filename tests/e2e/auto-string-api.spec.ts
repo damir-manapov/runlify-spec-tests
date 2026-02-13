@@ -13,11 +13,7 @@ describe('e2e: GraphQL API for auto-generated string id entity (cuid)', () => {
 
   beforeAll(async () => {
     ctx = await setupServer('with-auto-string-id', 'test_auto_string_api')
-    tickets = createCrudClient<Ticket>(
-      ctx.server,
-      'Ticket',
-      'id subject',
-    )
+    tickets = createCrudClient<Ticket>(ctx.server, 'Ticket', 'id subject')
   }, 240000)
 
   afterAll(async () => {
@@ -31,7 +27,7 @@ describe('e2e: GraphQL API for auto-generated string id entity (cuid)', () => {
   async function createOk(data: Record<string, unknown>): Promise<Ticket> {
     const r = await tickets.create(data)
     expect(r.errors).toBeUndefined()
-    return r.data!.createTicket!
+    return r.data?.createTicket as Ticket
   }
 
   async function removeQuiet(id: string): Promise<void> {
@@ -103,7 +99,7 @@ describe('e2e: GraphQL API for auto-generated string id entity (cuid)', () => {
       expect(r.errors).toBeUndefined()
 
       const check = await tickets.findOne(created.id)
-      expect(check.data!.Ticket).toBeNull()
+      expect(check.data?.Ticket).toBeNull()
     })
   })
 

@@ -13,11 +13,7 @@ describe('e2e: GraphQL API for auto-generated bigint id entity', () => {
 
   beforeAll(async () => {
     ctx = await setupServer('with-bigint-id', 'test_bigint_api')
-    counters = createCrudClient<Counter>(
-      ctx.server,
-      'Counter',
-      'id label',
-    )
+    counters = createCrudClient<Counter>(ctx.server, 'Counter', 'id label')
   }, 240000)
 
   afterAll(async () => {
@@ -31,7 +27,7 @@ describe('e2e: GraphQL API for auto-generated bigint id entity', () => {
   async function createOk(data: Record<string, unknown>): Promise<Counter> {
     const r = await counters.create(data)
     expect(r.errors).toBeUndefined()
-    return r.data!.createCounter!
+    return r.data?.createCounter as Counter
   }
 
   async function removeQuiet(id: string): Promise<void> {
@@ -90,7 +86,7 @@ describe('e2e: GraphQL API for auto-generated bigint id entity', () => {
       expect(r.errors).toBeUndefined()
 
       const check = await counters.findOne(created.id)
-      expect(check.data!.Counter).toBeNull()
+      expect(check.data?.Counter).toBeNull()
     })
   })
 

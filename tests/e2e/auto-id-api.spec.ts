@@ -35,7 +35,7 @@ describe('e2e: GraphQL API for auto-generated int id entity', () => {
   async function createOk(data: Record<string, unknown>): Promise<Item> {
     const r = await items.create(data)
     expect(r.errors).toBeUndefined()
-    return r.data!.createItem!
+    return r.data?.createItem as Item
   }
 
   async function removeQuiet(id: number): Promise<void> {
@@ -96,7 +96,7 @@ describe('e2e: GraphQL API for auto-generated int id entity', () => {
       expect(r.errors).toBeUndefined()
 
       const check = await items.findOne(created.id)
-      expect(check.data!.Item).toBeNull()
+      expect(check.data?.Item).toBeNull()
     })
   })
 
