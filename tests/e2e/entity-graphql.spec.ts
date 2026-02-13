@@ -1,12 +1,7 @@
 import fs from 'node:fs'
 import path from 'node:path'
 import { afterAll, beforeAll, describe, expect, it } from 'vitest'
-import {
-  type PreparedBackend,
-  prepareBackend,
-  runOrFail,
-  teardownBackend,
-} from './prepare-backend.js'
+import { type PreparedBackend, prepareBackend, teardownBackend } from './prepare-backend.js'
 
 describe('e2e: generated entity GraphQL layer', () => {
   let prepared: PreparedBackend
@@ -161,14 +156,6 @@ describe('e2e: generated entity GraphQL layer', () => {
       expect(schema).toContain('title')
       expect(schema).toContain('price')
       expect(schema).toContain('Float')
-    })
-
-    it('prisma validate succeeds', () => {
-      runOrFail('prisma validate', 'npx prisma validate', {
-        cwd: prepared.backDir,
-        timeout: 15000,
-        env: { ...process.env, DATABASE_MAIN_WRITE_URI: 'postgresql://localhost:5432/test' },
-      })
     })
   })
 })

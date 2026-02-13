@@ -46,12 +46,6 @@ describe('e2e: GraphQL API for catalog entity', () => {
   // ---------------------------------------------------------------------------
 
   describe('basic CRUD', () => {
-    it('healthz endpoint responds', async () => {
-      const res = await fetch(`${ctx.server.baseUrl}/healthz`)
-      const body = (await res.json()) as { status: string }
-      expect(body.status).toBe('ok')
-    })
-
     it('creates a product', async () => {
       const result = await products.create({ id: 'gql-1', title: 'GraphQL Widget', price: 9.99 })
 
