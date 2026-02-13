@@ -1,13 +1,13 @@
 services:
   starter:
-    image: alpine:3.21
+    image: alpine:3.23
     command: echo "All services started"
     depends_on:
       postgres:
         condition: service_healthy
 
   postgres:
-    image: postgres:17.4-alpine
+    image: postgres:18.2-alpine
     environment:
       POSTGRES_USER: test
       POSTGRES_PASSWORD: test

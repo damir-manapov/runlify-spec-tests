@@ -19,13 +19,20 @@ npm i -g runlify
 ```
 runlify-spec-tests/
 ├── src/
-│   └── runner/          # Test runner utilities for invoking implementations
+│   └── runner/            # Test runner utilities for invoking implementations
 ├── tests/
-│   ├── init/            # Tests for `runlify init` command
-│   └── fixtures/        # Test fixtures and expected outputs
-├── compose/             # Docker Compose for e2e tests (Postgres)
-├── renovate.json        # Renovate config for dependency updates
-├── renovate-check.sh    # Local Renovate outdated check
+│   ├── init/              # Tests for `runlify init` command
+│   └── fixtures/          # Test fixtures and expected outputs
+├── compose/               # Docker Compose for e2e tests (Postgres)
+├── all-checks.sh          # Run check + health
+├── check.sh               # Lint, typecheck, tests
+├── health.sh              # Gitleaks, audit, renovate-check
+├── renovate-check.sh      # Local Renovate outdated check
+├── renovate.json          # Renovate config for dependency updates
+├── biome.json             # Linter & formatter config
+├── tsconfig.json          # TypeScript config
+├── vitest.config.ts       # Test runner config
+├── pnpm-workspace.yaml    # pnpm workspace config
 ```
 
 ## Usage
