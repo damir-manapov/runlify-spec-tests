@@ -1,4 +1,4 @@
-import { execSync } from 'node:child_process'
+import { type ChildProcess, execSync, spawn } from 'node:child_process'
 import fs from 'node:fs'
 import os from 'node:os'
 import path from 'node:path'
@@ -10,6 +10,12 @@ const scaffoldDir = path.join(fixturesDir, 'scaffold')
 export interface PreparedBackend {
   parentDir: string
   backDir: string
+}
+
+export interface StartedServer {
+  process: ChildProcess
+  port: number
+  baseUrl: string
 }
 
 /**
@@ -70,6 +76,87 @@ export async function prepareBackend(): Promise<PreparedBackend> {
   })
 
   return { parentDir, backDir }
+}
+
+/** Start the test server via tsx, return the process and the port it listens on. */
+export function startServer(cwd: string): Promise<StartedServer> {
+  return new Promise((resolve, reject) => {
+    const timeout = setTimeout(() => {
+      reject(new Error('Server did not start within 15s'))
+    }, 15000)
+
+    const proc = spawn('npx', ['tsx', 'src/test-server.ts'], {
+      cwd,
+      stdio: ['pipe', 'pipe', 'pipe'],
+      env: { ...process.env, NODE_ENV: 'test' },
+    })
+
+    let stderr = ''
+
+    proc.stdout?.on('data', (data: Buffer) => {
+      const line = data.toString().trim()
+      try {
+        const parsed = JSON.parse(line)
+        if (typeof parsed.port === 'number') {
+          clearTimeout(timeout)
+          resolve({
+            process: proc,
+            port: parsed.port,
+            baseUrl: `http://localhost:${parsed.port}`,
+          })
+        }
+      } catch {
+        // Not our JSON line, ignore
+      }
+    })
+
+    proc.stderr?.on('data', (data: Buffer) => {
+      stderr += data.toString()
+    })
+
+    proc.on('close', (code) => {
+      clearTimeout(timeout)
+      if (code !== null && code !== 0) {
+        reject(new Error(`Server exited with code ${code}:\n${stderr}`))
+      }
+    })
+
+    proc.on('error', (err) => {
+      clearTimeout(timeout)
+      reject(err)
+    })
+  })
+}
+
+/** Send SIGTERM and wait for the process to exit (up to 5s). */
+export async function stopServer(server: StartedServer | undefined): Promise<void> {
+  if (!server?.process) return
+  server.process.kill('SIGTERM')
+  await new Promise<void>((resolve) => {
+    server.process.on('close', () => resolve())
+    setTimeout(resolve, 5000)
+  })
+}
+
+/** Remove the temp directory created by prepareBackend. */
+export function cleanupPrepared(prepared: PreparedBackend | undefined): void {
+  if (prepared?.parentDir) fs.rmSync(prepared.parentDir, { recursive: true, force: true })
+}
+
+/** Run a shell command, throwing a descriptive error on failure. */
+export function runOrFail(
+  label: string,
+  command: string,
+  options: Parameters<typeof execSync>[1],
+): void {
+  try {
+    execSync(command, { stdio: 'pipe', ...options })
+  } catch (err: unknown) {
+    const e = err as { stdout?: Buffer; stderr?: Buffer }
+    const stdout = e.stdout?.toString() ?? ''
+    const stderr = e.stderr?.toString() ?? ''
+    throw new Error(`${label} failed:\n${stdout}\n${stderr}`)
+  }
 }
 
 /** Recursively copy srcDir into destDir. If overwrite=false, skip existing files. */

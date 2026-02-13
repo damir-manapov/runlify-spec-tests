@@ -1,8 +1,12 @@
-import { execSync } from 'node:child_process'
 import fs from 'node:fs'
 import path from 'node:path'
 import { afterAll, beforeAll, describe, expect, it } from 'vitest'
-import { type PreparedBackend, prepareBackend } from './prepare-backend.js'
+import {
+  cleanupPrepared,
+  type PreparedBackend,
+  prepareBackend,
+  runOrFail,
+} from './prepare-backend.js'
 
 describe('e2e: generated backend compiles', () => {
   let prepared: PreparedBackend
@@ -12,38 +16,22 @@ describe('e2e: generated backend compiles', () => {
   }, 180000)
 
   afterAll(() => {
-    if (prepared?.parentDir) fs.rmSync(prepared.parentDir, { recursive: true, force: true })
+    cleanupPrepared(prepared)
   })
 
   it('tsc --noEmit succeeds', () => {
-    try {
-      execSync('npx tsc --noEmit', {
-        cwd: prepared.backDir,
-        stdio: 'pipe',
-        timeout: 30000,
-      })
-    } catch (err: unknown) {
-      const e = err as { stdout?: Buffer; stderr?: Buffer }
-      const stdout = e.stdout?.toString() ?? ''
-      const stderr = e.stderr?.toString() ?? ''
-      throw new Error(`tsc failed:\n${stdout}\n${stderr}`)
-    }
+    runOrFail('tsc', 'npx tsc --noEmit', {
+      cwd: prepared.backDir,
+      timeout: 30000,
+    })
   })
 
   it('prisma validate succeeds', () => {
-    try {
-      execSync('npx prisma validate', {
-        cwd: prepared.backDir,
-        stdio: 'pipe',
-        timeout: 15000,
-        env: { ...process.env, DATABASE_MAIN_WRITE_URI: 'postgresql://localhost:5432/test' },
-      })
-    } catch (err: unknown) {
-      const e = err as { stdout?: Buffer; stderr?: Buffer }
-      const stdout = e.stdout?.toString() ?? ''
-      const stderr = e.stderr?.toString() ?? ''
-      throw new Error(`prisma validate failed:\n${stdout}\n${stderr}`)
-    }
+    runOrFail('prisma validate', 'npx prisma validate', {
+      cwd: prepared.backDir,
+      timeout: 15000,
+      env: { ...process.env, DATABASE_MAIN_WRITE_URI: 'postgresql://localhost:5432/test' },
+    })
   })
 
   it('generated Prisma schema has datasource and generator', () => {
