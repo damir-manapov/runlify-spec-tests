@@ -497,6 +497,40 @@ export function runOrFail(
   }
 }
 
+// ---------------------------------------------------------------------------
+// Helpers for spec files that write custom files into a fresh backend
+// ---------------------------------------------------------------------------
+
+/** Write a file at an arbitrary path relative to the backend root. */
+export function writeBackFile(fresh: FreshBackend, relPath: string, code: string): void {
+  const fullPath = path.join(fresh.backDir, relPath)
+  fs.mkdirSync(path.dirname(fullPath), { recursive: true })
+  fs.writeFileSync(fullPath, code)
+}
+
+/**
+ * Compile (tsc --noEmit), push schema, and start the server.
+ * Use with prepareBackendFresh for specs that inject custom code.
+ */
+export async function compileAndStart(
+  fresh: FreshBackend,
+  schema: string,
+): Promise<{ server: StartedServer; dbUrl: string }> {
+  const { databaseUrl } = await import('./graphql-client.js')
+
+  runOrFail('tsc', 'npx tsc --noEmit', { cwd: fresh.backDir, timeout: 30000 })
+
+  const dbUrl = databaseUrl(schema)
+  runOrFail('prisma db push', 'npx prisma db push --force-reset --accept-data-loss', {
+    cwd: fresh.backDir,
+    timeout: 30000,
+    env: { ...process.env, DATABASE_MAIN_WRITE_URI: dbUrl },
+  })
+
+  const server = await startServer(fresh.backDir, dbUrl)
+  return { server, dbUrl }
+}
+
 /** Recursively copy srcDir into destDir. If overwrite=false, skip existing files. */
 function copyDirRecursive(srcDir: string, destDir: string, overwrite: boolean) {
   for (const entry of fs.readdirSync(srcDir, { withFileTypes: true })) {

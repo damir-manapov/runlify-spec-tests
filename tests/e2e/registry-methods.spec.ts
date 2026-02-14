@@ -1,45 +1,14 @@
-import fs from 'node:fs'
-import path from 'node:path'
 import { afterAll, beforeAll, describe, expect, it } from 'vitest'
-import { type CrudClient, createCrudClient, databaseUrl, gql } from './graphql-client.js'
+import { type CrudClient, createCrudClient, gql } from './graphql-client.js'
 import {
   cleanupFresh,
+  compileAndStart,
   type FreshBackend,
   prepareBackendFresh,
-  runOrFail,
   type StartedServer,
-  startServer,
   stopServer,
+  writeBackFile,
 } from './prepare-backend.js'
-
-// ---------------------------------------------------------------------------
-// Helpers
-// ---------------------------------------------------------------------------
-
-/** Write a file at an arbitrary path relative to the backend root. */
-function writeBackFile(fresh: FreshBackend, relPath: string, code: string): void {
-  const fullPath = path.join(fresh.backDir, relPath)
-  fs.mkdirSync(path.dirname(fullPath), { recursive: true })
-  fs.writeFileSync(fullPath, code)
-}
-
-/** Compile and start the server. */
-async function compileAndStart(
-  fresh: FreshBackend,
-  schema: string,
-): Promise<{ server: StartedServer; dbUrl: string }> {
-  runOrFail('tsc', 'npx tsc --noEmit', { cwd: fresh.backDir, timeout: 30000 })
-
-  const dbUrl = databaseUrl(schema)
-  runOrFail('prisma db push', 'npx prisma db push --force-reset --accept-data-loss', {
-    cwd: fresh.backDir,
-    timeout: 30000,
-    env: { ...process.env, DATABASE_MAIN_WRITE_URI: dbUrl },
-  })
-
-  const server = await startServer(fresh.backDir, dbUrl)
-  return { server, dbUrl }
-}
 
 // ===========================================================================
 // 1. InfoRegistry: sliceOfTheLast / sliceOfTheFirst — exposed via custom
