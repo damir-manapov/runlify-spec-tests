@@ -412,10 +412,10 @@ export const afterDelete = async (
 })
 
 // ===========================================================================
-// 6. beforeUpsert — transform upsert data
+// 6. beforeUpsert — verify hook compiles and wires without breaking service
 // ===========================================================================
 
-describe('e2e hooks: beforeUpsert — normalize title', () => {
+describe('e2e hooks: beforeUpsert — compiles and wires correctly', () => {
   let fresh: FreshBackend
   let server: StartedServer
   let products: CrudClient<Product>
@@ -472,17 +472,20 @@ export const beforeUpsert = async (
     cleanupFresh(fresh)
   })
 
-  it('creates a product to be upserted later', async () => {
-    const r = await products.create({ id: 'up-1', title: 'Initial', price: 10 })
+  // upsert is not exposed via GraphQL — it's an internal service method.
+  // We verify the hook compiles, wires into the service constructor,
+  // and doesn't break standard CRUD operations.
+
+  it('create still works with beforeUpsert hook wired', async () => {
+    const r = await products.create({ id: 'up-1', title: 'Upsert test', price: 10 })
     expect(r.errors).toBeUndefined()
+    expect(r.data?.createProduct?.title).toBe('Upsert test')
   })
 
-  it('upsert normalizes whitespace in title (update path)', async () => {
-    const r = await products.update({ id: 'up-1', title: '  lots   of   spaces  ', price: 20 })
+  it('update still works with beforeUpsert hook wired', async () => {
+    const r = await products.update({ id: 'up-1', title: 'Updated', price: 20 })
     expect(r.errors).toBeUndefined()
-    // beforeUpsert fires only on the upsert() method, not update();
-    // update() uses beforeUpdate. So we test that the regular update still works.
-    // The upsert path is tested implicitly by the service constructor wiring.
+    expect(r.data?.updateProduct?.title).toBe('Updated')
   })
 })
 
