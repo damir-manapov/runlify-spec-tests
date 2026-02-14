@@ -1021,11 +1021,12 @@ describe('e2e API: auto string id / cuid (with-auto-string-id)', () => {
 })
 
 // ---------------------------------------------------------------------------
-// 8. Info registry — non-periodic, non-registrar-depended (with-info-registry / Price)
+// 8. Info registry — periodic (day), non-registrar-depended (with-info-registry / Price)
 // ---------------------------------------------------------------------------
 
 interface Price {
   id: string
+  date: string
   region: string
   amount: number
 }
@@ -1036,7 +1037,7 @@ describe('e2e API: infoRegistry (with-info-registry)', () => {
 
   beforeAll(async () => {
     ctx = await setupServer('with-info-registry', 'test_info_registry_api')
-    prices = createCrudClient<Price>(ctx.server, 'Price', 'id region amount')
+    prices = createCrudClient<Price>(ctx.server, 'Price', 'id date region amount')
   }, 240000)
 
   afterAll(async () => {
@@ -1055,7 +1056,7 @@ describe('e2e API: infoRegistry (with-info-registry)', () => {
 
   describe('basic CRUD', () => {
     it('creates a price entry', async () => {
-      const p = await createOk({ id: 'p-1', region: 'US', amount: 99.5 })
+      const p = await createOk({ id: 'p-1', date: '2025-01-15', region: 'US', amount: 99.5 })
       expect(p.id).toBe('p-1')
       expect(p.region).toBe('US')
       expect(p.amount).toBe(99.5)
@@ -1068,7 +1069,7 @@ describe('e2e API: infoRegistry (with-info-registry)', () => {
     })
 
     it('updates price amount', async () => {
-      const r = await prices.update({ id: 'p-1', region: 'US', amount: 149.99 })
+      const r = await prices.update({ id: 'p-1', date: '2025-01-15', region: 'US', amount: 149.99 })
       expect(r.errors).toBeUndefined()
       expect(r.data?.updatePrice?.amount).toBe(149.99)
     })
@@ -1083,8 +1084,8 @@ describe('e2e API: infoRegistry (with-info-registry)', () => {
 
   describe('dimensions form unique constraint', () => {
     it('creates two prices with different regions', async () => {
-      await createOk({ id: 'p-2', region: 'US', amount: 100 })
-      await createOk({ id: 'p-3', region: 'EU', amount: 120 })
+      await createOk({ id: 'p-2', date: '2025-02-01', region: 'US', amount: 100 })
+      await createOk({ id: 'p-3', date: '2025-02-01', region: 'EU', amount: 120 })
 
       const r = await prices.findAll()
       expect(r.errors).toBeUndefined()
@@ -1097,8 +1098,8 @@ describe('e2e API: infoRegistry (with-info-registry)', () => {
 
   describe('filters', () => {
     it('filters by region', async () => {
-      await createOk({ id: 'f-1', region: 'US', amount: 50 })
-      await createOk({ id: 'f-2', region: 'EU', amount: 75 })
+      await createOk({ id: 'f-1', date: '2025-03-01', region: 'US', amount: 50 })
+      await createOk({ id: 'f-2', date: '2025-03-01', region: 'EU', amount: 75 })
 
       const r = await prices.findAll({ filter: { region: 'EU' } })
       expect(r.errors).toBeUndefined()
@@ -1109,8 +1110,8 @@ describe('e2e API: infoRegistry (with-info-registry)', () => {
     })
 
     it('filters by amount range', async () => {
-      await createOk({ id: 'r-1', region: 'UK', amount: 10 })
-      await createOk({ id: 'r-2', region: 'JP', amount: 200 })
+      await createOk({ id: 'r-1', date: '2025-04-01', region: 'UK', amount: 10 })
+      await createOk({ id: 'r-2', date: '2025-04-01', region: 'JP', amount: 200 })
 
       const r = await prices.findAll({ filter: { amount_gte: 100 } })
       expect(r.errors).toBeUndefined()
@@ -1123,8 +1124,8 @@ describe('e2e API: infoRegistry (with-info-registry)', () => {
 
   describe('count', () => {
     it('returns correct count', async () => {
-      await createOk({ id: 'c-1', region: 'CA', amount: 30 })
-      await createOk({ id: 'c-2', region: 'MX', amount: 40 })
+      await createOk({ id: 'c-1', date: '2025-05-01', region: 'CA', amount: 30 })
+      await createOk({ id: 'c-2', date: '2025-05-01', region: 'MX', amount: 40 })
 
       const r = await prices.count()
       expect(r.errors).toBeUndefined()

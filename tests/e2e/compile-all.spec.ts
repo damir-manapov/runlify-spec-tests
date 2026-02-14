@@ -212,7 +212,7 @@ const fixtures: FixtureSpec[] = [
     entityTs: { names: ['Category', 'Article'] },
   },
 
-  // ---- infoRegistry (non-periodic, non-registrar-depended) ----
+  // ---- infoRegistry (periodic day, non-registrar-depended) ----
   {
     fixture: 'with-info-registry',
     label: 'infoRegistry entity (Price)',
@@ -220,6 +220,7 @@ const fixtures: FixtureSpec[] = [
       model: 'Price',
       idType: 'String',
       extraFields: [
+        { pattern: /date\s+DateTime\s+@db\.Date/ },
         { pattern: /region\s+String/ },
         { pattern: /amount\s+Float/ },
       ],
@@ -228,7 +229,7 @@ const fixtures: FixtureSpec[] = [
       entity: 'Price',
       service: 'prices',
       gqlIdType: 'ID!',
-      requiredFields: ['region: String!', 'amount: Float!'],
+      requiredFields: ['date: Date!', 'region: String!', 'amount: Float!'],
       createMutationIdBehaviour: 'required',
       createMutationIdPattern: /id:/,
     },

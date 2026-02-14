@@ -2,12 +2,13 @@
 import {mergeTypeDefs} from '@graphql-tools/merge';
 import {loadFiles} from '@graphql-tools/load-files';
 import path from 'path';
+import {typeDefs} from 'graphql-scalars';
 
 const getTypeDefs = () => Promise.all([
   loadFiles(path.join(__dirname, '../*/graph/services/*/*TypeDefs.?(ts)?(js)')),
   loadFiles(path.join(__dirname, '../*/graph/services/*/*typeDefs.?(ts)?(js)')),
 ])
   .then(files => files.flat().filter(s => s.kind && s.kind === 'Document'))
-  .then((files) => mergeTypeDefs([...files]))
+  .then((files) => mergeTypeDefs([...typeDefs, ...files]))
 
 export default getTypeDefs;

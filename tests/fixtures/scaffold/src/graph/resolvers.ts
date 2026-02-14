@@ -2,6 +2,7 @@
 import {mergeResolvers} from '@graphql-tools/merge';
 import {loadFilesSync} from '@graphql-tools/load-files';
 import {GraphQLScalarType, Kind} from 'graphql';
+import {resolvers} from 'graphql-scalars';
 import path from 'path';
 
 /** Custom BigInt scalar — serializes/parses bigint as string */
@@ -27,6 +28,6 @@ const resolversArray = [
   ...loadFilesSync(path.join(__dirname, '../*/graph/services/*/resolvers.?(ts)?(js)')),
 ];
 
-const mergedResolvers = mergeResolvers([...resolversArray]);
+const mergedResolvers = mergeResolvers([resolvers, ...resolversArray]);
 
 export default mergedResolvers;

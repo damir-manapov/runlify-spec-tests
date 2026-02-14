@@ -34,7 +34,7 @@
     {
       "name": "adm.jwt.secret",
       "type": "string",
-      "needFor": "\u0421\u0435\u043a\u0440\u0435\u0442 \u0434\u043b\u044f \u043f\u043e\u0434\u043f\u0438\u0441\u0438 JWT-\u0442\u043e\u043a\u0435\u043d\u043e\u0432 \u043f\u0440\u0438\u043b\u043e\u0436\u0435\u043d\u0438\u044f \u0430\u0434\u043c\u0438\u043d\u043a\u0438",
+      "needFor": "Секрет для подписи JWT-токенов приложения админки",
       "default": "admSecret",
       "required": false,
       "scopes": [
@@ -48,7 +48,7 @@
     {
       "name": "admin.recaptcha.publicKey",
       "type": "string",
-      "needFor": "\u041f\u0443\u0431\u043b\u0438\u0447\u043d\u044b\u0439 \u0442\u043e\u043a\u0435\u043d \u0440\u0435\u043a\u0430\u043f\u0447\u0438 \u043f\u0440\u0438\u043b\u043e\u0436\u0435\u043d\u0438\u044f \u0430\u0434\u043c\u0438\u043d\u043a\u0438",
+      "needFor": "Публичный токен рекапчи приложения админки",
       "default": "",
       "required": false,
       "scopes": [
@@ -60,7 +60,7 @@
     {
       "name": "admin.recaptcha.requiredScore",
       "type": "float",
-      "needFor": "\u0422\u0440\u0435\u0431\u0443\u0435\u043c\u044b\u0439 \u0443\u0440\u043e\u0432\u0435\u043d\u044c \u0434\u043e\u0432\u0435\u0440\u0438\u044f \u043a \u043f\u043e\u043b\u044c\u0437\u043e\u0432\u0430\u0442\u0435\u043b\u044e",
+      "needFor": "Требуемый уровень доверия к пользователю",
       "default": 0.7,
       "required": false,
       "scopes": [
@@ -74,7 +74,7 @@
     {
       "name": "admin.recaptcha.secretKey",
       "type": "string",
-      "needFor": "\u0421\u0435\u043a\u0440\u0435\u0442\u043d\u044b\u0439 \u0442\u043e\u043a\u0435\u043d \u0440\u0435\u043a\u0430\u043f\u0447\u0438 \u043f\u0440\u0438\u043b\u043e\u0436\u0435\u043d\u0438\u044f \u0430\u0434\u043c\u0438\u043d\u043a\u0438",
+      "needFor": "Секретный токен рекапчи приложения админки",
       "default": "",
       "required": false,
       "scopes": [
@@ -88,7 +88,7 @@
     {
       "name": "admin.ui.url",
       "type": "string",
-      "needFor": "\u0423\u0440\u043b \u0430\u0434\u043c\u0438\u043d\u0438\u0441\u0442\u0440\u0430\u0442\u0438\u0432\u043d\u043e\u0433\u043e \u0438\u043d\u0442\u0435\u0440\u0444\u0435\u0439\u0441\u0430 (\u0431\u0435\u0437 \u043a\u043e\u043d\u0435\u0447\u043d\u043e\u0433\u043e \u0441\u043b\u0435\u0448\u0430)",
+      "needFor": "Урл административного интерфейса (без конечного слеша)",
       "default": "http://localhost:8080",
       "required": false,
       "scopes": [
@@ -102,7 +102,7 @@
     {
       "name": "app.environment",
       "type": "string",
-      "needFor": "\u041d\u0430\u0437\u0432\u0430\u043d\u0438\u0435 \u043e\u043a\u0440\u0443\u0436\u0435\u043d\u0438\u044f",
+      "needFor": "Название окружения",
       "default": "dev",
       "required": true,
       "scopes": [
@@ -116,7 +116,7 @@
     {
       "name": "app.jwt.secret",
       "type": "string",
-      "needFor": "\u0421\u0435\u043a\u0440\u0435\u0442 \u0434\u043b\u044f \u043f\u043e\u0434\u043f\u0438\u0441\u0438 JWT-\u0442\u043e\u043a\u0435\u043d\u043e\u0432 \u043f\u0440\u0438\u043b\u043e\u0436\u0435\u043d\u0438\u044f \u043f\u043e\u043b\u044c\u0437\u043e\u0432\u0430\u0442\u0435\u043b\u0435\u0439",
+      "needFor": "Секрет для подписи JWT-токенов приложения пользователей",
       "default": "appSecret",
       "required": false,
       "scopes": [
@@ -130,7 +130,7 @@
     {
       "name": "app.name",
       "type": "string",
-      "needFor": "\u0422\u0435\u0445\u043d\u0438\u0447\u0435\u0441\u043a\u043e\u0435 \u043d\u0430\u0437\u0432\u0430\u043d\u0438\u0435 \u043f\u0440\u0438\u043b\u043e\u0436\u0435\u043d\u0438\u044f",
+      "needFor": "Техническое название приложения",
       "default": "",
       "required": true,
       "scopes": [
@@ -144,7 +144,7 @@
     {
       "name": "app.title",
       "type": "string",
-      "needFor": "\u041f\u043e\u043b\u044c\u0437\u043e\u0432\u0430\u0442\u0435\u043b\u044c\u0441\u043a\u043e\u0435 \u043d\u0430\u0437\u0432\u0430\u043d\u0438\u0435 \u043f\u0440\u0438\u043b\u043e\u0436\u0435\u043d\u0438\u044f",
+      "needFor": "Пользовательское название приложения",
       "default": "",
       "required": false,
       "scopes": [
@@ -158,7 +158,7 @@
     {
       "name": "app.ui.url",
       "type": "string",
-      "needFor": "\u0423\u0440\u043b \u0438\u043d\u0442\u0435\u0440\u0444\u0435\u0439\u0441\u0430 \u043a\u043e\u043d\u0435\u0447\u043d\u043e\u0433\u043e \u043f\u043e\u043b\u044c\u0437\u043e\u0432\u0430\u0442\u0435\u043b\u044f (\u0431\u0435\u0437 \u043a\u043e\u043d\u0435\u0447\u043d\u043e\u0433\u043e \u0441\u043b\u0435\u0448\u0430)",
+      "needFor": "Урл интерфейса конечного пользователя (без конечного слеша)",
       "default": "http://localhost:4000",
       "required": false,
       "scopes": [
@@ -172,7 +172,7 @@
     {
       "name": "authorization.backendChecks.enabled",
       "type": "bool",
-      "needFor": "\u041f\u0440\u043e\u0432\u0435\u0440\u043a\u0430 \u0430\u0432\u0442\u043e\u0440\u0438\u0437\u0430\u0446\u0438\u0438 \u043d\u0430 \u0431\u0435\u043a\u0435\u043d\u0434\u0435 \u0432\u043a\u043b\u044e\u0447\u0435\u043d\u044b",
+      "needFor": "Проверка авторизации на бекенде включены",
       "default": false,
       "required": false,
       "scopes": [
@@ -186,7 +186,7 @@
     {
       "name": "bootstrap.enabled",
       "type": "bool",
-      "needFor": "\u041f\u043e\u0434\u0433\u043e\u0442\u0430\u0432\u043b\u0438\u0432\u0430\u0442\u044c \u043e\u043a\u0440\u0443\u0436\u0435\u0438\u043d\u0435 \u043f\u0440\u0438 \u0437\u0430\u043f\u0443\u0441\u043a\u0435",
+      "needFor": "Подготавливать окружеине при запуске",
       "default": false,
       "required": false,
       "scopes": [
@@ -200,7 +200,7 @@
     {
       "name": "checkLoginIframe",
       "type": "bool",
-      "needFor": "\u041f\u0440\u043e\u0432\u0435\u0440\u043a\u0430 \u0430\u0432\u0442\u043e\u0440\u0438\u0437\u0430\u0446\u0438\u0438 \u0432\u043e \u0444\u0440\u0435\u0439\u043c\u0435 \u0432\u043a\u043b\u044e\u0447\u0435\u043d\u0430",
+      "needFor": "Проверка авторизации во фрейме включена",
       "default": false,
       "required": false,
       "scopes": [
@@ -213,7 +213,7 @@
     {
       "name": "customer.recaptcha.publicKey",
       "type": "string",
-      "needFor": "\u041f\u0443\u0431\u043b\u0438\u0447\u043d\u044b\u0439 \u0442\u043e\u043a\u0435\u043d \u0440\u0435\u043a\u0430\u043f\u0447\u0438 \u043f\u0440\u0438\u043b\u043e\u0436\u0435\u043d\u0438\u044f \u043f\u043e\u043b\u044c\u0437\u043e\u0432\u0430\u0442\u0435\u043b\u044f",
+      "needFor": "Публичный токен рекапчи приложения пользователя",
       "default": "",
       "required": false,
       "scopes": [
@@ -225,7 +225,7 @@
     {
       "name": "customer.recaptcha.requiredScore",
       "type": "string",
-      "needFor": "\u0422\u0440\u0435\u0431\u0443\u0435\u043c\u044b\u0439 \u0443\u0440\u043e\u0432\u0435\u043d\u044c \u0434\u043e\u0432\u0435\u0440\u0438\u044f \u043a \u043f\u043e\u043b\u044c\u0437\u043e\u0432\u0430\u0442\u0435\u043b\u044e",
+      "needFor": "Требуемый уровень доверия к пользователю",
       "default": "0.7",
       "required": false,
       "scopes": [
@@ -239,7 +239,7 @@
     {
       "name": "customer.recaptcha.secretKey",
       "type": "string",
-      "needFor": "\u0421\u0435\u043a\u0440\u0435\u0442\u043d\u044b\u0439 \u0442\u043e\u043a\u0435\u043d \u0440\u0435\u043a\u0430\u043f\u0447\u0438 \u043f\u0440\u0438\u043b\u043e\u0436\u0435\u043d\u0438\u044f \u043f\u043e\u043b\u044c\u0437\u043e\u0432\u0430\u0442\u0435\u043b\u044f",
+      "needFor": "Секретный токен рекапчи приложения пользователя",
       "default": "",
       "required": false,
       "scopes": [
@@ -253,7 +253,7 @@
     {
       "name": "database.main.migration.uri",
       "type": "string",
-      "needFor": "\u0421\u0442\u0440\u043e\u043a\u0430 \u043f\u043e\u0434\u043a\u043b\u044e\u0447\u0435\u043d\u0438\u044f \u043a \u043e\u0441\u043d\u043e\u0432\u043d\u043e\u0439 \u0431\u0430\u0437\u0435 \u0434\u043b\u044f \u043c\u0438\u0433\u0440\u0430\u0446\u0438\u0439 (\u0434\u043e\u043b\u0436\u043d\u0430 \u0431\u044b\u0442\u044c \u043f\u0440\u044f\u043c\u043e\u0439 \u0441\u0442\u0440\u043e\u043a\u043e\u0439 \u043f\u043e\u0434\u043a\u043b\u044e\u0447\u0435\u043d\u0438\u044f \u043a \u0431\u0434 \u043c\u0438\u043d\u0443\u044f pgbouncer, \u0435\u0441\u043b\u0438 \u043e\u043d \u0438\u0441\u043f\u043e\u043b\u044c\u0437\u0443\u0435\u0442\u0441\u044f)",
+      "needFor": "Строка подключения к основной базе для миграций (должна быть прямой строкой подключения к бд минуя pgbouncer, если он используется)",
       "default": "postgresql://postgres:password@localhost:5432",
       "required": true,
       "scopes": [
@@ -267,7 +267,7 @@
     {
       "name": "database.main.readOnly.enabled",
       "type": "bool",
-      "needFor": "\u0412\u043a\u043b\u044e\u0447\u0435\u043d\u0430 \u043b\u0438 \u0440\u0430\u0431\u043e\u0442\u0430 \u0441 \u0437\u0430\u043f\u0440\u043e\u0441\u0430\u043c\u0438 \u043d\u0430 \u0447\u0442\u0435\u043d\u0438\u0435 \u0447\u0435\u0440\u0435\u0437 \u043e\u0442\u0434\u0435\u043b\u044c\u043d\u043e\u0435 \u043f\u043e\u0434\u043a\u043b\u044e\u0447\u0435\u043d\u0438\u0435",
+      "needFor": "Включена ли работа с запросами на чтение через отдельное подключение",
       "default": false,
       "required": true,
       "scopes": [
@@ -281,7 +281,7 @@
     {
       "name": "database.main.readOnly.uri",
       "type": "string",
-      "needFor": "\u0421\u0442\u0440\u043e\u043a\u0430 \u043f\u043e\u0434\u043a\u043b\u044e\u0447\u0435\u043d\u0438\u044f \u043a \u043e\u0441\u043d\u043e\u0432\u043d\u043e\u0439 \u0431\u0430\u0437\u0435 \u0442\u043e\u043b\u044c\u043a\u043e \u0434\u043b\u044f \u0447\u0442\u0435\u043d\u0438\u044f",
+      "needFor": "Строка подключения к основной базе только для чтения",
       "default": "postgresql://postgres:password@localhost:5432",
       "required": false,
       "scopes": [
@@ -295,7 +295,7 @@
     {
       "name": "database.main.write.uri",
       "type": "string",
-      "needFor": "\u0421\u0442\u0440\u043e\u043a\u0430 \u043f\u043e\u0434\u043a\u043b\u044e\u0447\u0435\u043d\u0438\u044f \u043a \u043e\u0441\u043d\u043e\u0432\u043d\u043e\u0439 \u0431\u0430\u0437\u0435 \u0434\u0430\u043d\u043d\u044b\u0445 \u0434\u043b\u044f \u0437\u0430\u043f\u0438\u0441\u0438",
+      "needFor": "Строка подключения к основной базе данных для записи",
       "default": "postgresql://postgres:password@localhost:5432",
       "required": true,
       "scopes": [
@@ -345,7 +345,7 @@
     {
       "name": "endpoint",
       "type": "string",
-      "needFor": "\u041f\u0443\u0442\u044c \u043a \u0431\u0435\u043a\u0435\u043d\u0434\u0443",
+      "needFor": "Путь к бекенду",
       "default": "",
       "required": false,
       "scopes": [
@@ -357,7 +357,7 @@
     {
       "name": "es.cloudId",
       "type": "string",
-      "needFor": "\u0418\u0434\u0435\u043d\u0442\u0438\u0444\u0438\u043a\u0430\u0442\u043e\u0440 \u0430\u043a\u043a\u0430\u0443\u043d\u0442\u0430 \u0432 \u043e\u0431\u043b\u0430\u0447\u043d\u043e\u043c \u0441\u0435\u0440\u0432\u0438\u0441\u0435 ElasticSearch",
+      "needFor": "Идентификатор аккаунта в облачном сервисе ElasticSearch",
       "default": "",
       "required": false,
       "scopes": [
@@ -371,7 +371,7 @@
     {
       "name": "es.enabled",
       "type": "bool",
-      "needFor": "\u042d\u043b\u0430\u0441\u0442\u0438\u043a \u0432\u043a\u043b\u044e\u0447\u0435\u043d",
+      "needFor": "Эластик включен",
       "default": false,
       "required": false,
       "scopes": [
@@ -385,7 +385,7 @@
     {
       "name": "es.node",
       "type": "string",
-      "needFor": "\u041d\u043e\u0434\u0430 \u044d\u043b\u0430\u0441\u0442\u0438\u043a\u0430",
+      "needFor": "Нода эластика",
       "default": "http://localhost:9200",
       "required": false,
       "scopes": [
@@ -399,7 +399,7 @@
     {
       "name": "es.password",
       "type": "string",
-      "needFor": "\u041f\u0430\u0440\u043e\u043b\u044c \u0434\u043b\u044f \u0430\u0432\u0442\u043e\u0440\u0438\u0437\u0430\u0446\u0438\u0438 \u0432 \u043e\u0431\u043b\u0430\u0447\u043d\u043e\u043c \u0441\u0435\u0440\u0432\u0438\u0441\u0435 ElasticSearch",
+      "needFor": "Пароль для авторизации в облачном сервисе ElasticSearch",
       "default": "",
       "required": false,
       "scopes": [
@@ -413,7 +413,7 @@
     {
       "name": "es.tls.rejectUnauthorized",
       "type": "bool",
-      "needFor": "\u0417\u0430\u043f\u0440\u0435\u0449\u0430\u0442\u044c \u043d\u0435\u0432\u0430\u043b\u0438\u0434\u043d\u044b\u0439 ssl \u0441\u0435\u0440\u0442\u0438\u0444\u0438\u043a\u0430\u0442",
+      "needFor": "Запрещать невалидный ssl сертификат",
       "default": false,
       "required": false,
       "scopes": [
@@ -427,7 +427,7 @@
     {
       "name": "es.username",
       "type": "string",
-      "needFor": "\u041f\u043e\u043b\u044c\u0437\u043e\u0432\u0430\u0442\u0435\u043b\u044c \u0434\u043b\u044f \u0430\u0432\u0442\u043e\u0440\u0438\u0437\u0430\u0446\u0438\u0438 \u0432 \u043e\u0431\u043b\u0430\u0447\u043d\u043e\u043c \u0441\u0435\u0440\u0432\u0438\u0441\u0435 ElasticSearch",
+      "needFor": "Пользователь для авторизации в облачном сервисе ElasticSearch",
       "default": "",
       "required": false,
       "scopes": [
@@ -441,7 +441,7 @@
     {
       "name": "graphql.playground.enabled",
       "type": "bool",
-      "needFor": "\u0412\u043a\u043b\u044e\u0447\u0435\u043d\u0438\u0435 graphql playground (true | false)",
+      "needFor": "Включение graphql playground (true | false)",
       "default": true,
       "required": false,
       "scopes": [
@@ -455,7 +455,7 @@
     {
       "name": "kafka.auth.enabled",
       "type": "bool",
-      "needFor": "\u0412\u043a\u043b\u044e\u0447\u0435\u043d\u0430 \u043f\u0440\u043e\u0432\u0435\u0440\u043a\u0430 \u0430\u0443\u0442\u0435\u043d\u0442\u0438\u0444\u0438\u043a\u0430\u0446\u0438\u0438",
+      "needFor": "Включена проверка аутентификации",
       "default": true,
       "required": true,
       "scopes": [
@@ -469,7 +469,7 @@
     {
       "name": "kafka.brokers",
       "type": "string",
-      "needFor": "\u0421\u043f\u0438\u0441\u043e\u043a kafka \u0431\u043b\u043e\u043a\u0435\u0440\u043e\u0432",
+      "needFor": "Список kafka блокеров",
       "default": "localhost:29092;localhost:29094",
       "required": false,
       "scopes": [
@@ -483,7 +483,7 @@
     {
       "name": "kafka.enabled",
       "type": "bool",
-      "needFor": "\u041a\u0430\u0444\u043a\u0430 \u0432\u043a\u043b\u044e\u0447\u0435\u043d\u0430",
+      "needFor": "Кафка включена",
       "default": false,
       "required": false,
       "scopes": [
@@ -497,7 +497,7 @@
     {
       "name": "kafka.password",
       "type": "string",
-      "needFor": "\u041f\u0430\u0440\u043e\u043b\u044c \u0434\u043e\u0441\u0442\u0443\u043f\u0430 \u0432 kafka",
+      "needFor": "Пароль доступа в kafka",
       "default": "",
       "required": false,
       "scopes": [
@@ -511,7 +511,7 @@
     {
       "name": "kafka.queue.acks",
       "type": "int",
-      "needFor": "`-1`(all) \u0432\u0441\u0435 \u043d\u0435\u0441\u0438\u043d\u0445\u0440\u043e\u043d\u0438\u0437\u0438\u0440\u043e\u0432\u0430\u043d\u043d\u044b\u0435 \u0440\u0435\u043f\u043b\u0438\u043a\u0438 \u0434\u043e\u043b\u0436\u043d\u044b \u043f\u043e\u0434\u0442\u0432\u0435\u0440\u0434\u0438\u0442\u044c (\u043f\u043e \u0443\u043c\u043e\u043b\u0447\u0430\u043d\u0438\u044e), `0` \u043d\u0435\u0442 \u043f\u043e\u0434\u0442\u0432\u0435\u0440\u0436\u0434\u0435\u043d\u0438\u0439, `1` \u0442\u043e\u043b\u044c\u043a\u043e \u0436\u0434\u0435\u0442 \u043f\u043e\u0434\u0442\u0432\u0435\u0440\u0436\u0434\u0435\u043d\u0438\u044f \u043b\u0438\u0434\u0435\u0440\u0430",
+      "needFor": "`-1`(all) все несинхронизированные реплики должны подтвердить (по умолчанию), `0` нет подтверждений, `1` только ждет подтверждения лидера",
       "default": 1,
       "required": false,
       "scopes": [
@@ -525,7 +525,7 @@
     {
       "name": "kafka.queue.defaultRetryTime",
       "type": "int",
-      "needFor": "\u0412\u0440\u0435\u043c\u044f \u043f\u0430\u0443\u0437\u044b \u043f\u043e\u0441\u043b\u0435 \u043f\u0435\u0440\u0432\u043e\u0439 \u043e\u0448\u0438\u0431\u043a\u0438, \u043d\u0430\u043f\u0440\u0438\u043c\u0435\u0440 20000 \u043c\u0441, \u043f\u043e\u0442\u043e\u043c \u043e\u043d\u043e \u0443\u0432\u0435\u043b\u0438\u0447\u0438\u0432\u0430\u0435\u0442\u0441\u044f \u044d\u043a\u0441\u043f\u043e\u043d\u0435\u043d\u0446\u0438\u0430\u043b\u044c\u043d\u043e \u0441 \u043c\u0443\u043b\u044c\u0442\u0438\u043f\u043b\u0438\u043a\u0430\u0442\u043e\u0440\u043e\u043c 1.5",
+      "needFor": "Время паузы после первой ошибки, например 20000 мс, потом оно увеличивается экспоненциально с мультипликатором 1.5",
       "default": 20000,
       "required": false,
       "scopes": [
@@ -539,7 +539,7 @@
     {
       "name": "kafka.queue.maxAttemptsSize",
       "type": "int",
-      "needFor": "\u041c\u0430\u043a\u0441\u0438\u043c\u0430\u043b\u044c\u043d\u043e\u0435 \u043a\u043e\u043b\u0438\u0447\u0435\u0441\u0442\u0432\u043e \u043f\u043e\u043f\u044b\u0442\u043e\u043a \u043e\u0431\u0440\u0430\u0431\u043e\u0442\u043a\u0438 \u043e\u0448\u0438\u0431\u043a\u0438 \u043d\u0430 \u0441\u043e\u043e\u0431\u0449\u0435\u043d\u0438\u0435",
+      "needFor": "Максимальное количество попыток обработки ошибки на сообщение",
       "default": 10,
       "required": false,
       "scopes": [
@@ -553,7 +553,7 @@
     {
       "name": "kafka.queue.stackSize",
       "type": "int",
-      "needFor": "\u041a\u043e\u043b\u0438\u0447\u0435\u0441\u0442\u0432\u043e \u0441\u043e\u043e\u0431\u0449\u0435\u043d\u0438\u0439, \u043e\u0431\u0440\u0430\u0431\u0430\u0442\u044b\u0432\u0430\u0435\u043c\u044b\u0445 \u043f\u0430\u0440\u0430\u043b\u043b\u0435\u043b\u044c\u043d\u043e",
+      "needFor": "Количество сообщений, обрабатываемых параллельно",
       "default": 3,
       "required": false,
       "scopes": [
@@ -567,7 +567,7 @@
     {
       "name": "kafka.queue.supportedVersion",
       "type": "string",
-      "needFor": "\u041f\u043e\u0434\u0434\u0435\u0440\u0436\u0438\u0432\u0430\u0435\u043c\u044b\u0435 \u0432\u0435\u0440\u0441\u0438\u0438 \u0441\u043e\u043e\u0431\u0449\u0435\u043d\u0438\u044f",
+      "needFor": "Поддерживаемые версии сообщения",
       "default": "1;2",
       "required": false,
       "scopes": [
@@ -581,7 +581,7 @@
     {
       "name": "kafka.queue.waitingInterruptTime",
       "type": "int",
-      "needFor": "\u0412\u0440\u0435\u043c\u044f \u043f\u0430\u0443\u0437\u044b \u0432 \u043e\u0447\u0435\u0440\u0435\u0434\u0438 \u043e\u0436\u0438\u0434\u0430\u043d\u0438\u044f, \u043a\u043e\u0433\u0434\u0430 \u043e\u043d\u0430 \u043f\u0440\u043e\u0448\u043b\u0430 \u0432\u0441\u0435 \u0441\u043e\u043e\u0431\u0449\u0435\u043d\u0438\u044f, \u044d\u0442\u043e \u0447\u0442\u043e\u0431\u044b \u043e\u043d\u0430 \u043d\u0435 \u043a\u0440\u0443\u0442\u0438\u043b\u0430 \u0441\u043e\u043e\u0431\u0449\u0435\u043d\u0438\u044f \u043f\u043e\u043a\u0440\u0443\u0433\u0443 \u0431\u0435\u0437 \u043e\u0441\u0442\u0430\u043d\u043e\u0432\u043a\u0438 ",
+      "needFor": "Время паузы в очереди ожидания, когда она прошла все сообщения, это чтобы она не крутила сообщения покругу без остановки ",
       "default": 60000,
       "required": false,
       "scopes": [
@@ -609,7 +609,7 @@
     {
       "name": "kafka.ssl.enabled",
       "type": "bool",
-      "needFor": "\u0412\u043a\u043b\u044e\u0447\u0435\u043d\u0430 \u0440\u0430\u0431\u043e\u0442\u0430 \u043f\u043e ssl",
+      "needFor": "Включена работа по ssl",
       "default": true,
       "required": true,
       "scopes": [
@@ -623,7 +623,7 @@
     {
       "name": "kafka.ssl.rejectUnauthorized",
       "type": "bool",
-      "needFor": "\u0417\u0430\u043f\u0440\u0435\u0449\u0430\u0442\u044c \u043d\u0435\u0432\u0430\u043b\u0438\u0434\u043d\u044b\u0439 ssl \u0441\u0435\u0440\u0442\u0438\u0444\u0438\u043a\u0430\u0442",
+      "needFor": "Запрещать невалидный ssl сертификат",
       "default": false,
       "required": false,
       "scopes": [
@@ -637,7 +637,7 @@
     {
       "name": "kafka.username",
       "type": "string",
-      "needFor": "Username \u0434\u043e\u0441\u0442\u0443\u043f\u0430 \u0432 kafka",
+      "needFor": "Username доступа в kafka",
       "default": "",
       "required": false,
       "scopes": [
@@ -651,7 +651,7 @@
     {
       "name": "keycloak.adm.cli.client",
       "type": "string",
-      "needFor": "\u041a\u043b\u0438\u0435\u043d\u0442 \u0434\u043b\u044f \u0434\u043e\u0441\u0442\u0443\u043f\u0430 \u0432 api keycloak \u0430\u0434\u043c\u0438\u043d\u043a\u0438",
+      "needFor": "Клиент для доступа в api keycloak админки",
       "default": "backend-api",
       "required": false,
       "scopes": [
@@ -665,7 +665,7 @@
     {
       "name": "keycloak.adm.cli.secret",
       "type": "string",
-      "needFor": "\u0421\u0435\u043a\u0440\u0435\u0442 \u0434\u043b\u044f \u0434\u043e\u0441\u0442\u0443\u043f\u0430 \u0432 api keycloak \u0430\u0434\u043c\u0438\u043d\u043a\u0438",
+      "needFor": "Секрет для доступа в api keycloak админки",
       "default": "",
       "required": false,
       "scopes": [
@@ -679,7 +679,7 @@
     {
       "name": "keycloak.app.cli.client",
       "type": "string",
-      "needFor": "\u041a\u043b\u0438\u0435\u043d\u0442 \u0434\u043b\u044f \u0434\u043e\u0441\u0442\u0443\u043f\u0430 \u0432 api keycloak \u043f\u0440\u0438\u043b\u043e\u0436\u0435\u043d\u0438\u044f \u043f\u043e\u043b\u044c\u0437\u043e\u0432\u0430\u0442\u0435\u043b\u044f",
+      "needFor": "Клиент для доступа в api keycloak приложения пользователя",
       "default": "backend-api",
       "required": false,
       "scopes": [
@@ -693,7 +693,7 @@
     {
       "name": "keycloak.app.cli.secret",
       "type": "string",
-      "needFor": "\u0421\u0435\u043a\u0440\u0435\u0442 \u0434\u043b\u044f \u0434\u043e\u0441\u0442\u0443\u043f\u0430 \u0432 api keycloak \u043f\u0440\u0438\u043b\u043e\u0436\u0435\u043d\u0438\u044f \u043f\u043e\u043b\u044c\u0437\u043e\u0432\u0430\u0442\u0435\u043b\u044f",
+      "needFor": "Секрет для доступа в api keycloak приложения пользователя",
       "default": "",
       "required": false,
       "scopes": [
@@ -707,7 +707,7 @@
     {
       "name": "logs.format",
       "type": "string",
-      "needFor": "\u0424\u043e\u0440\u043c\u0430\u0442 \u043b\u043e\u0433\u043e\u0432 (plain | json)",
+      "needFor": "Формат логов (plain | json)",
       "default": "plain",
       "required": false,
       "scopes": [
@@ -721,7 +721,7 @@
     {
       "name": "loki.url",
       "type": "string",
-      "needFor": "\u0423\u0440\u043b \u0434\u043b\u044f \u0434\u043e\u0441\u0442\u0443\u043f\u0430 \u0432 Loki. \u0418\u0441\u043f\u043e\u043b\u044c\u0437\u0443\u0435\u0442\u0441\u044f \u0434\u043b\u044f \u0437\u0430\u043f\u0440\u043e\u0441\u0430 \u0431\u0438\u0437\u043d\u0435\u0441-\u043b\u043e\u0433\u043e\u0432",
+      "needFor": "Урл для доступа в Loki. Используется для запроса бизнес-логов",
       "default": "",
       "required": false,
       "scopes": [
@@ -735,7 +735,7 @@
     {
       "name": "oidc.adm.clientId",
       "type": "string",
-      "needFor": "\u0418\u0434\u0435\u043d\u0442\u0438\u0444\u0438\u043a\u0430\u0442\u043e\u0440 \u043a\u043b\u0438\u0435\u043d\u0442\u0430 oidc \u0434\u043b\u044f \u0430\u0434\u043c\u0438\u043d\u043a\u0438",
+      "needFor": "Идентификатор клиента oidc для админки",
       "default": "",
       "required": false,
       "scopes": [
@@ -747,7 +747,7 @@
     {
       "name": "oidc.adm.issuer",
       "type": "string",
-      "needFor": "Issuer oidc \u0434\u043b\u044f \u0430\u0434\u043c\u0438\u043d\u043a\u0438",
+      "needFor": "Issuer oidc для админки",
       "default": "",
       "required": false,
       "scopes": [
@@ -760,7 +760,7 @@
     {
       "name": "oidc.adm.jwksRejectUnauthorized",
       "type": "bool",
-      "needFor": "\u0417\u0430\u043f\u0440\u0435\u0449\u0430\u0442\u044c \u043d\u0435\u0432\u0430\u043b\u0438\u0434\u043d\u044b\u0439 ssl \u0441\u0435\u0440\u0442\u0438\u0444\u0438\u043a\u0430\u0442",
+      "needFor": "Запрещать невалидный ssl сертификат",
       "default": false,
       "required": false,
       "scopes": [
@@ -774,7 +774,7 @@
     {
       "name": "oidc.adm.jwksUri",
       "type": "string",
-      "needFor": "Uri jwks oidc \u0434\u043b\u044f \u043f\u0440\u043e\u0432\u0435\u0440\u043a\u0438 \u0430\u0432\u0442\u043e\u0440\u0438\u0437\u0430\u0446\u0438\u0438 \u0430\u0434\u043c\u0438\u043d\u043a\u0438",
+      "needFor": "Uri jwks oidc для проверки авторизации админки",
       "default": "",
       "required": false,
       "scopes": [
@@ -786,7 +786,7 @@
     {
       "name": "oidc.adm.logoutType",
       "type": "string",
-      "needFor": "\u0422\u0438\u043f \u0432\u044b\u0445\u043e\u0434\u0430 \u0430\u0434\u043c\u0438\u043d\u043a\u0438",
+      "needFor": "Тип выхода админки",
       "default": "",
       "required": false,
       "scopes": [
@@ -798,7 +798,7 @@
     {
       "name": "oidc.adm.realm",
       "type": "string",
-      "needFor": "\u0420\u0435\u0430\u043b\u043c oidc \u0434\u043b\u044f \u0430\u0434\u043c\u0438\u043d\u043a\u0438",
+      "needFor": "Реалм oidc для админки",
       "default": "",
       "required": false,
       "scopes": [
@@ -811,7 +811,7 @@
     {
       "name": "oidc.adm.url",
       "type": "string",
-      "needFor": "\u0425\u043e\u0441\u0442 oidc \u0434\u043b\u044f \u0430\u0434\u043c\u0438\u043d\u043a\u0438",
+      "needFor": "Хост oidc для админки",
       "default": "",
       "required": false,
       "scopes": [
@@ -824,7 +824,7 @@
     {
       "name": "oidc.app.clientId",
       "type": "string",
-      "needFor": "\u0418\u0434\u0435\u043d\u0442\u0438\u0444\u0438\u043a\u0430\u0442\u043e\u0440 \u043a\u043b\u0438\u0435\u043d\u0442\u0430 oidc \u0434\u043b\u044f \u043f\u0440\u0438\u043b\u043e\u0436\u0435\u043d\u0438\u044f \u043f\u043e\u043b\u044c\u0437\u043e\u0432\u0430\u0442\u0435\u043b\u044f",
+      "needFor": "Идентификатор клиента oidc для приложения пользователя",
       "default": "",
       "required": false,
       "scopes": [
@@ -836,7 +836,7 @@
     {
       "name": "oidc.app.realm",
       "type": "string",
-      "needFor": "\u0420\u0435\u0430\u043b\u043c oidc \u0434\u043b\u044f \u043f\u0440\u0438\u043b\u043e\u0436\u0435\u043d\u0438\u044f \u043f\u043e\u043b\u044c\u0437\u043e\u0432\u0430\u0442\u0435\u043b\u044f",
+      "needFor": "Реалм oidc для приложения пользователя",
       "default": "",
       "required": false,
       "scopes": [
@@ -849,7 +849,7 @@
     {
       "name": "oidc.app.url",
       "type": "string",
-      "needFor": "\u0425\u043e\u0441\u0442 oidc \u0434\u043b\u044f \u043f\u0440\u0438\u043b\u043e\u0436\u0435\u043d\u0438\u044f \u043f\u043e\u043b\u044c\u0437\u043e\u0432\u0430\u0442\u0435\u043b\u044f",
+      "needFor": "Хост oidc для приложения пользователя",
       "default": "",
       "required": false,
       "scopes": [
@@ -862,7 +862,7 @@
     {
       "name": "s3.accessKeyId",
       "type": "string",
-      "needFor": "\u0418\u0434\u0435\u043d\u0442\u0438\u0444\u0438\u043a\u0430\u0442\u043e\u0440 \u0434\u043e\u0441\u0442\u0443\u043f\u0430 \u0434\u043b\u044f \u0430\u0432\u0442\u043e\u0440\u0438\u0437\u0430\u0446\u0438\u0438 \u0432 S3",
+      "needFor": "Идентификатор доступа для авторизации в S3",
       "default": "",
       "required": true,
       "scopes": [
@@ -876,7 +876,7 @@
     {
       "name": "s3.bucket.emailFiles",
       "type": "string",
-      "needFor": "\u0418\u043c\u044f \u0431\u0430\u043a\u0435\u0442\u0430 \u0434\u043b\u044f \u0445\u0440\u0430\u043d\u0435\u043d\u0438\u044f \u0444\u0430\u0439\u043b\u043e\u0432, \u043e\u0442\u043f\u0440\u0430\u0432\u043b\u0435\u043d\u043d\u044b\u0445 \u043d\u0430 \u043f\u043e\u0447\u0442\u0443",
+      "needFor": "Имя бакета для хранения файлов, отправленных на почту",
       "default": "",
       "required": true,
       "scopes": [
@@ -890,7 +890,7 @@
     {
       "name": "s3.bucket.tmpFilesToDownload",
       "type": "string",
-      "needFor": "\u0418\u043c\u044f \u0431\u0430\u043a\u0435\u0442\u0430 \u0434\u043b\u044f \u0445\u0440\u0430\u043d\u0435\u043d\u0438\u044f \u0432\u0440\u0435\u043c\u0435\u043d\u043d\u044b\u0445 \u0444\u0430\u0439\u043b\u043e\u0432, \u0441\u043e\u0437\u0434\u0430\u043d\u043d\u044b\u0445 \u0434\u043b\u044f \u0441\u043a\u0430\u0447\u0438\u0432\u0430\u043d\u0438\u044f \u043f\u043e\u043b\u044c\u0437\u043e\u0432\u0430\u0442\u0435\u043b\u044f\u043c\u0438",
+      "needFor": "Имя бакета для хранения временных файлов, созданных для скачивания пользователями",
       "default": "",
       "required": true,
       "scopes": [
@@ -904,7 +904,7 @@
     {
       "name": "s3.endpoint",
       "type": "string",
-      "needFor": "\u042d\u043d\u0434\u043f\u043e\u0438\u043d\u0442 S3, \u043a\u043e\u0442\u043e\u0440\u044b\u0439 \u0438\u0441\u043f\u043e\u043b\u044c\u0437\u0443\u0435\u0442 \u0431\u0435\u043a\u0435\u043d\u0434",
+      "needFor": "Эндпоинт S3, который использует бекенд",
       "default": "s3.eu-central-1.wasabisys.com",
       "required": true,
       "scopes": [
@@ -918,7 +918,7 @@
     {
       "name": "s3.public.endpoint",
       "type": "string",
-      "needFor": "\u042d\u043d\u0434\u043f\u043e\u0438\u043d\u0442 S3, \u0434\u043e\u0441\u0442\u0443\u043f\u043d\u044b\u0439 \u0434\u043b\u044f \u0444\u0440\u043e\u043d\u0442\u0435\u043d\u0434\u0430",
+      "needFor": "Эндпоинт S3, доступный для фронтенда",
       "default": "",
       "required": false,
       "scopes": [
@@ -932,7 +932,7 @@
     {
       "name": "s3.region",
       "type": "string",
-      "needFor": "\u0418\u0434\u0435\u043d\u0442\u0438\u0444\u0438\u043a\u0430\u0442\u043e\u0440 \u0434\u043e\u0441\u0442\u0443\u043f\u0430 \u0434\u043b\u044f \u0430\u0432\u0442\u043e\u0440\u0438\u0437\u0430\u0446\u0438\u0438 \u0432 S3",
+      "needFor": "Идентификатор доступа для авторизации в S3",
       "default": "eu-central-1",
       "required": true,
       "scopes": [
@@ -946,7 +946,7 @@
     {
       "name": "s3.secretAccessKey",
       "type": "string",
-      "needFor": "\u0421\u0435\u043a\u0440\u0435\u0442\u043d\u044b\u0439 \u043a\u043b\u044e\u0447 \u0434\u043b\u044f \u0430\u0432\u0442\u043e\u0440\u0438\u0437\u0430\u0446\u0438\u0438 \u0432 S3",
+      "needFor": "Секретный ключ для авторизации в S3",
       "default": "",
       "required": true,
       "scopes": [
@@ -994,7 +994,7 @@
           "name": "id",
           "title": {
             "en": "Id",
-            "ru": "\u0418\u0434"
+            "ru": "Ид"
           },
           "needFor": "",
           "updatable": true,
@@ -1014,6 +1014,32 @@
           "category": "id",
           "type": "string",
           "stringType": "plain",
+          "filters": [
+            "equal"
+          ]
+        },
+        {
+          "name": "date",
+          "title": {
+            "en": "Date",
+            "ru": "Дата"
+          },
+          "needFor": "",
+          "updatable": true,
+          "required": true,
+          "requiredOnInput": true,
+          "updatableByUser": true,
+          "hidden": false,
+          "searchable": true,
+          "showInList": true,
+          "showInCreate": true,
+          "showInEdit": true,
+          "showInFilter": true,
+          "showInShow": true,
+          "sharded": false,
+          "array": false,
+          "type": "date",
+          "category": "scalar",
           "filters": [
             "equal"
           ]
@@ -1073,6 +1099,7 @@
       ],
       "uniqueConstraints": [
         [
+          "date",
           "region"
         ]
       ],
@@ -1171,7 +1198,7 @@
             "name": "allArgs",
             "title": {
               "en": {
-                "singular": "\u041e\u0441\u043d\u043e\u0432\u043d\u0430\u044f \u043c\u043e\u0434\u0435\u043b\u044c \u0440\u0435\u0437\u0443\u043b\u044c\u0442\u0430\u0442\u0430 prices"
+                "singular": "Основная модель результата prices"
               }
             },
             "needFor": {},
@@ -1201,7 +1228,7 @@
             "name": "createArgs",
             "title": {
               "en": {
-                "singular": "\u041e\u0441\u043d\u043e\u0432\u043d\u0430\u044f \u043c\u043e\u0434\u0435\u043b\u044c \u0440\u0435\u0437\u0443\u043b\u044c\u0442\u0430\u0442\u0430 prices"
+                "singular": "Основная модель результата prices"
               }
             },
             "needFor": {},
@@ -1231,7 +1258,7 @@
             "name": "updateArgs",
             "title": {
               "en": {
-                "singular": "\u041e\u0441\u043d\u043e\u0432\u043d\u0430\u044f \u043c\u043e\u0434\u0435\u043b\u044c \u0440\u0435\u0437\u0443\u043b\u044c\u0442\u0430\u0442\u0430 prices"
+                "singular": "Основная модель результата prices"
               }
             },
             "needFor": {},
@@ -1261,7 +1288,7 @@
             "name": "deleteArgs",
             "title": {
               "en": {
-                "singular": "\u041e\u0441\u043d\u043e\u0432\u043d\u0430\u044f \u043c\u043e\u0434\u0435\u043b\u044c \u0440\u0435\u0437\u0443\u043b\u044c\u0442\u0430\u0442\u0430 prices"
+                "singular": "Основная модель результата prices"
               }
             },
             "needFor": {},
@@ -1285,6 +1312,32 @@
       "type": "infoRegistry",
       "registrarDepended": false,
       "dimensions": [
+        {
+          "name": "date",
+          "title": {
+            "en": "Date",
+            "ru": "Дата"
+          },
+          "needFor": "",
+          "updatable": true,
+          "required": true,
+          "requiredOnInput": true,
+          "updatableByUser": true,
+          "hidden": false,
+          "searchable": true,
+          "showInList": true,
+          "showInCreate": true,
+          "showInEdit": true,
+          "showInFilter": true,
+          "showInShow": true,
+          "sharded": false,
+          "array": false,
+          "type": "date",
+          "category": "scalar",
+          "filters": [
+            "equal"
+          ]
+        },
         {
           "name": "region",
           "title": {
@@ -1340,7 +1393,7 @@
           "numberType": "base"
         }
       ],
-      "period": "notPeriodic"
+      "period": "day"
     }
   ],
   "sumRegistries": [],
