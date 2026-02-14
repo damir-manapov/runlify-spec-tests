@@ -1,4 +1,5 @@
 /* Copied from rlw-back */
+import {singular} from 'pluralize';
 import * as R from 'ramda';
 
 type FilterValue = string | Date | number | boolean | null | FilterValue[] | Record<string, any>;
@@ -118,6 +119,27 @@ export const toPrismaWhere = (filter?: FilterObject | null) => {
       AND: [
         ...(result as any).AND ?? [],
         ...filtersForAnd,
+      ],
+    };
+  }
+
+  // Arrays
+  const arraysPairs = initialPairs
+    .filter(
+      ([key, val]: R.KeyValuePair<string, any>) => Array.isArray(val) && !postfixesForAnd.some(pf => key.includes(pf)),
+    );
+  if (arraysPairs.length > 0) {
+    const arrays = arraysPairs
+      .map(([key, value]) => R.fromPairs([[singular(key), {
+        in: value,
+      }]]))
+      .reduce((acc, current) => ({...acc, ...current}), {});
+
+    result = {
+      ...result,
+      AND: [
+        ...(result as any).AND ?? [],
+        {...arrays},
       ],
     };
   }

@@ -217,6 +217,160 @@ describe('e2e API: auto-generated int id (with-auto-id)', () => {
       await removeQuiet(c.id)
     })
   })
+
+  describe('sort DESC', () => {
+    it('sorts by quantity DESC', async () => {
+      const a = await createOk({ name: 'Lo', quantity: 10, active: true })
+      const b = await createOk({ name: 'Hi', quantity: 100, active: true })
+      const c = await createOk({ name: 'Mid', quantity: 50, active: true })
+
+      const r = await items.findAll({ sortField: 'quantity', sortOrder: 'DESC' })
+      expect(r.errors).toBeUndefined()
+      const quantities = r.data?.allItems?.map((i: Item) => i.quantity) ?? []
+      expect(quantities).toEqual([...quantities].sort((a, b) => b - a))
+
+      await removeQuiet(a.id)
+      await removeQuiet(b.id)
+      await removeQuiet(c.id)
+    })
+  })
+
+  describe('full-text search (q filter)', () => {
+    it('finds items by name substring', async () => {
+      const a = await createOk({ name: 'Searchable Widget', quantity: 1, active: true })
+      const b = await createOk({ name: 'Another Thing', quantity: 1, active: true })
+
+      const r = await items.findAll({ filter: { q: 'Widget' } })
+      expect(r.errors).toBeUndefined()
+      const names = r.data?.allItems?.map((i: Item) => i.name) ?? []
+      expect(names).toContain('Searchable Widget')
+      expect(names).not.toContain('Another Thing')
+
+      await removeQuiet(a.id)
+      await removeQuiet(b.id)
+    })
+
+    it('finds items by description substring', async () => {
+      const a = await createOk({
+        name: 'QDesc-A',
+        quantity: 1,
+        active: true,
+        description: 'unique-token-xyz',
+      })
+      const b = await createOk({
+        name: 'QDesc-B',
+        quantity: 1,
+        active: true,
+        description: 'something else',
+      })
+
+      const r = await items.findAll({ filter: { q: 'unique-token' } })
+      expect(r.errors).toBeUndefined()
+      const names = r.data?.allItems?.map((i: Item) => i.name) ?? []
+      expect(names).toContain('QDesc-A')
+      expect(names).not.toContain('QDesc-B')
+
+      await removeQuiet(a.id)
+      await removeQuiet(b.id)
+    })
+  })
+
+  describe('pagination', () => {
+    it('limits results with perPage', async () => {
+      const ids: number[] = []
+      for (let i = 0; i < 5; i++) {
+        const item = await createOk({ name: `Page-${i}`, quantity: i, active: true })
+        ids.push(item.id)
+      }
+
+      const r = await items.findAll({ perPage: 2 })
+      expect(r.errors).toBeUndefined()
+      expect(r.data?.allItems?.length).toBe(2)
+
+      for (const id of ids) await removeQuiet(id)
+    })
+
+    it('paginates through pages', async () => {
+      const ids: number[] = []
+      for (let i = 0; i < 4; i++) {
+        const item = await createOk({ name: `Pg-${i}`, quantity: i, active: true })
+        ids.push(item.id)
+      }
+
+      const page0 = await items.findAll({ page: 0, perPage: 2, sortField: 'id', sortOrder: 'ASC' })
+      const page1 = await items.findAll({ page: 1, perPage: 2, sortField: 'id', sortOrder: 'ASC' })
+      expect(page0.errors).toBeUndefined()
+      expect(page1.errors).toBeUndefined()
+      expect(page0.data?.allItems?.length).toBe(2)
+      expect(page1.data?.allItems?.length).toBe(2)
+
+      const idsPage0 = page0.data?.allItems?.map((i: Item) => i.id) ?? []
+      const idsPage1 = page1.data?.allItems?.map((i: Item) => i.id) ?? []
+      // No overlap between pages
+      for (const id of idsPage0) {
+        expect(idsPage1).not.toContain(id)
+      }
+
+      for (const id of ids) await removeQuiet(id)
+    })
+  })
+
+  describe('ids bulk filter', () => {
+    it('filters by list of ids', async () => {
+      const a = await createOk({ name: 'Bulk-A', quantity: 1, active: true })
+      const b = await createOk({ name: 'Bulk-B', quantity: 2, active: true })
+      const c = await createOk({ name: 'Bulk-C', quantity: 3, active: true })
+
+      const r = await items.findAll({ filter: { ids: [a.id, c.id] } })
+      expect(r.errors).toBeUndefined()
+      const names = r.data?.allItems?.map((i: Item) => i.name) ?? []
+      expect(names).toContain('Bulk-A')
+      expect(names).toContain('Bulk-C')
+      expect(names).not.toContain('Bulk-B')
+
+      await removeQuiet(a.id)
+      await removeQuiet(b.id)
+      await removeQuiet(c.id)
+    })
+  })
+
+  describe('findOne non-existent', () => {
+    it('returns null for non-existent id', async () => {
+      const r = await items.findOne(999999)
+      expect(r.errors).toBeUndefined()
+      expect(r.data?.Item).toBeNull()
+    })
+  })
+
+  describe('_defined filter', () => {
+    it('filters items with null description', async () => {
+      const a = await createOk({ name: 'HasDesc', quantity: 1, active: true, description: 'yes' })
+      const b = await createOk({ name: 'NoDesc', quantity: 1, active: true })
+
+      const r = await items.findAll({ filter: { description_defined: false } })
+      expect(r.errors).toBeUndefined()
+      const names = r.data?.allItems?.map((i: Item) => i.name) ?? []
+      expect(names).toContain('NoDesc')
+      expect(names).not.toContain('HasDesc')
+
+      await removeQuiet(a.id)
+      await removeQuiet(b.id)
+    })
+
+    it('filters items with non-null description', async () => {
+      const a = await createOk({ name: 'WithDesc', quantity: 1, active: true, description: 'present' })
+      const b = await createOk({ name: 'Without', quantity: 1, active: true })
+
+      const r = await items.findAll({ filter: { description_defined: true } })
+      expect(r.errors).toBeUndefined()
+      const names = r.data?.allItems?.map((i: Item) => i.name) ?? []
+      expect(names).toContain('WithDesc')
+      expect(names).not.toContain('Without')
+
+      await removeQuiet(a.id)
+      await removeQuiet(b.id)
+    })
+  })
 })
 
 // ---------------------------------------------------------------------------
@@ -424,6 +578,49 @@ describe('e2e API: document entity (with-document)', () => {
 
       await removeQuiet('cnt-1')
       await removeQuiet('cnt-2')
+    })
+  })
+
+  describe('full-text search (q filter)', () => {
+    it('finds orders by code substring', async () => {
+      await createOk({ id: 'q-1', date: isoDate, code: 'SPECIAL-ORDER', total: 1 })
+      await createOk({ id: 'q-2', date: isoDate, code: 'NORMAL-ORDER', total: 1 })
+
+      const r = await orders.findAll({ filter: { q: 'SPECIAL' } })
+      expect(r.errors).toBeUndefined()
+      const codes = r.data?.allOrders?.map((o: Order) => o.code) ?? []
+      expect(codes).toContain('SPECIAL-ORDER')
+      expect(codes).not.toContain('NORMAL-ORDER')
+
+      await removeQuiet('q-1')
+      await removeQuiet('q-2')
+    })
+  })
+
+  describe('findOne non-existent', () => {
+    it('returns null for non-existent id', async () => {
+      const r = await orders.findOne('does-not-exist')
+      expect(r.errors).toBeUndefined()
+      expect(r.data?.Order).toBeNull()
+    })
+  })
+
+  describe('ids bulk filter', () => {
+    it('filters by list of ids', async () => {
+      await createOk({ id: 'ids-1', date: isoDate, code: 'IDS-1', total: 1 })
+      await createOk({ id: 'ids-2', date: isoDate, code: 'IDS-2', total: 2 })
+      await createOk({ id: 'ids-3', date: isoDate, code: 'IDS-3', total: 3 })
+
+      const r = await orders.findAll({ filter: { ids: ['ids-1', 'ids-3'] } })
+      expect(r.errors).toBeUndefined()
+      const codes = r.data?.allOrders?.map((o: Order) => o.code) ?? []
+      expect(codes).toContain('IDS-1')
+      expect(codes).toContain('IDS-3')
+      expect(codes).not.toContain('IDS-2')
+
+      await removeQuiet('ids-1')
+      await removeQuiet('ids-2')
+      await removeQuiet('ids-3')
     })
   })
 })
@@ -663,6 +860,44 @@ describe('e2e API: linked entities (with-relations)', () => {
       expect(r.errors).toBeUndefined()
     })
   })
+
+  describe('_defined filter on link field', () => {
+    it('filters articles with null categoryId', async () => {
+      await createCategory({ id: 'isn-1', name: 'HasCat' })
+      await createArticle({ id: 'isn-a1', title: 'Linked', categoryId: 'isn-1' })
+      await createArticle({ id: 'isn-a2', title: 'Orphan' })
+
+      const r = await articles.findAll({ filter: { categoryId_defined: false } })
+      expect(r.errors).toBeUndefined()
+      const titles = r.data?.allArticles?.map((a: Article) => a.title) ?? []
+      expect(titles).toContain('Orphan')
+      expect(titles).not.toContain('Linked')
+
+      await cleanup(
+        { type: 'article', id: 'isn-a1' },
+        { type: 'article', id: 'isn-a2' },
+        { type: 'category', id: 'isn-1' },
+      )
+    })
+
+    it('filters articles with non-null categoryId', async () => {
+      await createCategory({ id: 'isn-2', name: 'Present' })
+      await createArticle({ id: 'isn-a3', title: 'HasLink', categoryId: 'isn-2' })
+      await createArticle({ id: 'isn-a4', title: 'NoLink' })
+
+      const r = await articles.findAll({ filter: { categoryId_defined: true } })
+      expect(r.errors).toBeUndefined()
+      const titles = r.data?.allArticles?.map((a: Article) => a.title) ?? []
+      expect(titles).toContain('HasLink')
+      expect(titles).not.toContain('NoLink')
+
+      await cleanup(
+        { type: 'article', id: 'isn-a3' },
+        { type: 'article', id: 'isn-a4' },
+        { type: 'category', id: 'isn-2' },
+      )
+    })
+  })
 })
 
 // ---------------------------------------------------------------------------
@@ -785,6 +1020,14 @@ describe('e2e API: manual int id (with-manual-int-id)', () => {
 
       await removeQuiet(40)
       await removeQuiet(50)
+    })
+  })
+
+  describe('findOne non-existent', () => {
+    it('returns null for non-existent int id', async () => {
+      const r = await entries.findOne(999999)
+      expect(r.errors).toBeUndefined()
+      expect(r.data?.Entry).toBeNull()
     })
   })
 })
@@ -1133,6 +1376,59 @@ describe('e2e API: infoRegistry (with-info-registry)', () => {
 
       await removeQuiet('c-1')
       await removeQuiet('c-2')
+    })
+  })
+
+  describe('date field filtering', () => {
+    it('filters by date_gte', async () => {
+      await createOk({ id: 'df-1', date: '2025-01-01', region: 'X1', amount: 10 })
+      await createOk({ id: 'df-2', date: '2025-06-01', region: 'X2', amount: 20 })
+      await createOk({ id: 'df-3', date: '2025-12-01', region: 'X3', amount: 30 })
+
+      const r = await prices.findAll({ filter: { date_gte: '2025-05-01' } })
+      expect(r.errors).toBeUndefined()
+      const ids = r.data?.allPrices?.map((p: Price) => p.id) ?? []
+      expect(ids).toContain('df-2')
+      expect(ids).toContain('df-3')
+      expect(ids).not.toContain('df-1')
+
+      await removeQuiet('df-1')
+      await removeQuiet('df-2')
+      await removeQuiet('df-3')
+    })
+
+    it('filters by date_lte', async () => {
+      await createOk({ id: 'dl-1', date: '2025-01-01', region: 'Y1', amount: 10 })
+      await createOk({ id: 'dl-2', date: '2025-06-01', region: 'Y2', amount: 20 })
+      await createOk({ id: 'dl-3', date: '2025-12-01', region: 'Y3', amount: 30 })
+
+      const r = await prices.findAll({ filter: { date_lte: '2025-07-01' } })
+      expect(r.errors).toBeUndefined()
+      const ids = r.data?.allPrices?.map((p: Price) => p.id) ?? []
+      expect(ids).toContain('dl-1')
+      expect(ids).toContain('dl-2')
+      expect(ids).not.toContain('dl-3')
+
+      await removeQuiet('dl-1')
+      await removeQuiet('dl-2')
+      await removeQuiet('dl-3')
+    })
+
+    it('filters by date range (gte + lte combined)', async () => {
+      await createOk({ id: 'dr-1', date: '2025-01-01', region: 'Z1', amount: 10 })
+      await createOk({ id: 'dr-2', date: '2025-06-01', region: 'Z2', amount: 20 })
+      await createOk({ id: 'dr-3', date: '2025-12-01', region: 'Z3', amount: 30 })
+
+      const r = await prices.findAll({ filter: { date_gte: '2025-03-01', date_lte: '2025-09-01' } })
+      expect(r.errors).toBeUndefined()
+      const ids = r.data?.allPrices?.map((p: Price) => p.id) ?? []
+      expect(ids).toContain('dr-2')
+      expect(ids).not.toContain('dr-1')
+      expect(ids).not.toContain('dr-3')
+
+      await removeQuiet('dr-1')
+      await removeQuiet('dr-2')
+      await removeQuiet('dr-3')
     })
   })
 })
