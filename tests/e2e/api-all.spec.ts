@@ -1019,3 +1019,220 @@ describe('e2e API: auto string id / cuid (with-auto-string-id)', () => {
     })
   })
 })
+
+// ---------------------------------------------------------------------------
+// 8. Info registry — non-periodic, non-registrar-depended (with-info-registry / Price)
+// ---------------------------------------------------------------------------
+
+interface Price {
+  id: string
+  region: string
+  amount: number
+}
+
+describe('e2e API: infoRegistry (with-info-registry)', () => {
+  let ctx: SetupServerResult
+  let prices: CrudClient<Price>
+
+  beforeAll(async () => {
+    ctx = await setupServer('with-info-registry', 'test_info_registry_api')
+    prices = createCrudClient<Price>(ctx.server, 'Price', 'id region amount')
+  }, 240000)
+
+  afterAll(async () => {
+    await teardownServer(ctx)
+  })
+
+  async function createOk(data: Record<string, unknown>): Promise<Price> {
+    const r = await prices.create(data)
+    expect(r.errors).toBeUndefined()
+    return r.data?.createPrice as Price
+  }
+
+  async function removeQuiet(id: string): Promise<void> {
+    await prices.remove(id)
+  }
+
+  describe('basic CRUD', () => {
+    it('creates a price entry', async () => {
+      const p = await createOk({ id: 'p-1', region: 'US', amount: 99.5 })
+      expect(p.id).toBe('p-1')
+      expect(p.region).toBe('US')
+      expect(p.amount).toBe(99.5)
+    })
+
+    it('reads price by id', async () => {
+      const r = await prices.findOne('p-1')
+      expect(r.errors).toBeUndefined()
+      expect(r.data?.Price?.region).toBe('US')
+    })
+
+    it('updates price amount', async () => {
+      const r = await prices.update({ id: 'p-1', region: 'US', amount: 149.99 })
+      expect(r.errors).toBeUndefined()
+      expect(r.data?.updatePrice?.amount).toBe(149.99)
+    })
+
+    it('removes price entry', async () => {
+      const r = await prices.remove('p-1')
+      expect(r.errors).toBeUndefined()
+      const check = await prices.findOne('p-1')
+      expect(check.data?.Price).toBeNull()
+    })
+  })
+
+  describe('dimensions form unique constraint', () => {
+    it('creates two prices with different regions', async () => {
+      await createOk({ id: 'p-2', region: 'US', amount: 100 })
+      await createOk({ id: 'p-3', region: 'EU', amount: 120 })
+
+      const r = await prices.findAll()
+      expect(r.errors).toBeUndefined()
+      expect(r.data?.allPrices?.length).toBeGreaterThanOrEqual(2)
+
+      await removeQuiet('p-2')
+      await removeQuiet('p-3')
+    })
+  })
+
+  describe('filters', () => {
+    it('filters by region', async () => {
+      await createOk({ id: 'f-1', region: 'US', amount: 50 })
+      await createOk({ id: 'f-2', region: 'EU', amount: 75 })
+
+      const r = await prices.findAll({ filter: { region: 'EU' } })
+      expect(r.errors).toBeUndefined()
+      expect(r.data?.allPrices?.every((p: Price) => p.region === 'EU')).toBe(true)
+
+      await removeQuiet('f-1')
+      await removeQuiet('f-2')
+    })
+
+    it('filters by amount range', async () => {
+      await createOk({ id: 'r-1', region: 'UK', amount: 10 })
+      await createOk({ id: 'r-2', region: 'JP', amount: 200 })
+
+      const r = await prices.findAll({ filter: { amount_gte: 100 } })
+      expect(r.errors).toBeUndefined()
+      expect(r.data?.allPrices?.every((p: Price) => p.amount >= 100)).toBe(true)
+
+      await removeQuiet('r-1')
+      await removeQuiet('r-2')
+    })
+  })
+
+  describe('count', () => {
+    it('returns correct count', async () => {
+      await createOk({ id: 'c-1', region: 'CA', amount: 30 })
+      await createOk({ id: 'c-2', region: 'MX', amount: 40 })
+
+      const r = await prices.count()
+      expect(r.errors).toBeUndefined()
+      expect(r.data?._allPricesMeta?.count).toBeGreaterThanOrEqual(2)
+
+      await removeQuiet('c-1')
+      await removeQuiet('c-2')
+    })
+  })
+})
+
+// ---------------------------------------------------------------------------
+// 9. Sum registry — non-registrar-depended (with-sum-registry / Total)
+// ---------------------------------------------------------------------------
+
+interface Total {
+  id: string
+  region: string
+  amount: number
+}
+
+describe('e2e API: sumRegistry (with-sum-registry)', () => {
+  let ctx: SetupServerResult
+  let totals: CrudClient<Total>
+
+  beforeAll(async () => {
+    ctx = await setupServer('with-sum-registry', 'test_sum_registry_api')
+    totals = createCrudClient<Total>(ctx.server, 'Total', 'id region amount')
+  }, 240000)
+
+  afterAll(async () => {
+    await teardownServer(ctx)
+  })
+
+  async function createOk(data: Record<string, unknown>): Promise<Total> {
+    const r = await totals.create(data)
+    expect(r.errors).toBeUndefined()
+    return r.data?.createTotal as Total
+  }
+
+  async function removeQuiet(id: string): Promise<void> {
+    await totals.remove(id)
+  }
+
+  describe('basic CRUD', () => {
+    it('creates a total entry', async () => {
+      const t = await createOk({ id: 't-1', region: 'US', amount: 1000 })
+      expect(t.id).toBe('t-1')
+      expect(t.region).toBe('US')
+      expect(t.amount).toBe(1000)
+    })
+
+    it('reads total by id', async () => {
+      const r = await totals.findOne('t-1')
+      expect(r.errors).toBeUndefined()
+      expect(r.data?.Total?.region).toBe('US')
+      expect(r.data?.Total?.amount).toBe(1000)
+    })
+
+    it('updates total amount', async () => {
+      const r = await totals.update({ id: 't-1', region: 'US', amount: 2500 })
+      expect(r.errors).toBeUndefined()
+      expect(r.data?.updateTotal?.amount).toBe(2500)
+    })
+
+    it('removes total entry', async () => {
+      const r = await totals.remove('t-1')
+      expect(r.errors).toBeUndefined()
+      const check = await totals.findOne('t-1')
+      expect(check.data?.Total).toBeNull()
+    })
+  })
+
+  describe('findAll and count', () => {
+    it('lists all totals', async () => {
+      await createOk({ id: 't-2', region: 'EU', amount: 500 })
+      await createOk({ id: 't-3', region: 'APAC', amount: 750 })
+
+      const r = await totals.findAll()
+      expect(r.errors).toBeUndefined()
+      expect(r.data?.allTotals?.length).toBeGreaterThanOrEqual(2)
+
+      await removeQuiet('t-2')
+      await removeQuiet('t-3')
+    })
+
+    it('counts totals', async () => {
+      await createOk({ id: 't-4', region: 'LATAM', amount: 300 })
+
+      const r = await totals.count()
+      expect(r.errors).toBeUndefined()
+      expect(r.data?._allTotalsMeta?.count).toBeGreaterThanOrEqual(1)
+
+      await removeQuiet('t-4')
+    })
+  })
+
+  describe('filters', () => {
+    it('filters by region', async () => {
+      await createOk({ id: 'sf-1', region: 'US', amount: 100 })
+      await createOk({ id: 'sf-2', region: 'EU', amount: 200 })
+
+      const r = await totals.findAll({ filter: { region: 'US' } })
+      expect(r.errors).toBeUndefined()
+      expect(r.data?.allTotals?.every((t: Total) => t.region === 'US')).toBe(true)
+
+      await removeQuiet('sf-1')
+      await removeQuiet('sf-2')
+    })
+  })
+})

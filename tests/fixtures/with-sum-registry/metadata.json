@@ -1,0 +1,1392 @@
+{
+  "name": "tst",
+  "prefix": "tst",
+  "deployEnvironments": [
+    {
+      "name": "dev",
+      "manualDeploy": false,
+      "main": false,
+      "clusterName": "stage01",
+      "workerClusterName": "workers01",
+      "branchName": "master",
+      "metricsEnabled": true,
+      "host": "making.ventures",
+      "runnerTag": "dev",
+      "gitlabEnvPrefix": "dev"
+    },
+    {
+      "name": "prod",
+      "manualDeploy": true,
+      "main": true,
+      "clusterName": "stage01",
+      "workerClusterName": "workers01",
+      "branchName": "release",
+      "metricsEnabled": true,
+      "host": "making.ventures",
+      "runnerTag": "prod",
+      "gitlabEnvPrefix": "prod"
+    }
+  ],
+  "glossary": [],
+  "commands": [],
+  "telegramBots": [],
+  "configVars": [
+    {
+      "name": "adm.jwt.secret",
+      "type": "string",
+      "needFor": "Секрет для подписи JWT-токенов приложения админки",
+      "default": "admSecret",
+      "required": false,
+      "scopes": [
+        "back",
+        "worker",
+        "telegramBot"
+      ],
+      "hidden": true,
+      "editable": false
+    },
+    {
+      "name": "admin.recaptcha.publicKey",
+      "type": "string",
+      "needFor": "Публичный токен рекапчи приложения админки",
+      "default": "",
+      "required": false,
+      "scopes": [
+        "admin-app"
+      ],
+      "hidden": false,
+      "editable": true
+    },
+    {
+      "name": "admin.recaptcha.requiredScore",
+      "type": "float",
+      "needFor": "Требуемый уровень доверия к пользователю",
+      "default": 0.7,
+      "required": false,
+      "scopes": [
+        "back",
+        "worker",
+        "telegramBot"
+      ],
+      "hidden": false,
+      "editable": true
+    },
+    {
+      "name": "admin.recaptcha.secretKey",
+      "type": "string",
+      "needFor": "Секретный токен рекапчи приложения админки",
+      "default": "",
+      "required": false,
+      "scopes": [
+        "back",
+        "worker",
+        "telegramBot"
+      ],
+      "hidden": true,
+      "editable": false
+    },
+    {
+      "name": "admin.ui.url",
+      "type": "string",
+      "needFor": "Урл административного интерфейса (без конечного слеша)",
+      "default": "http://localhost:8080",
+      "required": false,
+      "scopes": [
+        "back",
+        "worker",
+        "telegramBot"
+      ],
+      "hidden": false,
+      "editable": true
+    },
+    {
+      "name": "app.environment",
+      "type": "string",
+      "needFor": "Название окружения",
+      "default": "dev",
+      "required": true,
+      "scopes": [
+        "back",
+        "worker",
+        "telegramBot"
+      ],
+      "hidden": false,
+      "editable": true
+    },
+    {
+      "name": "app.jwt.secret",
+      "type": "string",
+      "needFor": "Секрет для подписи JWT-токенов приложения пользователей",
+      "default": "appSecret",
+      "required": false,
+      "scopes": [
+        "back",
+        "worker",
+        "telegramBot"
+      ],
+      "hidden": true,
+      "editable": false
+    },
+    {
+      "name": "app.name",
+      "type": "string",
+      "needFor": "Техническое название приложения",
+      "default": "",
+      "required": true,
+      "scopes": [
+        "back",
+        "worker",
+        "telegramBot"
+      ],
+      "hidden": false,
+      "editable": true
+    },
+    {
+      "name": "app.title",
+      "type": "string",
+      "needFor": "Пользовательское название приложения",
+      "default": "",
+      "required": false,
+      "scopes": [
+        "back",
+        "worker",
+        "telegramBot"
+      ],
+      "hidden": false,
+      "editable": true
+    },
+    {
+      "name": "app.ui.url",
+      "type": "string",
+      "needFor": "Урл интерфейса конечного пользователя (без конечного слеша)",
+      "default": "http://localhost:4000",
+      "required": false,
+      "scopes": [
+        "back",
+        "worker",
+        "telegramBot"
+      ],
+      "hidden": false,
+      "editable": true
+    },
+    {
+      "name": "authorization.backendChecks.enabled",
+      "type": "bool",
+      "needFor": "Проверка авторизации на бекенде включены",
+      "default": false,
+      "required": false,
+      "scopes": [
+        "back",
+        "worker",
+        "telegramBot"
+      ],
+      "hidden": false,
+      "editable": true
+    },
+    {
+      "name": "bootstrap.enabled",
+      "type": "bool",
+      "needFor": "Подготавливать окружеине при запуске",
+      "default": false,
+      "required": false,
+      "scopes": [
+        "back",
+        "worker",
+        "telegramBot"
+      ],
+      "hidden": false,
+      "editable": true
+    },
+    {
+      "name": "checkLoginIframe",
+      "type": "bool",
+      "needFor": "Проверка авторизации во фрейме включена",
+      "default": false,
+      "required": false,
+      "scopes": [
+        "back",
+        "admin-app"
+      ],
+      "hidden": false,
+      "editable": true
+    },
+    {
+      "name": "customer.recaptcha.publicKey",
+      "type": "string",
+      "needFor": "Публичный токен рекапчи приложения пользователя",
+      "default": "",
+      "required": false,
+      "scopes": [
+        "cutomer-app"
+      ],
+      "hidden": false,
+      "editable": true
+    },
+    {
+      "name": "customer.recaptcha.requiredScore",
+      "type": "string",
+      "needFor": "Требуемый уровень доверия к пользователю",
+      "default": "0.7",
+      "required": false,
+      "scopes": [
+        "back",
+        "worker",
+        "telegramBot"
+      ],
+      "hidden": false,
+      "editable": true
+    },
+    {
+      "name": "customer.recaptcha.secretKey",
+      "type": "string",
+      "needFor": "Секретный токен рекапчи приложения пользователя",
+      "default": "",
+      "required": false,
+      "scopes": [
+        "back",
+        "worker",
+        "telegramBot"
+      ],
+      "hidden": true,
+      "editable": false
+    },
+    {
+      "name": "database.main.migration.uri",
+      "type": "string",
+      "needFor": "Строка подключения к основной базе для миграций (должна быть прямой строкой подключения к бд минуя pgbouncer, если он используется)",
+      "default": "postgresql://postgres:password@localhost:5432",
+      "required": true,
+      "scopes": [
+        "back",
+        "worker",
+        "telegramBot"
+      ],
+      "hidden": true,
+      "editable": false
+    },
+    {
+      "name": "database.main.readOnly.enabled",
+      "type": "bool",
+      "needFor": "Включена ли работа с запросами на чтение через отдельное подключение",
+      "default": false,
+      "required": true,
+      "scopes": [
+        "back",
+        "worker",
+        "telegramBot"
+      ],
+      "hidden": false,
+      "editable": true
+    },
+    {
+      "name": "database.main.readOnly.uri",
+      "type": "string",
+      "needFor": "Строка подключения к основной базе только для чтения",
+      "default": "postgresql://postgres:password@localhost:5432",
+      "required": false,
+      "scopes": [
+        "back",
+        "worker",
+        "telegramBot"
+      ],
+      "hidden": true,
+      "editable": false
+    },
+    {
+      "name": "database.main.write.uri",
+      "type": "string",
+      "needFor": "Строка подключения к основной базе данных для записи",
+      "default": "postgresql://postgres:password@localhost:5432",
+      "required": true,
+      "scopes": [
+        "back",
+        "worker",
+        "telegramBot"
+      ],
+      "hidden": true,
+      "editable": false
+    },
+    {
+      "name": "dockerRegistry.domain",
+      "type": "string",
+      "needFor": "Docker registry domain",
+      "default": "",
+      "required": false,
+      "scopes": [
+        "ci"
+      ],
+      "hidden": false,
+      "editable": true
+    },
+    {
+      "name": "dockerRegistry.password",
+      "type": "string",
+      "needFor": "Docker registry password",
+      "default": "",
+      "required": false,
+      "scopes": [
+        "ci"
+      ],
+      "hidden": false,
+      "editable": true
+    },
+    {
+      "name": "dockerRegistry.username",
+      "type": "string",
+      "needFor": "Docker registry username",
+      "default": "",
+      "required": false,
+      "scopes": [
+        "ci"
+      ],
+      "hidden": false,
+      "editable": true
+    },
+    {
+      "name": "endpoint",
+      "type": "string",
+      "needFor": "Путь к бекенду",
+      "default": "",
+      "required": false,
+      "scopes": [
+        "admin-app"
+      ],
+      "hidden": false,
+      "editable": true
+    },
+    {
+      "name": "es.cloudId",
+      "type": "string",
+      "needFor": "Идентификатор аккаунта в облачном сервисе ElasticSearch",
+      "default": "",
+      "required": false,
+      "scopes": [
+        "back",
+        "worker",
+        "telegramBot"
+      ],
+      "hidden": false,
+      "editable": true
+    },
+    {
+      "name": "es.enabled",
+      "type": "bool",
+      "needFor": "Эластик включен",
+      "default": false,
+      "required": false,
+      "scopes": [
+        "back",
+        "worker",
+        "telegramBot"
+      ],
+      "hidden": false,
+      "editable": true
+    },
+    {
+      "name": "es.node",
+      "type": "string",
+      "needFor": "Нода эластика",
+      "default": "http://localhost:9200",
+      "required": false,
+      "scopes": [
+        "back",
+        "worker",
+        "telegramBot"
+      ],
+      "hidden": false,
+      "editable": true
+    },
+    {
+      "name": "es.password",
+      "type": "string",
+      "needFor": "Пароль для авторизации в облачном сервисе ElasticSearch",
+      "default": "",
+      "required": false,
+      "scopes": [
+        "back",
+        "worker",
+        "telegramBot"
+      ],
+      "hidden": true,
+      "editable": false
+    },
+    {
+      "name": "es.tls.rejectUnauthorized",
+      "type": "bool",
+      "needFor": "Запрещать невалидный ssl сертификат",
+      "default": false,
+      "required": false,
+      "scopes": [
+        "back",
+        "worker",
+        "telegramBot"
+      ],
+      "hidden": false,
+      "editable": true
+    },
+    {
+      "name": "es.username",
+      "type": "string",
+      "needFor": "Пользователь для авторизации в облачном сервисе ElasticSearch",
+      "default": "",
+      "required": false,
+      "scopes": [
+        "back",
+        "worker",
+        "telegramBot"
+      ],
+      "hidden": false,
+      "editable": true
+    },
+    {
+      "name": "graphql.playground.enabled",
+      "type": "bool",
+      "needFor": "Включение graphql playground (true | false)",
+      "default": true,
+      "required": false,
+      "scopes": [
+        "back",
+        "worker",
+        "telegramBot"
+      ],
+      "hidden": false,
+      "editable": true
+    },
+    {
+      "name": "kafka.auth.enabled",
+      "type": "bool",
+      "needFor": "Включена проверка аутентификации",
+      "default": true,
+      "required": true,
+      "scopes": [
+        "back",
+        "worker",
+        "telegramBot"
+      ],
+      "hidden": false,
+      "editable": true
+    },
+    {
+      "name": "kafka.brokers",
+      "type": "string",
+      "needFor": "Список kafka блокеров",
+      "default": "localhost:29092;localhost:29094",
+      "required": false,
+      "scopes": [
+        "back",
+        "worker",
+        "telegramBot"
+      ],
+      "hidden": false,
+      "editable": true
+    },
+    {
+      "name": "kafka.enabled",
+      "type": "bool",
+      "needFor": "Кафка включена",
+      "default": false,
+      "required": false,
+      "scopes": [
+        "back",
+        "worker",
+        "telegramBot"
+      ],
+      "hidden": false,
+      "editable": true
+    },
+    {
+      "name": "kafka.password",
+      "type": "string",
+      "needFor": "Пароль доступа в kafka",
+      "default": "",
+      "required": false,
+      "scopes": [
+        "back",
+        "worker",
+        "telegramBot"
+      ],
+      "hidden": true,
+      "editable": false
+    },
+    {
+      "name": "kafka.queue.acks",
+      "type": "int",
+      "needFor": "`-1`(all) все несинхронизированные реплики должны подтвердить (по умолчанию), `0` нет подтверждений, `1` только ждет подтверждения лидера",
+      "default": 1,
+      "required": false,
+      "scopes": [
+        "back",
+        "worker",
+        "telegramBot"
+      ],
+      "hidden": false,
+      "editable": true
+    },
+    {
+      "name": "kafka.queue.defaultRetryTime",
+      "type": "int",
+      "needFor": "Время паузы после первой ошибки, например 20000 мс, потом оно увеличивается экспоненциально с мультипликатором 1.5",
+      "default": 20000,
+      "required": false,
+      "scopes": [
+        "back",
+        "worker",
+        "telegramBot"
+      ],
+      "hidden": false,
+      "editable": true
+    },
+    {
+      "name": "kafka.queue.maxAttemptsSize",
+      "type": "int",
+      "needFor": "Максимальное количество попыток обработки ошибки на сообщение",
+      "default": 10,
+      "required": false,
+      "scopes": [
+        "back",
+        "worker",
+        "telegramBot"
+      ],
+      "hidden": false,
+      "editable": true
+    },
+    {
+      "name": "kafka.queue.stackSize",
+      "type": "int",
+      "needFor": "Количество сообщений, обрабатываемых параллельно",
+      "default": 3,
+      "required": false,
+      "scopes": [
+        "back",
+        "worker",
+        "telegramBot"
+      ],
+      "hidden": false,
+      "editable": true
+    },
+    {
+      "name": "kafka.queue.supportedVersion",
+      "type": "string",
+      "needFor": "Поддерживаемые версии сообщения",
+      "default": "1;2",
+      "required": false,
+      "scopes": [
+        "back",
+        "worker",
+        "telegramBot"
+      ],
+      "hidden": false,
+      "editable": true
+    },
+    {
+      "name": "kafka.queue.waitingInterruptTime",
+      "type": "int",
+      "needFor": "Время паузы в очереди ожидания, когда она прошла все сообщения, это чтобы она не крутила сообщения покругу без остановки ",
+      "default": 60000,
+      "required": false,
+      "scopes": [
+        "back",
+        "worker",
+        "telegramBot"
+      ],
+      "hidden": false,
+      "editable": true
+    },
+    {
+      "name": "kafka.sasl.mechanism",
+      "type": "string",
+      "needFor": "SASL mechanism",
+      "default": "plain",
+      "required": true,
+      "scopes": [
+        "back",
+        "worker",
+        "telegramBot"
+      ],
+      "hidden": false,
+      "editable": true
+    },
+    {
+      "name": "kafka.ssl.enabled",
+      "type": "bool",
+      "needFor": "Включена работа по ssl",
+      "default": true,
+      "required": true,
+      "scopes": [
+        "back",
+        "worker",
+        "telegramBot"
+      ],
+      "hidden": false,
+      "editable": true
+    },
+    {
+      "name": "kafka.ssl.rejectUnauthorized",
+      "type": "bool",
+      "needFor": "Запрещать невалидный ssl сертификат",
+      "default": false,
+      "required": false,
+      "scopes": [
+        "back",
+        "worker",
+        "telegramBot"
+      ],
+      "hidden": false,
+      "editable": true
+    },
+    {
+      "name": "kafka.username",
+      "type": "string",
+      "needFor": "Username доступа в kafka",
+      "default": "",
+      "required": false,
+      "scopes": [
+        "back",
+        "worker",
+        "telegramBot"
+      ],
+      "hidden": false,
+      "editable": true
+    },
+    {
+      "name": "keycloak.adm.cli.client",
+      "type": "string",
+      "needFor": "Клиент для доступа в api keycloak админки",
+      "default": "backend-api",
+      "required": false,
+      "scopes": [
+        "back",
+        "worker",
+        "telegramBot"
+      ],
+      "hidden": false,
+      "editable": true
+    },
+    {
+      "name": "keycloak.adm.cli.secret",
+      "type": "string",
+      "needFor": "Секрет для доступа в api keycloak админки",
+      "default": "",
+      "required": false,
+      "scopes": [
+        "back",
+        "worker",
+        "telegramBot"
+      ],
+      "hidden": false,
+      "editable": true
+    },
+    {
+      "name": "keycloak.app.cli.client",
+      "type": "string",
+      "needFor": "Клиент для доступа в api keycloak приложения пользователя",
+      "default": "backend-api",
+      "required": false,
+      "scopes": [
+        "back",
+        "worker",
+        "telegramBot"
+      ],
+      "hidden": false,
+      "editable": true
+    },
+    {
+      "name": "keycloak.app.cli.secret",
+      "type": "string",
+      "needFor": "Секрет для доступа в api keycloak приложения пользователя",
+      "default": "",
+      "required": false,
+      "scopes": [
+        "back",
+        "worker",
+        "telegramBot"
+      ],
+      "hidden": false,
+      "editable": true
+    },
+    {
+      "name": "logs.format",
+      "type": "string",
+      "needFor": "Формат логов (plain | json)",
+      "default": "plain",
+      "required": false,
+      "scopes": [
+        "back",
+        "worker",
+        "telegramBot"
+      ],
+      "hidden": false,
+      "editable": true
+    },
+    {
+      "name": "loki.url",
+      "type": "string",
+      "needFor": "Урл для доступа в Loki. Используется для запроса бизнес-логов",
+      "default": "",
+      "required": false,
+      "scopes": [
+        "back",
+        "worker",
+        "telegramBot"
+      ],
+      "hidden": false,
+      "editable": true
+    },
+    {
+      "name": "oidc.adm.clientId",
+      "type": "string",
+      "needFor": "Идентификатор клиента oidc для админки",
+      "default": "",
+      "required": false,
+      "scopes": [
+        "admin-app"
+      ],
+      "hidden": false,
+      "editable": true
+    },
+    {
+      "name": "oidc.adm.issuer",
+      "type": "string",
+      "needFor": "Issuer oidc для админки",
+      "default": "",
+      "required": false,
+      "scopes": [
+        "back",
+        "admin-app"
+      ],
+      "hidden": false,
+      "editable": true
+    },
+    {
+      "name": "oidc.adm.jwksRejectUnauthorized",
+      "type": "bool",
+      "needFor": "Запрещать невалидный ssl сертификат",
+      "default": false,
+      "required": false,
+      "scopes": [
+        "back",
+        "worker",
+        "telegramBot"
+      ],
+      "hidden": false,
+      "editable": true
+    },
+    {
+      "name": "oidc.adm.jwksUri",
+      "type": "string",
+      "needFor": "Uri jwks oidc для проверки авторизации админки",
+      "default": "",
+      "required": false,
+      "scopes": [
+        "back"
+      ],
+      "hidden": false,
+      "editable": true
+    },
+    {
+      "name": "oidc.adm.logoutType",
+      "type": "string",
+      "needFor": "Тип выхода админки",
+      "default": "",
+      "required": false,
+      "scopes": [
+        "admin-app"
+      ],
+      "hidden": false,
+      "editable": true
+    },
+    {
+      "name": "oidc.adm.realm",
+      "type": "string",
+      "needFor": "Реалм oidc для админки",
+      "default": "",
+      "required": false,
+      "scopes": [
+        "back",
+        "admin-app"
+      ],
+      "hidden": false,
+      "editable": true
+    },
+    {
+      "name": "oidc.adm.url",
+      "type": "string",
+      "needFor": "Хост oidc для админки",
+      "default": "",
+      "required": false,
+      "scopes": [
+        "back",
+        "admin-app"
+      ],
+      "hidden": false,
+      "editable": true
+    },
+    {
+      "name": "oidc.app.clientId",
+      "type": "string",
+      "needFor": "Идентификатор клиента oidc для приложения пользователя",
+      "default": "",
+      "required": false,
+      "scopes": [
+        "cutomer-app"
+      ],
+      "hidden": false,
+      "editable": true
+    },
+    {
+      "name": "oidc.app.realm",
+      "type": "string",
+      "needFor": "Реалм oidc для приложения пользователя",
+      "default": "",
+      "required": false,
+      "scopes": [
+        "back",
+        "cutomer-app"
+      ],
+      "hidden": false,
+      "editable": true
+    },
+    {
+      "name": "oidc.app.url",
+      "type": "string",
+      "needFor": "Хост oidc для приложения пользователя",
+      "default": "",
+      "required": false,
+      "scopes": [
+        "back",
+        "cutomer-app"
+      ],
+      "hidden": false,
+      "editable": true
+    },
+    {
+      "name": "s3.accessKeyId",
+      "type": "string",
+      "needFor": "Идентификатор доступа для авторизации в S3",
+      "default": "",
+      "required": true,
+      "scopes": [
+        "back",
+        "worker",
+        "telegramBot"
+      ],
+      "hidden": false,
+      "editable": true
+    },
+    {
+      "name": "s3.bucket.emailFiles",
+      "type": "string",
+      "needFor": "Имя бакета для хранения файлов, отправленных на почту",
+      "default": "",
+      "required": true,
+      "scopes": [
+        "back",
+        "worker",
+        "telegramBot"
+      ],
+      "hidden": false,
+      "editable": true
+    },
+    {
+      "name": "s3.bucket.tmpFilesToDownload",
+      "type": "string",
+      "needFor": "Имя бакета для хранения временных файлов, созданных для скачивания пользователями",
+      "default": "",
+      "required": true,
+      "scopes": [
+        "back",
+        "worker",
+        "telegramBot"
+      ],
+      "hidden": false,
+      "editable": true
+    },
+    {
+      "name": "s3.endpoint",
+      "type": "string",
+      "needFor": "Эндпоинт S3, который использует бекенд",
+      "default": "s3.eu-central-1.wasabisys.com",
+      "required": true,
+      "scopes": [
+        "back",
+        "worker",
+        "telegramBot"
+      ],
+      "hidden": true,
+      "editable": false
+    },
+    {
+      "name": "s3.public.endpoint",
+      "type": "string",
+      "needFor": "Эндпоинт S3, доступный для фронтенда",
+      "default": "",
+      "required": false,
+      "scopes": [
+        "back",
+        "worker",
+        "telegramBot"
+      ],
+      "hidden": true,
+      "editable": false
+    },
+    {
+      "name": "s3.region",
+      "type": "string",
+      "needFor": "Идентификатор доступа для авторизации в S3",
+      "default": "eu-central-1",
+      "required": true,
+      "scopes": [
+        "back",
+        "worker",
+        "telegramBot"
+      ],
+      "hidden": false,
+      "editable": true
+    },
+    {
+      "name": "s3.secretAccessKey",
+      "type": "string",
+      "needFor": "Секретный ключ для авторизации в S3",
+      "default": "",
+      "required": true,
+      "scopes": [
+        "back",
+        "worker",
+        "telegramBot"
+      ],
+      "hidden": true,
+      "editable": false
+    },
+    {
+      "name": "sentry.dsn",
+      "type": "string",
+      "needFor": "Sentry dsn",
+      "default": "",
+      "required": false,
+      "scopes": [
+        "back",
+        "worker",
+        "telegramBot"
+      ],
+      "hidden": false,
+      "editable": true
+    }
+  ],
+  "catalogs": [],
+  "documents": [],
+  "infoRegistries": [],
+  "sumRegistries": [
+    {
+      "name": "totals",
+      "title": {
+        "en": {
+          "plural": "Totals",
+          "singular": "Total"
+        }
+      },
+      "needFor": {},
+      "materialUiIcon": "Brightness1Outlined",
+      "previewFeatures": [],
+      "singleKey": true,
+      "titleField": "id",
+      "keyField": "id",
+      "fields": [
+        {
+          "name": "id",
+          "title": {
+            "en": "Id",
+            "ru": "Ид"
+          },
+          "needFor": "",
+          "updatable": true,
+          "required": true,
+          "requiredOnInput": true,
+          "updatableByUser": true,
+          "hidden": false,
+          "searchable": true,
+          "showInList": true,
+          "showInCreate": true,
+          "showInEdit": true,
+          "showInFilter": true,
+          "showInShow": true,
+          "sharded": false,
+          "array": false,
+          "autoGenerated": false,
+          "category": "id",
+          "type": "string",
+          "stringType": "plain",
+          "filters": [
+            "equal"
+          ]
+        },
+        {
+          "name": "region",
+          "title": {
+            "en": "Region"
+          },
+          "needFor": "",
+          "updatable": true,
+          "required": true,
+          "requiredOnInput": true,
+          "updatableByUser": true,
+          "hidden": false,
+          "searchable": true,
+          "showInList": true,
+          "showInCreate": true,
+          "showInEdit": true,
+          "showInFilter": true,
+          "showInShow": true,
+          "sharded": false,
+          "array": false,
+          "type": "string",
+          "category": "scalar",
+          "stringType": "plain",
+          "filters": [
+            "equal"
+          ]
+        },
+        {
+          "name": "amount",
+          "title": {
+            "en": "Amount"
+          },
+          "needFor": "",
+          "updatable": true,
+          "required": true,
+          "requiredOnInput": true,
+          "updatableByUser": true,
+          "hidden": false,
+          "searchable": true,
+          "showInList": true,
+          "showInCreate": true,
+          "showInEdit": true,
+          "showInFilter": true,
+          "showInShow": true,
+          "sharded": false,
+          "array": false,
+          "type": "float",
+          "category": "scalar",
+          "filters": [
+            "equal"
+          ],
+          "numberType": "base"
+        }
+      ],
+      "uniqueConstraints": [
+        [
+          "region"
+        ]
+      ],
+      "indexes": [],
+      "forms": {
+        "list": {
+          "filter": {
+            "fields": [
+              {
+                "name": "id",
+                "hidden": false,
+                "alwaysOn": false
+              },
+              {
+                "name": "region",
+                "hidden": false,
+                "alwaysOn": false
+              },
+              {
+                "name": "amount",
+                "hidden": false,
+                "alwaysOn": false
+              }
+            ]
+          }
+        },
+        "show": {
+          "ignoredLinkedEntities": []
+        }
+      },
+      "predefinedElements": [],
+      "devPerefinedElements": [],
+      "auditable": true,
+      "externalSearch": false,
+      "elasticOnly": false,
+      "searchEnabled": true,
+      "sortField": "id",
+      "sortOrder": "DESC",
+      "multitenancy": "none",
+      "commonElementsVisibleToAll": false,
+      "sharded": false,
+      "isExternalSearch": false,
+      "creatableByUser": true,
+      "updatableByUser": true,
+      "removableByUser": true,
+      "exportableByUser": true,
+      "excludeFromCommonMenu": false,
+      "clearDBAfter": [],
+      "allowedToChange": "",
+      "permissions": [],
+      "pages": [
+        {
+          "name": "totals.all",
+          "title": {
+            "en": {
+              "singular": "totals.all"
+            }
+          },
+          "needFor": {},
+          "materialUiIcon": "Brightness1Outlined",
+          "previewFeatures": [],
+          "type": "page",
+          "link": "/totals",
+          "label": "catalogs.totals.title.plural"
+        },
+        {
+          "name": "totals.create",
+          "title": {
+            "en": {
+              "singular": "totals.create"
+            }
+          },
+          "needFor": {},
+          "materialUiIcon": "Brightness1Outlined",
+          "previewFeatures": [],
+          "type": "page",
+          "link": "/totals/create",
+          "label": "catalogs.totals.title.singular"
+        }
+      ],
+      "generalModels": [],
+      "inputModels": [],
+      "outputModels": [],
+      "methods": [
+        {
+          "name": "all",
+          "title": {
+            "en": {
+              "singular": "all"
+            }
+          },
+          "needFor": {},
+          "materialUiIcon": "Brightness1Outlined",
+          "previewFeatures": [],
+          "argsModel": {
+            "name": "allArgs",
+            "title": {
+              "en": {
+                "singular": "Основная модель результата totals"
+              }
+            },
+            "needFor": {},
+            "materialUiIcon": "Brightness1Outlined",
+            "previewFeatures": [],
+            "fields": []
+          },
+          "returnModel": {
+            "returnType": "void"
+          },
+          "exportedToApi": true,
+          "queable": false,
+          "methodType": "query",
+          "async": false
+        },
+        {
+          "name": "create",
+          "title": {
+            "en": {
+              "singular": "create"
+            }
+          },
+          "needFor": {},
+          "materialUiIcon": "Brightness1Outlined",
+          "previewFeatures": [],
+          "argsModel": {
+            "name": "createArgs",
+            "title": {
+              "en": {
+                "singular": "Основная модель результата totals"
+              }
+            },
+            "needFor": {},
+            "materialUiIcon": "Brightness1Outlined",
+            "previewFeatures": [],
+            "fields": []
+          },
+          "returnModel": {
+            "returnType": "void"
+          },
+          "exportedToApi": true,
+          "queable": false,
+          "methodType": "mutation",
+          "async": false
+        },
+        {
+          "name": "update",
+          "title": {
+            "en": {
+              "singular": "update"
+            }
+          },
+          "needFor": {},
+          "materialUiIcon": "Brightness1Outlined",
+          "previewFeatures": [],
+          "argsModel": {
+            "name": "updateArgs",
+            "title": {
+              "en": {
+                "singular": "Основная модель результата totals"
+              }
+            },
+            "needFor": {},
+            "materialUiIcon": "Brightness1Outlined",
+            "previewFeatures": [],
+            "fields": []
+          },
+          "returnModel": {
+            "returnType": "void"
+          },
+          "exportedToApi": true,
+          "queable": false,
+          "methodType": "mutation",
+          "async": false
+        },
+        {
+          "name": "delete",
+          "title": {
+            "en": {
+              "singular": "delete"
+            }
+          },
+          "needFor": {},
+          "materialUiIcon": "Brightness1Outlined",
+          "previewFeatures": [],
+          "argsModel": {
+            "name": "deleteArgs",
+            "title": {
+              "en": {
+                "singular": "Основная модель результата totals"
+              }
+            },
+            "needFor": {},
+            "materialUiIcon": "Brightness1Outlined",
+            "previewFeatures": [],
+            "fields": []
+          },
+          "returnModel": {
+            "returnType": "void"
+          },
+          "exportedToApi": true,
+          "queable": false,
+          "methodType": "mutation",
+          "async": false
+        }
+      ],
+      "labels": [
+        "catalogs.totals.title.plural",
+        "catalogs.totals.title.singular"
+      ],
+      "type": "sumRegistry",
+      "registrarDepended": false,
+      "dimensions": [
+        {
+          "name": "region",
+          "title": {
+            "en": "Region"
+          },
+          "needFor": "",
+          "updatable": true,
+          "required": true,
+          "requiredOnInput": true,
+          "updatableByUser": true,
+          "hidden": false,
+          "searchable": true,
+          "showInList": true,
+          "showInCreate": true,
+          "showInEdit": true,
+          "showInFilter": true,
+          "showInShow": true,
+          "sharded": false,
+          "array": false,
+          "type": "string",
+          "category": "scalar",
+          "stringType": "plain",
+          "filters": [
+            "equal"
+          ]
+        }
+      ],
+      "resources": [
+        {
+          "name": "amount",
+          "title": {
+            "en": "Amount"
+          },
+          "needFor": "",
+          "updatable": true,
+          "required": true,
+          "requiredOnInput": true,
+          "updatableByUser": true,
+          "hidden": false,
+          "searchable": true,
+          "showInList": true,
+          "showInCreate": true,
+          "showInEdit": true,
+          "showInFilter": true,
+          "showInShow": true,
+          "sharded": false,
+          "array": false,
+          "type": "float",
+          "category": "scalar",
+          "filters": [
+            "equal"
+          ],
+          "numberType": "base"
+        }
+      ]
+    }
+  ],
+  "languages": [
+    {
+      "id": "en",
+      "title": "English"
+    },
+    {
+      "id": "ru",
+      "title": "Russian"
+    }
+  ],
+  "defaultLanguage": "en",
+  "reports": [],
+  "restApis": [],
+  "integrationClients": [],
+  "workers": [],
+  "roles": [],
+  "menuItems": [],
+  "pages": [],
+  "back": {
+    "name": "back",
+    "title": {
+      "en": {
+        "singular": "back"
+      }
+    },
+    "needFor": {},
+    "materialUiIcon": "Brightness1Outlined",
+    "previewFeatures": [],
+    "replicas": 1,
+    "requests": {
+      "memory": "192Mi",
+      "cpu": "0.15",
+      "maxOldSpaceSize": 173
+    },
+    "limits": {
+      "memory": "192Mi",
+      "cpu": "0.15",
+      "maxOldSpaceSize": 173
+    }
+  },
+  "generalModels": [],
+  "inputModels": [],
+  "outputModels": [],
+  "methods": [],
+  "labels": [],
+  "additionalServices": []
+}

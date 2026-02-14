@@ -36,6 +36,12 @@ export interface DocumentConfig extends ServiceConfig {
   externalSearchDeps?: Partial<Record<string, string>>
 }
 
+export type InfoRegistryPeriod = 'notPeriodic' | 'second' | 'day' | 'month' | 'year'
+
+export interface InfoRegistryConfig extends ServiceConfig {
+  period: InfoRegistryPeriod
+}
+
 export type BaseServiceConstrictors = {
   [K in keyof BaseServices]: (ctx: Context) => BaseServices[K]
 }

@@ -257,6 +257,12 @@ function removeStaleEntityDirs(fresh: FreshBackend): void {
   for (const d of (metadata.documents ?? []) as { name: string }[]) {
     activeEntities.add(d.name)
   }
+  for (const r of (metadata.infoRegistries ?? []) as { name: string }[]) {
+    activeEntities.add(r.name)
+  }
+  for (const r of (metadata.sumRegistries ?? []) as { name: string }[]) {
+    activeEntities.add(r.name)
+  }
 
   removeStaleGraphDirs(fresh.backDir, activeEntities)
   removeStaleServiceDirs(fresh.backDir, activeEntities)

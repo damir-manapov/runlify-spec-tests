@@ -1,0 +1,1393 @@
+{
+  "name": "tst",
+  "prefix": "tst",
+  "deployEnvironments": [
+    {
+      "name": "dev",
+      "manualDeploy": false,
+      "main": false,
+      "clusterName": "stage01",
+      "workerClusterName": "workers01",
+      "branchName": "master",
+      "metricsEnabled": true,
+      "host": "making.ventures",
+      "runnerTag": "dev",
+      "gitlabEnvPrefix": "dev"
+    },
+    {
+      "name": "prod",
+      "manualDeploy": true,
+      "main": true,
+      "clusterName": "stage01",
+      "workerClusterName": "workers01",
+      "branchName": "release",
+      "metricsEnabled": true,
+      "host": "making.ventures",
+      "runnerTag": "prod",
+      "gitlabEnvPrefix": "prod"
+    }
+  ],
+  "glossary": [],
+  "commands": [],
+  "telegramBots": [],
+  "configVars": [
+    {
+      "name": "adm.jwt.secret",
+      "type": "string",
+      "needFor": "\u0421\u0435\u043a\u0440\u0435\u0442 \u0434\u043b\u044f \u043f\u043e\u0434\u043f\u0438\u0441\u0438 JWT-\u0442\u043e\u043a\u0435\u043d\u043e\u0432 \u043f\u0440\u0438\u043b\u043e\u0436\u0435\u043d\u0438\u044f \u0430\u0434\u043c\u0438\u043d\u043a\u0438",
+      "default": "admSecret",
+      "required": false,
+      "scopes": [
+        "back",
+        "worker",
+        "telegramBot"
+      ],
+      "hidden": true,
+      "editable": false
+    },
+    {
+      "name": "admin.recaptcha.publicKey",
+      "type": "string",
+      "needFor": "\u041f\u0443\u0431\u043b\u0438\u0447\u043d\u044b\u0439 \u0442\u043e\u043a\u0435\u043d \u0440\u0435\u043a\u0430\u043f\u0447\u0438 \u043f\u0440\u0438\u043b\u043e\u0436\u0435\u043d\u0438\u044f \u0430\u0434\u043c\u0438\u043d\u043a\u0438",
+      "default": "",
+      "required": false,
+      "scopes": [
+        "admin-app"
+      ],
+      "hidden": false,
+      "editable": true
+    },
+    {
+      "name": "admin.recaptcha.requiredScore",
+      "type": "float",
+      "needFor": "\u0422\u0440\u0435\u0431\u0443\u0435\u043c\u044b\u0439 \u0443\u0440\u043e\u0432\u0435\u043d\u044c \u0434\u043e\u0432\u0435\u0440\u0438\u044f \u043a \u043f\u043e\u043b\u044c\u0437\u043e\u0432\u0430\u0442\u0435\u043b\u044e",
+      "default": 0.7,
+      "required": false,
+      "scopes": [
+        "back",
+        "worker",
+        "telegramBot"
+      ],
+      "hidden": false,
+      "editable": true
+    },
+    {
+      "name": "admin.recaptcha.secretKey",
+      "type": "string",
+      "needFor": "\u0421\u0435\u043a\u0440\u0435\u0442\u043d\u044b\u0439 \u0442\u043e\u043a\u0435\u043d \u0440\u0435\u043a\u0430\u043f\u0447\u0438 \u043f\u0440\u0438\u043b\u043e\u0436\u0435\u043d\u0438\u044f \u0430\u0434\u043c\u0438\u043d\u043a\u0438",
+      "default": "",
+      "required": false,
+      "scopes": [
+        "back",
+        "worker",
+        "telegramBot"
+      ],
+      "hidden": true,
+      "editable": false
+    },
+    {
+      "name": "admin.ui.url",
+      "type": "string",
+      "needFor": "\u0423\u0440\u043b \u0430\u0434\u043c\u0438\u043d\u0438\u0441\u0442\u0440\u0430\u0442\u0438\u0432\u043d\u043e\u0433\u043e \u0438\u043d\u0442\u0435\u0440\u0444\u0435\u0439\u0441\u0430 (\u0431\u0435\u0437 \u043a\u043e\u043d\u0435\u0447\u043d\u043e\u0433\u043e \u0441\u043b\u0435\u0448\u0430)",
+      "default": "http://localhost:8080",
+      "required": false,
+      "scopes": [
+        "back",
+        "worker",
+        "telegramBot"
+      ],
+      "hidden": false,
+      "editable": true
+    },
+    {
+      "name": "app.environment",
+      "type": "string",
+      "needFor": "\u041d\u0430\u0437\u0432\u0430\u043d\u0438\u0435 \u043e\u043a\u0440\u0443\u0436\u0435\u043d\u0438\u044f",
+      "default": "dev",
+      "required": true,
+      "scopes": [
+        "back",
+        "worker",
+        "telegramBot"
+      ],
+      "hidden": false,
+      "editable": true
+    },
+    {
+      "name": "app.jwt.secret",
+      "type": "string",
+      "needFor": "\u0421\u0435\u043a\u0440\u0435\u0442 \u0434\u043b\u044f \u043f\u043e\u0434\u043f\u0438\u0441\u0438 JWT-\u0442\u043e\u043a\u0435\u043d\u043e\u0432 \u043f\u0440\u0438\u043b\u043e\u0436\u0435\u043d\u0438\u044f \u043f\u043e\u043b\u044c\u0437\u043e\u0432\u0430\u0442\u0435\u043b\u0435\u0439",
+      "default": "appSecret",
+      "required": false,
+      "scopes": [
+        "back",
+        "worker",
+        "telegramBot"
+      ],
+      "hidden": true,
+      "editable": false
+    },
+    {
+      "name": "app.name",
+      "type": "string",
+      "needFor": "\u0422\u0435\u0445\u043d\u0438\u0447\u0435\u0441\u043a\u043e\u0435 \u043d\u0430\u0437\u0432\u0430\u043d\u0438\u0435 \u043f\u0440\u0438\u043b\u043e\u0436\u0435\u043d\u0438\u044f",
+      "default": "",
+      "required": true,
+      "scopes": [
+        "back",
+        "worker",
+        "telegramBot"
+      ],
+      "hidden": false,
+      "editable": true
+    },
+    {
+      "name": "app.title",
+      "type": "string",
+      "needFor": "\u041f\u043e\u043b\u044c\u0437\u043e\u0432\u0430\u0442\u0435\u043b\u044c\u0441\u043a\u043e\u0435 \u043d\u0430\u0437\u0432\u0430\u043d\u0438\u0435 \u043f\u0440\u0438\u043b\u043e\u0436\u0435\u043d\u0438\u044f",
+      "default": "",
+      "required": false,
+      "scopes": [
+        "back",
+        "worker",
+        "telegramBot"
+      ],
+      "hidden": false,
+      "editable": true
+    },
+    {
+      "name": "app.ui.url",
+      "type": "string",
+      "needFor": "\u0423\u0440\u043b \u0438\u043d\u0442\u0435\u0440\u0444\u0435\u0439\u0441\u0430 \u043a\u043e\u043d\u0435\u0447\u043d\u043e\u0433\u043e \u043f\u043e\u043b\u044c\u0437\u043e\u0432\u0430\u0442\u0435\u043b\u044f (\u0431\u0435\u0437 \u043a\u043e\u043d\u0435\u0447\u043d\u043e\u0433\u043e \u0441\u043b\u0435\u0448\u0430)",
+      "default": "http://localhost:4000",
+      "required": false,
+      "scopes": [
+        "back",
+        "worker",
+        "telegramBot"
+      ],
+      "hidden": false,
+      "editable": true
+    },
+    {
+      "name": "authorization.backendChecks.enabled",
+      "type": "bool",
+      "needFor": "\u041f\u0440\u043e\u0432\u0435\u0440\u043a\u0430 \u0430\u0432\u0442\u043e\u0440\u0438\u0437\u0430\u0446\u0438\u0438 \u043d\u0430 \u0431\u0435\u043a\u0435\u043d\u0434\u0435 \u0432\u043a\u043b\u044e\u0447\u0435\u043d\u044b",
+      "default": false,
+      "required": false,
+      "scopes": [
+        "back",
+        "worker",
+        "telegramBot"
+      ],
+      "hidden": false,
+      "editable": true
+    },
+    {
+      "name": "bootstrap.enabled",
+      "type": "bool",
+      "needFor": "\u041f\u043e\u0434\u0433\u043e\u0442\u0430\u0432\u043b\u0438\u0432\u0430\u0442\u044c \u043e\u043a\u0440\u0443\u0436\u0435\u0438\u043d\u0435 \u043f\u0440\u0438 \u0437\u0430\u043f\u0443\u0441\u043a\u0435",
+      "default": false,
+      "required": false,
+      "scopes": [
+        "back",
+        "worker",
+        "telegramBot"
+      ],
+      "hidden": false,
+      "editable": true
+    },
+    {
+      "name": "checkLoginIframe",
+      "type": "bool",
+      "needFor": "\u041f\u0440\u043e\u0432\u0435\u0440\u043a\u0430 \u0430\u0432\u0442\u043e\u0440\u0438\u0437\u0430\u0446\u0438\u0438 \u0432\u043e \u0444\u0440\u0435\u0439\u043c\u0435 \u0432\u043a\u043b\u044e\u0447\u0435\u043d\u0430",
+      "default": false,
+      "required": false,
+      "scopes": [
+        "back",
+        "admin-app"
+      ],
+      "hidden": false,
+      "editable": true
+    },
+    {
+      "name": "customer.recaptcha.publicKey",
+      "type": "string",
+      "needFor": "\u041f\u0443\u0431\u043b\u0438\u0447\u043d\u044b\u0439 \u0442\u043e\u043a\u0435\u043d \u0440\u0435\u043a\u0430\u043f\u0447\u0438 \u043f\u0440\u0438\u043b\u043e\u0436\u0435\u043d\u0438\u044f \u043f\u043e\u043b\u044c\u0437\u043e\u0432\u0430\u0442\u0435\u043b\u044f",
+      "default": "",
+      "required": false,
+      "scopes": [
+        "cutomer-app"
+      ],
+      "hidden": false,
+      "editable": true
+    },
+    {
+      "name": "customer.recaptcha.requiredScore",
+      "type": "string",
+      "needFor": "\u0422\u0440\u0435\u0431\u0443\u0435\u043c\u044b\u0439 \u0443\u0440\u043e\u0432\u0435\u043d\u044c \u0434\u043e\u0432\u0435\u0440\u0438\u044f \u043a \u043f\u043e\u043b\u044c\u0437\u043e\u0432\u0430\u0442\u0435\u043b\u044e",
+      "default": "0.7",
+      "required": false,
+      "scopes": [
+        "back",
+        "worker",
+        "telegramBot"
+      ],
+      "hidden": false,
+      "editable": true
+    },
+    {
+      "name": "customer.recaptcha.secretKey",
+      "type": "string",
+      "needFor": "\u0421\u0435\u043a\u0440\u0435\u0442\u043d\u044b\u0439 \u0442\u043e\u043a\u0435\u043d \u0440\u0435\u043a\u0430\u043f\u0447\u0438 \u043f\u0440\u0438\u043b\u043e\u0436\u0435\u043d\u0438\u044f \u043f\u043e\u043b\u044c\u0437\u043e\u0432\u0430\u0442\u0435\u043b\u044f",
+      "default": "",
+      "required": false,
+      "scopes": [
+        "back",
+        "worker",
+        "telegramBot"
+      ],
+      "hidden": true,
+      "editable": false
+    },
+    {
+      "name": "database.main.migration.uri",
+      "type": "string",
+      "needFor": "\u0421\u0442\u0440\u043e\u043a\u0430 \u043f\u043e\u0434\u043a\u043b\u044e\u0447\u0435\u043d\u0438\u044f \u043a \u043e\u0441\u043d\u043e\u0432\u043d\u043e\u0439 \u0431\u0430\u0437\u0435 \u0434\u043b\u044f \u043c\u0438\u0433\u0440\u0430\u0446\u0438\u0439 (\u0434\u043e\u043b\u0436\u043d\u0430 \u0431\u044b\u0442\u044c \u043f\u0440\u044f\u043c\u043e\u0439 \u0441\u0442\u0440\u043e\u043a\u043e\u0439 \u043f\u043e\u0434\u043a\u043b\u044e\u0447\u0435\u043d\u0438\u044f \u043a \u0431\u0434 \u043c\u0438\u043d\u0443\u044f pgbouncer, \u0435\u0441\u043b\u0438 \u043e\u043d \u0438\u0441\u043f\u043e\u043b\u044c\u0437\u0443\u0435\u0442\u0441\u044f)",
+      "default": "postgresql://postgres:password@localhost:5432",
+      "required": true,
+      "scopes": [
+        "back",
+        "worker",
+        "telegramBot"
+      ],
+      "hidden": true,
+      "editable": false
+    },
+    {
+      "name": "database.main.readOnly.enabled",
+      "type": "bool",
+      "needFor": "\u0412\u043a\u043b\u044e\u0447\u0435\u043d\u0430 \u043b\u0438 \u0440\u0430\u0431\u043e\u0442\u0430 \u0441 \u0437\u0430\u043f\u0440\u043e\u0441\u0430\u043c\u0438 \u043d\u0430 \u0447\u0442\u0435\u043d\u0438\u0435 \u0447\u0435\u0440\u0435\u0437 \u043e\u0442\u0434\u0435\u043b\u044c\u043d\u043e\u0435 \u043f\u043e\u0434\u043a\u043b\u044e\u0447\u0435\u043d\u0438\u0435",
+      "default": false,
+      "required": true,
+      "scopes": [
+        "back",
+        "worker",
+        "telegramBot"
+      ],
+      "hidden": false,
+      "editable": true
+    },
+    {
+      "name": "database.main.readOnly.uri",
+      "type": "string",
+      "needFor": "\u0421\u0442\u0440\u043e\u043a\u0430 \u043f\u043e\u0434\u043a\u043b\u044e\u0447\u0435\u043d\u0438\u044f \u043a \u043e\u0441\u043d\u043e\u0432\u043d\u043e\u0439 \u0431\u0430\u0437\u0435 \u0442\u043e\u043b\u044c\u043a\u043e \u0434\u043b\u044f \u0447\u0442\u0435\u043d\u0438\u044f",
+      "default": "postgresql://postgres:password@localhost:5432",
+      "required": false,
+      "scopes": [
+        "back",
+        "worker",
+        "telegramBot"
+      ],
+      "hidden": true,
+      "editable": false
+    },
+    {
+      "name": "database.main.write.uri",
+      "type": "string",
+      "needFor": "\u0421\u0442\u0440\u043e\u043a\u0430 \u043f\u043e\u0434\u043a\u043b\u044e\u0447\u0435\u043d\u0438\u044f \u043a \u043e\u0441\u043d\u043e\u0432\u043d\u043e\u0439 \u0431\u0430\u0437\u0435 \u0434\u0430\u043d\u043d\u044b\u0445 \u0434\u043b\u044f \u0437\u0430\u043f\u0438\u0441\u0438",
+      "default": "postgresql://postgres:password@localhost:5432",
+      "required": true,
+      "scopes": [
+        "back",
+        "worker",
+        "telegramBot"
+      ],
+      "hidden": true,
+      "editable": false
+    },
+    {
+      "name": "dockerRegistry.domain",
+      "type": "string",
+      "needFor": "Docker registry domain",
+      "default": "",
+      "required": false,
+      "scopes": [
+        "ci"
+      ],
+      "hidden": false,
+      "editable": true
+    },
+    {
+      "name": "dockerRegistry.password",
+      "type": "string",
+      "needFor": "Docker registry password",
+      "default": "",
+      "required": false,
+      "scopes": [
+        "ci"
+      ],
+      "hidden": false,
+      "editable": true
+    },
+    {
+      "name": "dockerRegistry.username",
+      "type": "string",
+      "needFor": "Docker registry username",
+      "default": "",
+      "required": false,
+      "scopes": [
+        "ci"
+      ],
+      "hidden": false,
+      "editable": true
+    },
+    {
+      "name": "endpoint",
+      "type": "string",
+      "needFor": "\u041f\u0443\u0442\u044c \u043a \u0431\u0435\u043a\u0435\u043d\u0434\u0443",
+      "default": "",
+      "required": false,
+      "scopes": [
+        "admin-app"
+      ],
+      "hidden": false,
+      "editable": true
+    },
+    {
+      "name": "es.cloudId",
+      "type": "string",
+      "needFor": "\u0418\u0434\u0435\u043d\u0442\u0438\u0444\u0438\u043a\u0430\u0442\u043e\u0440 \u0430\u043a\u043a\u0430\u0443\u043d\u0442\u0430 \u0432 \u043e\u0431\u043b\u0430\u0447\u043d\u043e\u043c \u0441\u0435\u0440\u0432\u0438\u0441\u0435 ElasticSearch",
+      "default": "",
+      "required": false,
+      "scopes": [
+        "back",
+        "worker",
+        "telegramBot"
+      ],
+      "hidden": false,
+      "editable": true
+    },
+    {
+      "name": "es.enabled",
+      "type": "bool",
+      "needFor": "\u042d\u043b\u0430\u0441\u0442\u0438\u043a \u0432\u043a\u043b\u044e\u0447\u0435\u043d",
+      "default": false,
+      "required": false,
+      "scopes": [
+        "back",
+        "worker",
+        "telegramBot"
+      ],
+      "hidden": false,
+      "editable": true
+    },
+    {
+      "name": "es.node",
+      "type": "string",
+      "needFor": "\u041d\u043e\u0434\u0430 \u044d\u043b\u0430\u0441\u0442\u0438\u043a\u0430",
+      "default": "http://localhost:9200",
+      "required": false,
+      "scopes": [
+        "back",
+        "worker",
+        "telegramBot"
+      ],
+      "hidden": false,
+      "editable": true
+    },
+    {
+      "name": "es.password",
+      "type": "string",
+      "needFor": "\u041f\u0430\u0440\u043e\u043b\u044c \u0434\u043b\u044f \u0430\u0432\u0442\u043e\u0440\u0438\u0437\u0430\u0446\u0438\u0438 \u0432 \u043e\u0431\u043b\u0430\u0447\u043d\u043e\u043c \u0441\u0435\u0440\u0432\u0438\u0441\u0435 ElasticSearch",
+      "default": "",
+      "required": false,
+      "scopes": [
+        "back",
+        "worker",
+        "telegramBot"
+      ],
+      "hidden": true,
+      "editable": false
+    },
+    {
+      "name": "es.tls.rejectUnauthorized",
+      "type": "bool",
+      "needFor": "\u0417\u0430\u043f\u0440\u0435\u0449\u0430\u0442\u044c \u043d\u0435\u0432\u0430\u043b\u0438\u0434\u043d\u044b\u0439 ssl \u0441\u0435\u0440\u0442\u0438\u0444\u0438\u043a\u0430\u0442",
+      "default": false,
+      "required": false,
+      "scopes": [
+        "back",
+        "worker",
+        "telegramBot"
+      ],
+      "hidden": false,
+      "editable": true
+    },
+    {
+      "name": "es.username",
+      "type": "string",
+      "needFor": "\u041f\u043e\u043b\u044c\u0437\u043e\u0432\u0430\u0442\u0435\u043b\u044c \u0434\u043b\u044f \u0430\u0432\u0442\u043e\u0440\u0438\u0437\u0430\u0446\u0438\u0438 \u0432 \u043e\u0431\u043b\u0430\u0447\u043d\u043e\u043c \u0441\u0435\u0440\u0432\u0438\u0441\u0435 ElasticSearch",
+      "default": "",
+      "required": false,
+      "scopes": [
+        "back",
+        "worker",
+        "telegramBot"
+      ],
+      "hidden": false,
+      "editable": true
+    },
+    {
+      "name": "graphql.playground.enabled",
+      "type": "bool",
+      "needFor": "\u0412\u043a\u043b\u044e\u0447\u0435\u043d\u0438\u0435 graphql playground (true | false)",
+      "default": true,
+      "required": false,
+      "scopes": [
+        "back",
+        "worker",
+        "telegramBot"
+      ],
+      "hidden": false,
+      "editable": true
+    },
+    {
+      "name": "kafka.auth.enabled",
+      "type": "bool",
+      "needFor": "\u0412\u043a\u043b\u044e\u0447\u0435\u043d\u0430 \u043f\u0440\u043e\u0432\u0435\u0440\u043a\u0430 \u0430\u0443\u0442\u0435\u043d\u0442\u0438\u0444\u0438\u043a\u0430\u0446\u0438\u0438",
+      "default": true,
+      "required": true,
+      "scopes": [
+        "back",
+        "worker",
+        "telegramBot"
+      ],
+      "hidden": false,
+      "editable": true
+    },
+    {
+      "name": "kafka.brokers",
+      "type": "string",
+      "needFor": "\u0421\u043f\u0438\u0441\u043e\u043a kafka \u0431\u043b\u043e\u043a\u0435\u0440\u043e\u0432",
+      "default": "localhost:29092;localhost:29094",
+      "required": false,
+      "scopes": [
+        "back",
+        "worker",
+        "telegramBot"
+      ],
+      "hidden": false,
+      "editable": true
+    },
+    {
+      "name": "kafka.enabled",
+      "type": "bool",
+      "needFor": "\u041a\u0430\u0444\u043a\u0430 \u0432\u043a\u043b\u044e\u0447\u0435\u043d\u0430",
+      "default": false,
+      "required": false,
+      "scopes": [
+        "back",
+        "worker",
+        "telegramBot"
+      ],
+      "hidden": false,
+      "editable": true
+    },
+    {
+      "name": "kafka.password",
+      "type": "string",
+      "needFor": "\u041f\u0430\u0440\u043e\u043b\u044c \u0434\u043e\u0441\u0442\u0443\u043f\u0430 \u0432 kafka",
+      "default": "",
+      "required": false,
+      "scopes": [
+        "back",
+        "worker",
+        "telegramBot"
+      ],
+      "hidden": true,
+      "editable": false
+    },
+    {
+      "name": "kafka.queue.acks",
+      "type": "int",
+      "needFor": "`-1`(all) \u0432\u0441\u0435 \u043d\u0435\u0441\u0438\u043d\u0445\u0440\u043e\u043d\u0438\u0437\u0438\u0440\u043e\u0432\u0430\u043d\u043d\u044b\u0435 \u0440\u0435\u043f\u043b\u0438\u043a\u0438 \u0434\u043e\u043b\u0436\u043d\u044b \u043f\u043e\u0434\u0442\u0432\u0435\u0440\u0434\u0438\u0442\u044c (\u043f\u043e \u0443\u043c\u043e\u043b\u0447\u0430\u043d\u0438\u044e), `0` \u043d\u0435\u0442 \u043f\u043e\u0434\u0442\u0432\u0435\u0440\u0436\u0434\u0435\u043d\u0438\u0439, `1` \u0442\u043e\u043b\u044c\u043a\u043e \u0436\u0434\u0435\u0442 \u043f\u043e\u0434\u0442\u0432\u0435\u0440\u0436\u0434\u0435\u043d\u0438\u044f \u043b\u0438\u0434\u0435\u0440\u0430",
+      "default": 1,
+      "required": false,
+      "scopes": [
+        "back",
+        "worker",
+        "telegramBot"
+      ],
+      "hidden": false,
+      "editable": true
+    },
+    {
+      "name": "kafka.queue.defaultRetryTime",
+      "type": "int",
+      "needFor": "\u0412\u0440\u0435\u043c\u044f \u043f\u0430\u0443\u0437\u044b \u043f\u043e\u0441\u043b\u0435 \u043f\u0435\u0440\u0432\u043e\u0439 \u043e\u0448\u0438\u0431\u043a\u0438, \u043d\u0430\u043f\u0440\u0438\u043c\u0435\u0440 20000 \u043c\u0441, \u043f\u043e\u0442\u043e\u043c \u043e\u043d\u043e \u0443\u0432\u0435\u043b\u0438\u0447\u0438\u0432\u0430\u0435\u0442\u0441\u044f \u044d\u043a\u0441\u043f\u043e\u043d\u0435\u043d\u0446\u0438\u0430\u043b\u044c\u043d\u043e \u0441 \u043c\u0443\u043b\u044c\u0442\u0438\u043f\u043b\u0438\u043a\u0430\u0442\u043e\u0440\u043e\u043c 1.5",
+      "default": 20000,
+      "required": false,
+      "scopes": [
+        "back",
+        "worker",
+        "telegramBot"
+      ],
+      "hidden": false,
+      "editable": true
+    },
+    {
+      "name": "kafka.queue.maxAttemptsSize",
+      "type": "int",
+      "needFor": "\u041c\u0430\u043a\u0441\u0438\u043c\u0430\u043b\u044c\u043d\u043e\u0435 \u043a\u043e\u043b\u0438\u0447\u0435\u0441\u0442\u0432\u043e \u043f\u043e\u043f\u044b\u0442\u043e\u043a \u043e\u0431\u0440\u0430\u0431\u043e\u0442\u043a\u0438 \u043e\u0448\u0438\u0431\u043a\u0438 \u043d\u0430 \u0441\u043e\u043e\u0431\u0449\u0435\u043d\u0438\u0435",
+      "default": 10,
+      "required": false,
+      "scopes": [
+        "back",
+        "worker",
+        "telegramBot"
+      ],
+      "hidden": false,
+      "editable": true
+    },
+    {
+      "name": "kafka.queue.stackSize",
+      "type": "int",
+      "needFor": "\u041a\u043e\u043b\u0438\u0447\u0435\u0441\u0442\u0432\u043e \u0441\u043e\u043e\u0431\u0449\u0435\u043d\u0438\u0439, \u043e\u0431\u0440\u0430\u0431\u0430\u0442\u044b\u0432\u0430\u0435\u043c\u044b\u0445 \u043f\u0430\u0440\u0430\u043b\u043b\u0435\u043b\u044c\u043d\u043e",
+      "default": 3,
+      "required": false,
+      "scopes": [
+        "back",
+        "worker",
+        "telegramBot"
+      ],
+      "hidden": false,
+      "editable": true
+    },
+    {
+      "name": "kafka.queue.supportedVersion",
+      "type": "string",
+      "needFor": "\u041f\u043e\u0434\u0434\u0435\u0440\u0436\u0438\u0432\u0430\u0435\u043c\u044b\u0435 \u0432\u0435\u0440\u0441\u0438\u0438 \u0441\u043e\u043e\u0431\u0449\u0435\u043d\u0438\u044f",
+      "default": "1;2",
+      "required": false,
+      "scopes": [
+        "back",
+        "worker",
+        "telegramBot"
+      ],
+      "hidden": false,
+      "editable": true
+    },
+    {
+      "name": "kafka.queue.waitingInterruptTime",
+      "type": "int",
+      "needFor": "\u0412\u0440\u0435\u043c\u044f \u043f\u0430\u0443\u0437\u044b \u0432 \u043e\u0447\u0435\u0440\u0435\u0434\u0438 \u043e\u0436\u0438\u0434\u0430\u043d\u0438\u044f, \u043a\u043e\u0433\u0434\u0430 \u043e\u043d\u0430 \u043f\u0440\u043e\u0448\u043b\u0430 \u0432\u0441\u0435 \u0441\u043e\u043e\u0431\u0449\u0435\u043d\u0438\u044f, \u044d\u0442\u043e \u0447\u0442\u043e\u0431\u044b \u043e\u043d\u0430 \u043d\u0435 \u043a\u0440\u0443\u0442\u0438\u043b\u0430 \u0441\u043e\u043e\u0431\u0449\u0435\u043d\u0438\u044f \u043f\u043e\u043a\u0440\u0443\u0433\u0443 \u0431\u0435\u0437 \u043e\u0441\u0442\u0430\u043d\u043e\u0432\u043a\u0438 ",
+      "default": 60000,
+      "required": false,
+      "scopes": [
+        "back",
+        "worker",
+        "telegramBot"
+      ],
+      "hidden": false,
+      "editable": true
+    },
+    {
+      "name": "kafka.sasl.mechanism",
+      "type": "string",
+      "needFor": "SASL mechanism",
+      "default": "plain",
+      "required": true,
+      "scopes": [
+        "back",
+        "worker",
+        "telegramBot"
+      ],
+      "hidden": false,
+      "editable": true
+    },
+    {
+      "name": "kafka.ssl.enabled",
+      "type": "bool",
+      "needFor": "\u0412\u043a\u043b\u044e\u0447\u0435\u043d\u0430 \u0440\u0430\u0431\u043e\u0442\u0430 \u043f\u043e ssl",
+      "default": true,
+      "required": true,
+      "scopes": [
+        "back",
+        "worker",
+        "telegramBot"
+      ],
+      "hidden": false,
+      "editable": true
+    },
+    {
+      "name": "kafka.ssl.rejectUnauthorized",
+      "type": "bool",
+      "needFor": "\u0417\u0430\u043f\u0440\u0435\u0449\u0430\u0442\u044c \u043d\u0435\u0432\u0430\u043b\u0438\u0434\u043d\u044b\u0439 ssl \u0441\u0435\u0440\u0442\u0438\u0444\u0438\u043a\u0430\u0442",
+      "default": false,
+      "required": false,
+      "scopes": [
+        "back",
+        "worker",
+        "telegramBot"
+      ],
+      "hidden": false,
+      "editable": true
+    },
+    {
+      "name": "kafka.username",
+      "type": "string",
+      "needFor": "Username \u0434\u043e\u0441\u0442\u0443\u043f\u0430 \u0432 kafka",
+      "default": "",
+      "required": false,
+      "scopes": [
+        "back",
+        "worker",
+        "telegramBot"
+      ],
+      "hidden": false,
+      "editable": true
+    },
+    {
+      "name": "keycloak.adm.cli.client",
+      "type": "string",
+      "needFor": "\u041a\u043b\u0438\u0435\u043d\u0442 \u0434\u043b\u044f \u0434\u043e\u0441\u0442\u0443\u043f\u0430 \u0432 api keycloak \u0430\u0434\u043c\u0438\u043d\u043a\u0438",
+      "default": "backend-api",
+      "required": false,
+      "scopes": [
+        "back",
+        "worker",
+        "telegramBot"
+      ],
+      "hidden": false,
+      "editable": true
+    },
+    {
+      "name": "keycloak.adm.cli.secret",
+      "type": "string",
+      "needFor": "\u0421\u0435\u043a\u0440\u0435\u0442 \u0434\u043b\u044f \u0434\u043e\u0441\u0442\u0443\u043f\u0430 \u0432 api keycloak \u0430\u0434\u043c\u0438\u043d\u043a\u0438",
+      "default": "",
+      "required": false,
+      "scopes": [
+        "back",
+        "worker",
+        "telegramBot"
+      ],
+      "hidden": false,
+      "editable": true
+    },
+    {
+      "name": "keycloak.app.cli.client",
+      "type": "string",
+      "needFor": "\u041a\u043b\u0438\u0435\u043d\u0442 \u0434\u043b\u044f \u0434\u043e\u0441\u0442\u0443\u043f\u0430 \u0432 api keycloak \u043f\u0440\u0438\u043b\u043e\u0436\u0435\u043d\u0438\u044f \u043f\u043e\u043b\u044c\u0437\u043e\u0432\u0430\u0442\u0435\u043b\u044f",
+      "default": "backend-api",
+      "required": false,
+      "scopes": [
+        "back",
+        "worker",
+        "telegramBot"
+      ],
+      "hidden": false,
+      "editable": true
+    },
+    {
+      "name": "keycloak.app.cli.secret",
+      "type": "string",
+      "needFor": "\u0421\u0435\u043a\u0440\u0435\u0442 \u0434\u043b\u044f \u0434\u043e\u0441\u0442\u0443\u043f\u0430 \u0432 api keycloak \u043f\u0440\u0438\u043b\u043e\u0436\u0435\u043d\u0438\u044f \u043f\u043e\u043b\u044c\u0437\u043e\u0432\u0430\u0442\u0435\u043b\u044f",
+      "default": "",
+      "required": false,
+      "scopes": [
+        "back",
+        "worker",
+        "telegramBot"
+      ],
+      "hidden": false,
+      "editable": true
+    },
+    {
+      "name": "logs.format",
+      "type": "string",
+      "needFor": "\u0424\u043e\u0440\u043c\u0430\u0442 \u043b\u043e\u0433\u043e\u0432 (plain | json)",
+      "default": "plain",
+      "required": false,
+      "scopes": [
+        "back",
+        "worker",
+        "telegramBot"
+      ],
+      "hidden": false,
+      "editable": true
+    },
+    {
+      "name": "loki.url",
+      "type": "string",
+      "needFor": "\u0423\u0440\u043b \u0434\u043b\u044f \u0434\u043e\u0441\u0442\u0443\u043f\u0430 \u0432 Loki. \u0418\u0441\u043f\u043e\u043b\u044c\u0437\u0443\u0435\u0442\u0441\u044f \u0434\u043b\u044f \u0437\u0430\u043f\u0440\u043e\u0441\u0430 \u0431\u0438\u0437\u043d\u0435\u0441-\u043b\u043e\u0433\u043e\u0432",
+      "default": "",
+      "required": false,
+      "scopes": [
+        "back",
+        "worker",
+        "telegramBot"
+      ],
+      "hidden": false,
+      "editable": true
+    },
+    {
+      "name": "oidc.adm.clientId",
+      "type": "string",
+      "needFor": "\u0418\u0434\u0435\u043d\u0442\u0438\u0444\u0438\u043a\u0430\u0442\u043e\u0440 \u043a\u043b\u0438\u0435\u043d\u0442\u0430 oidc \u0434\u043b\u044f \u0430\u0434\u043c\u0438\u043d\u043a\u0438",
+      "default": "",
+      "required": false,
+      "scopes": [
+        "admin-app"
+      ],
+      "hidden": false,
+      "editable": true
+    },
+    {
+      "name": "oidc.adm.issuer",
+      "type": "string",
+      "needFor": "Issuer oidc \u0434\u043b\u044f \u0430\u0434\u043c\u0438\u043d\u043a\u0438",
+      "default": "",
+      "required": false,
+      "scopes": [
+        "back",
+        "admin-app"
+      ],
+      "hidden": false,
+      "editable": true
+    },
+    {
+      "name": "oidc.adm.jwksRejectUnauthorized",
+      "type": "bool",
+      "needFor": "\u0417\u0430\u043f\u0440\u0435\u0449\u0430\u0442\u044c \u043d\u0435\u0432\u0430\u043b\u0438\u0434\u043d\u044b\u0439 ssl \u0441\u0435\u0440\u0442\u0438\u0444\u0438\u043a\u0430\u0442",
+      "default": false,
+      "required": false,
+      "scopes": [
+        "back",
+        "worker",
+        "telegramBot"
+      ],
+      "hidden": false,
+      "editable": true
+    },
+    {
+      "name": "oidc.adm.jwksUri",
+      "type": "string",
+      "needFor": "Uri jwks oidc \u0434\u043b\u044f \u043f\u0440\u043e\u0432\u0435\u0440\u043a\u0438 \u0430\u0432\u0442\u043e\u0440\u0438\u0437\u0430\u0446\u0438\u0438 \u0430\u0434\u043c\u0438\u043d\u043a\u0438",
+      "default": "",
+      "required": false,
+      "scopes": [
+        "back"
+      ],
+      "hidden": false,
+      "editable": true
+    },
+    {
+      "name": "oidc.adm.logoutType",
+      "type": "string",
+      "needFor": "\u0422\u0438\u043f \u0432\u044b\u0445\u043e\u0434\u0430 \u0430\u0434\u043c\u0438\u043d\u043a\u0438",
+      "default": "",
+      "required": false,
+      "scopes": [
+        "admin-app"
+      ],
+      "hidden": false,
+      "editable": true
+    },
+    {
+      "name": "oidc.adm.realm",
+      "type": "string",
+      "needFor": "\u0420\u0435\u0430\u043b\u043c oidc \u0434\u043b\u044f \u0430\u0434\u043c\u0438\u043d\u043a\u0438",
+      "default": "",
+      "required": false,
+      "scopes": [
+        "back",
+        "admin-app"
+      ],
+      "hidden": false,
+      "editable": true
+    },
+    {
+      "name": "oidc.adm.url",
+      "type": "string",
+      "needFor": "\u0425\u043e\u0441\u0442 oidc \u0434\u043b\u044f \u0430\u0434\u043c\u0438\u043d\u043a\u0438",
+      "default": "",
+      "required": false,
+      "scopes": [
+        "back",
+        "admin-app"
+      ],
+      "hidden": false,
+      "editable": true
+    },
+    {
+      "name": "oidc.app.clientId",
+      "type": "string",
+      "needFor": "\u0418\u0434\u0435\u043d\u0442\u0438\u0444\u0438\u043a\u0430\u0442\u043e\u0440 \u043a\u043b\u0438\u0435\u043d\u0442\u0430 oidc \u0434\u043b\u044f \u043f\u0440\u0438\u043b\u043e\u0436\u0435\u043d\u0438\u044f \u043f\u043e\u043b\u044c\u0437\u043e\u0432\u0430\u0442\u0435\u043b\u044f",
+      "default": "",
+      "required": false,
+      "scopes": [
+        "cutomer-app"
+      ],
+      "hidden": false,
+      "editable": true
+    },
+    {
+      "name": "oidc.app.realm",
+      "type": "string",
+      "needFor": "\u0420\u0435\u0430\u043b\u043c oidc \u0434\u043b\u044f \u043f\u0440\u0438\u043b\u043e\u0436\u0435\u043d\u0438\u044f \u043f\u043e\u043b\u044c\u0437\u043e\u0432\u0430\u0442\u0435\u043b\u044f",
+      "default": "",
+      "required": false,
+      "scopes": [
+        "back",
+        "cutomer-app"
+      ],
+      "hidden": false,
+      "editable": true
+    },
+    {
+      "name": "oidc.app.url",
+      "type": "string",
+      "needFor": "\u0425\u043e\u0441\u0442 oidc \u0434\u043b\u044f \u043f\u0440\u0438\u043b\u043e\u0436\u0435\u043d\u0438\u044f \u043f\u043e\u043b\u044c\u0437\u043e\u0432\u0430\u0442\u0435\u043b\u044f",
+      "default": "",
+      "required": false,
+      "scopes": [
+        "back",
+        "cutomer-app"
+      ],
+      "hidden": false,
+      "editable": true
+    },
+    {
+      "name": "s3.accessKeyId",
+      "type": "string",
+      "needFor": "\u0418\u0434\u0435\u043d\u0442\u0438\u0444\u0438\u043a\u0430\u0442\u043e\u0440 \u0434\u043e\u0441\u0442\u0443\u043f\u0430 \u0434\u043b\u044f \u0430\u0432\u0442\u043e\u0440\u0438\u0437\u0430\u0446\u0438\u0438 \u0432 S3",
+      "default": "",
+      "required": true,
+      "scopes": [
+        "back",
+        "worker",
+        "telegramBot"
+      ],
+      "hidden": false,
+      "editable": true
+    },
+    {
+      "name": "s3.bucket.emailFiles",
+      "type": "string",
+      "needFor": "\u0418\u043c\u044f \u0431\u0430\u043a\u0435\u0442\u0430 \u0434\u043b\u044f \u0445\u0440\u0430\u043d\u0435\u043d\u0438\u044f \u0444\u0430\u0439\u043b\u043e\u0432, \u043e\u0442\u043f\u0440\u0430\u0432\u043b\u0435\u043d\u043d\u044b\u0445 \u043d\u0430 \u043f\u043e\u0447\u0442\u0443",
+      "default": "",
+      "required": true,
+      "scopes": [
+        "back",
+        "worker",
+        "telegramBot"
+      ],
+      "hidden": false,
+      "editable": true
+    },
+    {
+      "name": "s3.bucket.tmpFilesToDownload",
+      "type": "string",
+      "needFor": "\u0418\u043c\u044f \u0431\u0430\u043a\u0435\u0442\u0430 \u0434\u043b\u044f \u0445\u0440\u0430\u043d\u0435\u043d\u0438\u044f \u0432\u0440\u0435\u043c\u0435\u043d\u043d\u044b\u0445 \u0444\u0430\u0439\u043b\u043e\u0432, \u0441\u043e\u0437\u0434\u0430\u043d\u043d\u044b\u0445 \u0434\u043b\u044f \u0441\u043a\u0430\u0447\u0438\u0432\u0430\u043d\u0438\u044f \u043f\u043e\u043b\u044c\u0437\u043e\u0432\u0430\u0442\u0435\u043b\u044f\u043c\u0438",
+      "default": "",
+      "required": true,
+      "scopes": [
+        "back",
+        "worker",
+        "telegramBot"
+      ],
+      "hidden": false,
+      "editable": true
+    },
+    {
+      "name": "s3.endpoint",
+      "type": "string",
+      "needFor": "\u042d\u043d\u0434\u043f\u043e\u0438\u043d\u0442 S3, \u043a\u043e\u0442\u043e\u0440\u044b\u0439 \u0438\u0441\u043f\u043e\u043b\u044c\u0437\u0443\u0435\u0442 \u0431\u0435\u043a\u0435\u043d\u0434",
+      "default": "s3.eu-central-1.wasabisys.com",
+      "required": true,
+      "scopes": [
+        "back",
+        "worker",
+        "telegramBot"
+      ],
+      "hidden": true,
+      "editable": false
+    },
+    {
+      "name": "s3.public.endpoint",
+      "type": "string",
+      "needFor": "\u042d\u043d\u0434\u043f\u043e\u0438\u043d\u0442 S3, \u0434\u043e\u0441\u0442\u0443\u043f\u043d\u044b\u0439 \u0434\u043b\u044f \u0444\u0440\u043e\u043d\u0442\u0435\u043d\u0434\u0430",
+      "default": "",
+      "required": false,
+      "scopes": [
+        "back",
+        "worker",
+        "telegramBot"
+      ],
+      "hidden": true,
+      "editable": false
+    },
+    {
+      "name": "s3.region",
+      "type": "string",
+      "needFor": "\u0418\u0434\u0435\u043d\u0442\u0438\u0444\u0438\u043a\u0430\u0442\u043e\u0440 \u0434\u043e\u0441\u0442\u0443\u043f\u0430 \u0434\u043b\u044f \u0430\u0432\u0442\u043e\u0440\u0438\u0437\u0430\u0446\u0438\u0438 \u0432 S3",
+      "default": "eu-central-1",
+      "required": true,
+      "scopes": [
+        "back",
+        "worker",
+        "telegramBot"
+      ],
+      "hidden": false,
+      "editable": true
+    },
+    {
+      "name": "s3.secretAccessKey",
+      "type": "string",
+      "needFor": "\u0421\u0435\u043a\u0440\u0435\u0442\u043d\u044b\u0439 \u043a\u043b\u044e\u0447 \u0434\u043b\u044f \u0430\u0432\u0442\u043e\u0440\u0438\u0437\u0430\u0446\u0438\u0438 \u0432 S3",
+      "default": "",
+      "required": true,
+      "scopes": [
+        "back",
+        "worker",
+        "telegramBot"
+      ],
+      "hidden": true,
+      "editable": false
+    },
+    {
+      "name": "sentry.dsn",
+      "type": "string",
+      "needFor": "Sentry dsn",
+      "default": "",
+      "required": false,
+      "scopes": [
+        "back",
+        "worker",
+        "telegramBot"
+      ],
+      "hidden": false,
+      "editable": true
+    }
+  ],
+  "catalogs": [],
+  "documents": [],
+  "infoRegistries": [
+    {
+      "name": "prices",
+      "title": {
+        "en": {
+          "plural": "Prices",
+          "singular": "Price"
+        }
+      },
+      "needFor": {},
+      "materialUiIcon": "Brightness1Outlined",
+      "previewFeatures": [],
+      "singleKey": true,
+      "titleField": "id",
+      "keyField": "id",
+      "fields": [
+        {
+          "name": "id",
+          "title": {
+            "en": "Id",
+            "ru": "\u0418\u0434"
+          },
+          "needFor": "",
+          "updatable": true,
+          "required": true,
+          "requiredOnInput": true,
+          "updatableByUser": true,
+          "hidden": false,
+          "searchable": true,
+          "showInList": true,
+          "showInCreate": true,
+          "showInEdit": true,
+          "showInFilter": true,
+          "showInShow": true,
+          "sharded": false,
+          "array": false,
+          "autoGenerated": false,
+          "category": "id",
+          "type": "string",
+          "stringType": "plain",
+          "filters": [
+            "equal"
+          ]
+        },
+        {
+          "name": "region",
+          "title": {
+            "en": "Region"
+          },
+          "needFor": "",
+          "updatable": true,
+          "required": true,
+          "requiredOnInput": true,
+          "updatableByUser": true,
+          "hidden": false,
+          "searchable": true,
+          "showInList": true,
+          "showInCreate": true,
+          "showInEdit": true,
+          "showInFilter": true,
+          "showInShow": true,
+          "sharded": false,
+          "array": false,
+          "type": "string",
+          "category": "scalar",
+          "stringType": "plain",
+          "filters": [
+            "equal"
+          ]
+        },
+        {
+          "name": "amount",
+          "title": {
+            "en": "Amount"
+          },
+          "needFor": "",
+          "updatable": true,
+          "required": true,
+          "requiredOnInput": true,
+          "updatableByUser": true,
+          "hidden": false,
+          "searchable": true,
+          "showInList": true,
+          "showInCreate": true,
+          "showInEdit": true,
+          "showInFilter": true,
+          "showInShow": true,
+          "sharded": false,
+          "array": false,
+          "type": "float",
+          "category": "scalar",
+          "filters": [
+            "equal"
+          ],
+          "numberType": "base"
+        }
+      ],
+      "uniqueConstraints": [
+        [
+          "region"
+        ]
+      ],
+      "indexes": [],
+      "forms": {
+        "list": {
+          "filter": {
+            "fields": [
+              {
+                "name": "id",
+                "hidden": false,
+                "alwaysOn": false
+              },
+              {
+                "name": "region",
+                "hidden": false,
+                "alwaysOn": false
+              },
+              {
+                "name": "amount",
+                "hidden": false,
+                "alwaysOn": false
+              }
+            ]
+          }
+        },
+        "show": {
+          "ignoredLinkedEntities": []
+        }
+      },
+      "predefinedElements": [],
+      "devPerefinedElements": [],
+      "auditable": true,
+      "externalSearch": false,
+      "elasticOnly": false,
+      "searchEnabled": false,
+      "sortField": "id",
+      "sortOrder": "DESC",
+      "multitenancy": "none",
+      "commonElementsVisibleToAll": false,
+      "sharded": false,
+      "isExternalSearch": false,
+      "creatableByUser": true,
+      "updatableByUser": true,
+      "removableByUser": true,
+      "exportableByUser": true,
+      "excludeFromCommonMenu": false,
+      "clearDBAfter": [],
+      "allowedToChange": "",
+      "permissions": [],
+      "pages": [
+        {
+          "name": "prices.all",
+          "title": {
+            "en": {
+              "singular": "prices.all"
+            }
+          },
+          "needFor": {},
+          "materialUiIcon": "Brightness1Outlined",
+          "previewFeatures": [],
+          "type": "page",
+          "link": "/prices",
+          "label": "catalogs.prices.title.plural"
+        },
+        {
+          "name": "prices.create",
+          "title": {
+            "en": {
+              "singular": "prices.create"
+            }
+          },
+          "needFor": {},
+          "materialUiIcon": "Brightness1Outlined",
+          "previewFeatures": [],
+          "type": "page",
+          "link": "/prices/create",
+          "label": "catalogs.prices.title.singular"
+        }
+      ],
+      "generalModels": [],
+      "inputModels": [],
+      "outputModels": [],
+      "methods": [
+        {
+          "name": "all",
+          "title": {
+            "en": {
+              "singular": "all"
+            }
+          },
+          "needFor": {},
+          "materialUiIcon": "Brightness1Outlined",
+          "previewFeatures": [],
+          "argsModel": {
+            "name": "allArgs",
+            "title": {
+              "en": {
+                "singular": "\u041e\u0441\u043d\u043e\u0432\u043d\u0430\u044f \u043c\u043e\u0434\u0435\u043b\u044c \u0440\u0435\u0437\u0443\u043b\u044c\u0442\u0430\u0442\u0430 prices"
+              }
+            },
+            "needFor": {},
+            "materialUiIcon": "Brightness1Outlined",
+            "previewFeatures": [],
+            "fields": []
+          },
+          "returnModel": {
+            "returnType": "void"
+          },
+          "exportedToApi": true,
+          "queable": false,
+          "methodType": "query",
+          "async": false
+        },
+        {
+          "name": "create",
+          "title": {
+            "en": {
+              "singular": "create"
+            }
+          },
+          "needFor": {},
+          "materialUiIcon": "Brightness1Outlined",
+          "previewFeatures": [],
+          "argsModel": {
+            "name": "createArgs",
+            "title": {
+              "en": {
+                "singular": "\u041e\u0441\u043d\u043e\u0432\u043d\u0430\u044f \u043c\u043e\u0434\u0435\u043b\u044c \u0440\u0435\u0437\u0443\u043b\u044c\u0442\u0430\u0442\u0430 prices"
+              }
+            },
+            "needFor": {},
+            "materialUiIcon": "Brightness1Outlined",
+            "previewFeatures": [],
+            "fields": []
+          },
+          "returnModel": {
+            "returnType": "void"
+          },
+          "exportedToApi": true,
+          "queable": false,
+          "methodType": "mutation",
+          "async": false
+        },
+        {
+          "name": "update",
+          "title": {
+            "en": {
+              "singular": "update"
+            }
+          },
+          "needFor": {},
+          "materialUiIcon": "Brightness1Outlined",
+          "previewFeatures": [],
+          "argsModel": {
+            "name": "updateArgs",
+            "title": {
+              "en": {
+                "singular": "\u041e\u0441\u043d\u043e\u0432\u043d\u0430\u044f \u043c\u043e\u0434\u0435\u043b\u044c \u0440\u0435\u0437\u0443\u043b\u044c\u0442\u0430\u0442\u0430 prices"
+              }
+            },
+            "needFor": {},
+            "materialUiIcon": "Brightness1Outlined",
+            "previewFeatures": [],
+            "fields": []
+          },
+          "returnModel": {
+            "returnType": "void"
+          },
+          "exportedToApi": true,
+          "queable": false,
+          "methodType": "mutation",
+          "async": false
+        },
+        {
+          "name": "delete",
+          "title": {
+            "en": {
+              "singular": "delete"
+            }
+          },
+          "needFor": {},
+          "materialUiIcon": "Brightness1Outlined",
+          "previewFeatures": [],
+          "argsModel": {
+            "name": "deleteArgs",
+            "title": {
+              "en": {
+                "singular": "\u041e\u0441\u043d\u043e\u0432\u043d\u0430\u044f \u043c\u043e\u0434\u0435\u043b\u044c \u0440\u0435\u0437\u0443\u043b\u044c\u0442\u0430\u0442\u0430 prices"
+              }
+            },
+            "needFor": {},
+            "materialUiIcon": "Brightness1Outlined",
+            "previewFeatures": [],
+            "fields": []
+          },
+          "returnModel": {
+            "returnType": "void"
+          },
+          "exportedToApi": true,
+          "queable": false,
+          "methodType": "mutation",
+          "async": false
+        }
+      ],
+      "labels": [
+        "catalogs.prices.title.plural",
+        "catalogs.prices.title.singular"
+      ],
+      "type": "infoRegistry",
+      "registrarDepended": false,
+      "dimensions": [
+        {
+          "name": "region",
+          "title": {
+            "en": "Region"
+          },
+          "needFor": "",
+          "updatable": true,
+          "required": true,
+          "requiredOnInput": true,
+          "updatableByUser": true,
+          "hidden": false,
+          "searchable": true,
+          "showInList": true,
+          "showInCreate": true,
+          "showInEdit": true,
+          "showInFilter": true,
+          "showInShow": true,
+          "sharded": false,
+          "array": false,
+          "type": "string",
+          "category": "scalar",
+          "stringType": "plain",
+          "filters": [
+            "equal"
+          ]
+        }
+      ],
+      "resources": [
+        {
+          "name": "amount",
+          "title": {
+            "en": "Amount"
+          },
+          "needFor": "",
+          "updatable": true,
+          "required": true,
+          "requiredOnInput": true,
+          "updatableByUser": true,
+          "hidden": false,
+          "searchable": true,
+          "showInList": true,
+          "showInCreate": true,
+          "showInEdit": true,
+          "showInFilter": true,
+          "showInShow": true,
+          "sharded": false,
+          "array": false,
+          "type": "float",
+          "category": "scalar",
+          "filters": [
+            "equal"
+          ],
+          "numberType": "base"
+        }
+      ],
+      "period": "notPeriodic"
+    }
+  ],
+  "sumRegistries": [],
+  "languages": [
+    {
+      "id": "en",
+      "title": "English"
+    },
+    {
+      "id": "ru",
+      "title": "Russian"
+    }
+  ],
+  "defaultLanguage": "en",
+  "reports": [],
+  "restApis": [],
+  "integrationClients": [],
+  "workers": [],
+  "roles": [],
+  "menuItems": [],
+  "pages": [],
+  "back": {
+    "name": "back",
+    "title": {
+      "en": {
+        "singular": "back"
+      }
+    },
+    "needFor": {},
+    "materialUiIcon": "Brightness1Outlined",
+    "previewFeatures": [],
+    "replicas": 1,
+    "requests": {
+      "memory": "192Mi",
+      "cpu": "0.15",
+      "maxOldSpaceSize": 173
+    },
+    "limits": {
+      "memory": "192Mi",
+      "cpu": "0.15",
+      "maxOldSpaceSize": 173
+    }
+  },
+  "generalModels": [],
+  "inputModels": [],
+  "outputModels": [],
+  "methods": [],
+  "labels": [],
+  "additionalServices": []
+}

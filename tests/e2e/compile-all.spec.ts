@@ -211,6 +211,52 @@ const fixtures: FixtureSpec[] = [
     ],
     entityTs: { names: ['Category', 'Article'] },
   },
+
+  // ---- infoRegistry (non-periodic, non-registrar-depended) ----
+  {
+    fixture: 'with-info-registry',
+    label: 'infoRegistry entity (Price)',
+    prisma: {
+      model: 'Price',
+      idType: 'String',
+      extraFields: [
+        { pattern: /region\s+String/ },
+        { pattern: /amount\s+Float/ },
+      ],
+    },
+    typeDefs: {
+      entity: 'Price',
+      service: 'prices',
+      gqlIdType: 'ID!',
+      requiredFields: ['region: String!', 'amount: Float!'],
+      createMutationIdBehaviour: 'required',
+      createMutationIdPattern: /id:/,
+    },
+    entityTs: { names: ['Price'] },
+  },
+
+  // ---- sumRegistry (non-registrar-depended) ----
+  {
+    fixture: 'with-sum-registry',
+    label: 'sumRegistry entity (Total)',
+    prisma: {
+      model: 'Total',
+      idType: 'String',
+      extraFields: [
+        { pattern: /region\s+String/ },
+        { pattern: /amount\s+Float/ },
+      ],
+    },
+    typeDefs: {
+      entity: 'Total',
+      service: 'totals',
+      gqlIdType: 'ID!',
+      requiredFields: ['region: String!', 'amount: Float!'],
+      createMutationIdBehaviour: 'required',
+      createMutationIdPattern: /id:/,
+    },
+    entityTs: { names: ['Total'] },
+  },
 ]
 
 // ---------------------------------------------------------------------------
