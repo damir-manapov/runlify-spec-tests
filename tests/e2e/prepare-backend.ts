@@ -52,6 +52,41 @@ export function makeTempProject(fixture: string, metadata?: Record<string, unkno
   return { parentDir, workDir }
 }
 
+// ---------------------------------------------------------------------------
+// File-reading helpers shared across spec files
+// ---------------------------------------------------------------------------
+
+/** Read the Prisma schema from a generated backend. */
+export function readSchema(backDir: string): string {
+  return fs.readFileSync(path.join(backDir, 'prisma/schema.prisma'), 'utf-8')
+}
+
+/** Read the baseTypeDefs.ts for a given graph service. */
+export function readTypeDefs(backDir: string, service: string): string {
+  return fs.readFileSync(
+    path.join(backDir, `src/adm/graph/services/${service}/baseTypeDefs.ts`),
+    'utf-8',
+  )
+}
+
+/** Read metadata.json from a workDir (project with src/meta layout). */
+export function readMetadata(workDir: string): Record<string, unknown> {
+  return JSON.parse(
+    fs.readFileSync(path.join(workDir, 'src/meta/metadata.json'), 'utf-8'),
+  ) as Record<string, unknown>
+}
+
+/** Write metadata.json to a workDir. */
+export function writeMetadata(workDir: string, metadata: Record<string, unknown>): void {
+  fs.writeFileSync(path.join(workDir, 'src/meta/metadata.json'), JSON.stringify(metadata, null, 2))
+}
+
+/** Read metadata.json directly from a fixture directory (not a workDir). */
+export function readFixtureMetadata(fixture: string): Record<string, unknown> {
+  const raw = fs.readFileSync(path.join(fixturesBaseDir, fixture, 'metadata.json'), 'utf-8')
+  return JSON.parse(raw) as Record<string, unknown>
+}
+
 /**
  * Generate a backend with --back-only, overlay scaffold stubs,
  * install dependencies and generate Prisma client.

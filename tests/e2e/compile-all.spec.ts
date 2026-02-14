@@ -4,6 +4,8 @@ import { afterAll, beforeAll, describe, expect, it } from 'vitest'
 import {
   type PreparedBackend,
   prepareBackend,
+  readSchema,
+  readTypeDefs,
   runOrFail,
   teardownBackend,
 } from './prepare-backend.js'
@@ -214,17 +216,6 @@ const fixtures: FixtureSpec[] = [
 // ---------------------------------------------------------------------------
 // Parameterized test runner — helper functions extracted to reduce complexity
 // ---------------------------------------------------------------------------
-
-function readSchema(backDir: string): string {
-  return fs.readFileSync(path.join(backDir, 'prisma/schema.prisma'), 'utf-8')
-}
-
-function readTypeDefs(backDir: string, service: string): string {
-  return fs.readFileSync(
-    path.join(backDir, `src/adm/graph/services/${service}/baseTypeDefs.ts`),
-    'utf-8',
-  )
-}
 
 function registerPrismaTests(pc: PrismaCheck, getBackDir: () => string): void {
   it(`Prisma: ${pc.model} has ${pc.idType} id${pc.hasAutoincrement ? ' (autoincrement)' : ''}${pc.hasCuid ? ' (cuid)' : ''}`, () => {

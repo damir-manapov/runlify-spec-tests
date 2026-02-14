@@ -2,15 +2,7 @@ import fs from 'node:fs'
 import path from 'node:path'
 import { afterAll, describe, expect, it } from 'vitest'
 import { assertRunlifyAvailable, runRunlify } from '../../src/runner/index.js'
-import { makeTempProject } from './prepare-backend.js'
-
-const fixturesBaseDir = path.resolve(import.meta.dirname, '../fixtures')
-
-/** Load the valid with-catalog metadata as a base */
-function validBase(): Record<string, unknown> {
-  const raw = fs.readFileSync(path.join(fixturesBaseDir, 'with-catalog', 'metadata.json'), 'utf-8')
-  return JSON.parse(raw) as Record<string, unknown>
-}
+import { makeTempProject, readFixtureMetadata } from './prepare-backend.js'
 
 const tempDirs: string[] = []
 
@@ -30,7 +22,7 @@ describe('e2e: invalid metadata handling', () => {
   })
 
   it('valid metadata generates successfully (baseline)', async () => {
-    const base = validBase()
+    const base = readFixtureMetadata('with-catalog')
     const { parentDir, workDir } = makeTempProject('with-catalog', base)
     tempDirs.push(parentDir)
 
@@ -54,7 +46,7 @@ describe('e2e: invalid metadata handling', () => {
   })
 
   it('metadata with empty catalogs array generates successfully', async () => {
-    const base = validBase()
+    const base = readFixtureMetadata('with-catalog')
     base.catalogs = []
     base.documents = []
     const { parentDir, workDir } = makeTempProject('with-catalog', base)
@@ -66,7 +58,7 @@ describe('e2e: invalid metadata handling', () => {
   })
 
   it('catalog with no fields (only id and search) still generates', async () => {
-    const base = validBase()
+    const base = readFixtureMetadata('with-catalog')
     const catalogs = base.catalogs as Array<Record<string, unknown>>
     const product = catalogs[0] as Record<string, unknown>
     // Keep only id and search fields (the minimum viable set)
@@ -85,7 +77,7 @@ describe('e2e: invalid metadata handling', () => {
   })
 
   it('catalog with missing name field fails', async () => {
-    const base = validBase()
+    const base = readFixtureMetadata('with-catalog')
     const catalogs = base.catalogs as Array<Record<string, unknown>>
     const product = catalogs[0] as Record<string, unknown>
     delete product.name
@@ -98,7 +90,7 @@ describe('e2e: invalid metadata handling', () => {
   })
 
   it('catalog with missing title field fails', async () => {
-    const base = validBase()
+    const base = readFixtureMetadata('with-catalog')
     const catalogs = base.catalogs as Array<Record<string, unknown>>
     const product = catalogs[0] as Record<string, unknown>
     delete product.title
@@ -111,7 +103,7 @@ describe('e2e: invalid metadata handling', () => {
   })
 
   it('field with unknown type fails or is handled gracefully', async () => {
-    const base = validBase()
+    const base = readFixtureMetadata('with-catalog')
     const catalogs = base.catalogs as Array<Record<string, unknown>>
     const product = catalogs[0] as Record<string, unknown>
     const fields = product.fields as Array<Record<string, unknown>>

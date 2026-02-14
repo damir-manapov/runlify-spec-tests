@@ -6,11 +6,15 @@ import {
   cleanupFresh,
   type FreshBackend,
   prepareBackendFresh,
+  readMetadata,
+  readSchema,
+  readTypeDefs,
   regenBackend,
   runOrFail,
   type StartedServer,
   startServer,
   stopServer,
+  writeMetadata,
 } from './prepare-backend.js'
 
 // ---------------------------------------------------------------------------
@@ -110,16 +114,6 @@ function makeCatalog(overrides: Record<string, unknown>): Record<string, unknown
   }
 }
 
-function readMetadata(workDir: string): Record<string, unknown> {
-  return JSON.parse(
-    fs.readFileSync(path.join(workDir, 'src/meta/metadata.json'), 'utf-8'),
-  ) as Record<string, unknown>
-}
-
-function writeMetadata(workDir: string, metadata: Record<string, unknown>): void {
-  fs.writeFileSync(path.join(workDir, 'src/meta/metadata.json'), JSON.stringify(metadata, null, 2))
-}
-
 // =========================================================================
 // 1. Add a field to an existing entity (compile-only)
 // =========================================================================
@@ -137,7 +131,7 @@ describe('e2e schema change: add field to existing entity', () => {
   })
 
   it('initial schema has Product with title and price', () => {
-    const schema = fs.readFileSync(path.join(fresh.backDir, 'prisma/schema.prisma'), 'utf-8')
+    const schema = readSchema(fresh.backDir)
     expect(schema).toContain('model Product {')
     expect(schema).toContain('title')
     expect(schema).toContain('price')
@@ -145,10 +139,7 @@ describe('e2e schema change: add field to existing entity', () => {
   })
 
   it('initial typeDefs do not include description', () => {
-    const typeDefs = fs.readFileSync(
-      path.join(fresh.backDir, 'src/adm/graph/services/products/baseTypeDefs.ts'),
-      'utf-8',
-    )
+    const typeDefs = readTypeDefs(fresh.backDir, 'products')
     expect(typeDefs).toContain('title: String!')
     expect(typeDefs).not.toContain('description')
   })
@@ -195,41 +186,32 @@ describe('e2e schema change: add field to existing entity', () => {
     })
 
     it('Prisma schema now includes description field', () => {
-      const schema = fs.readFileSync(path.join(fresh.backDir, 'prisma/schema.prisma'), 'utf-8')
+      const schema = readSchema(fresh.backDir)
       expect(schema).toContain('model Product {')
       expect(schema).toMatch(/description\s+String\?/)
     })
 
     it('existing fields are preserved in Prisma schema', () => {
-      const schema = fs.readFileSync(path.join(fresh.backDir, 'prisma/schema.prisma'), 'utf-8')
+      const schema = readSchema(fresh.backDir)
       expect(schema).toContain('title')
       expect(schema).toContain('price')
     })
 
     it('GraphQL typeDefs now include description', () => {
-      const typeDefs = fs.readFileSync(
-        path.join(fresh.backDir, 'src/adm/graph/services/products/baseTypeDefs.ts'),
-        'utf-8',
-      )
+      const typeDefs = readTypeDefs(fresh.backDir, 'products')
       expect(typeDefs).toContain('description')
       // Optional field — no ! in the type
       expect(typeDefs).toContain('description: String')
     })
 
     it('existing GraphQL fields are preserved', () => {
-      const typeDefs = fs.readFileSync(
-        path.join(fresh.backDir, 'src/adm/graph/services/products/baseTypeDefs.ts'),
-        'utf-8',
-      )
+      const typeDefs = readTypeDefs(fresh.backDir, 'products')
       expect(typeDefs).toContain('title: String!')
       expect(typeDefs).toContain('price: Float!')
     })
 
     it('create mutation includes description argument', () => {
-      const typeDefs = fs.readFileSync(
-        path.join(fresh.backDir, 'src/adm/graph/services/products/baseTypeDefs.ts'),
-        'utf-8',
-      )
+      const typeDefs = readTypeDefs(fresh.backDir, 'products')
       const createMatch = typeDefs.match(/createProduct\(([^)]+)\)/s)
       expect(createMatch).toBeTruthy()
       const createArgs = createMatch?.[1] ?? ''
@@ -334,14 +316,14 @@ describe('e2e schema change: add new entity', () => {
     })
 
     it('Prisma schema includes Review model', () => {
-      const schema = fs.readFileSync(path.join(fresh.backDir, 'prisma/schema.prisma'), 'utf-8')
+      const schema = readSchema(fresh.backDir)
       expect(schema).toContain('model Review {')
       expect(schema).toMatch(/comment\s+String/)
       expect(schema).toMatch(/rating\s+Int/)
     })
 
     it('existing Product model is preserved', () => {
-      const schema = fs.readFileSync(path.join(fresh.backDir, 'prisma/schema.prisma'), 'utf-8')
+      const schema = readSchema(fresh.backDir)
       expect(schema).toContain('model Product {')
     })
 
@@ -355,10 +337,7 @@ describe('e2e schema change: add new entity', () => {
     })
 
     it('Review typeDefs define correct types', () => {
-      const typeDefs = fs.readFileSync(
-        path.join(fresh.backDir, 'src/adm/graph/services/reviews/baseTypeDefs.ts'),
-        'utf-8',
-      )
+      const typeDefs = readTypeDefs(fresh.backDir, 'reviews')
       expect(typeDefs).toContain('type Review {')
       expect(typeDefs).toContain('id: ID!')
       expect(typeDefs).toContain('comment: String!')
@@ -366,20 +345,14 @@ describe('e2e schema change: add new entity', () => {
     })
 
     it('Review typeDefs have CRUD mutations', () => {
-      const typeDefs = fs.readFileSync(
-        path.join(fresh.backDir, 'src/adm/graph/services/reviews/baseTypeDefs.ts'),
-        'utf-8',
-      )
+      const typeDefs = readTypeDefs(fresh.backDir, 'reviews')
       expect(typeDefs).toContain('createReview(')
       expect(typeDefs).toContain('updateReview(')
       expect(typeDefs).toContain('removeReview(')
     })
 
     it('Review filter includes rating_lte and rating_gte', () => {
-      const typeDefs = fs.readFileSync(
-        path.join(fresh.backDir, 'src/adm/graph/services/reviews/baseTypeDefs.ts'),
-        'utf-8',
-      )
+      const typeDefs = readTypeDefs(fresh.backDir, 'reviews')
       expect(typeDefs).toContain('input ReviewFilter {')
       expect(typeDefs).toContain('rating_lte: Int')
       expect(typeDefs).toContain('rating_gte: Int')
@@ -395,10 +368,7 @@ describe('e2e schema change: add new entity', () => {
     })
 
     it('existing products GraphQL service is preserved', () => {
-      const typeDefs = fs.readFileSync(
-        path.join(fresh.backDir, 'src/adm/graph/services/products/baseTypeDefs.ts'),
-        'utf-8',
-      )
+      const typeDefs = readTypeDefs(fresh.backDir, 'products')
       expect(typeDefs).toContain('type Product {')
       expect(typeDefs).toContain('title: String!')
     })
@@ -504,7 +474,7 @@ describe('e2e schema change: remove field from entity', () => {
   })
 
   it('initial schema has price field', () => {
-    const schema = fs.readFileSync(path.join(fresh.backDir, 'prisma/schema.prisma'), 'utf-8')
+    const schema = readSchema(fresh.backDir)
     expect(schema).toMatch(/price\s+Float/)
   })
 
@@ -533,31 +503,25 @@ describe('e2e schema change: remove field from entity', () => {
     })
 
     it('Prisma schema no longer contains price', () => {
-      const schema = fs.readFileSync(path.join(fresh.backDir, 'prisma/schema.prisma'), 'utf-8')
+      const schema = readSchema(fresh.backDir)
       expect(schema).toContain('model Product {')
       expect(schema).not.toMatch(/price\s+Float/)
     })
 
     it('other fields are preserved', () => {
-      const schema = fs.readFileSync(path.join(fresh.backDir, 'prisma/schema.prisma'), 'utf-8')
+      const schema = readSchema(fresh.backDir)
       expect(schema).toContain('title')
       expect(schema).toMatch(/id\s+String/)
     })
 
     it('GraphQL typeDefs no longer contain price', () => {
-      const typeDefs = fs.readFileSync(
-        path.join(fresh.backDir, 'src/adm/graph/services/products/baseTypeDefs.ts'),
-        'utf-8',
-      )
+      const typeDefs = readTypeDefs(fresh.backDir, 'products')
       expect(typeDefs).not.toContain('price')
       expect(typeDefs).toContain('title: String!')
     })
 
     it('create mutation no longer has price argument', () => {
-      const typeDefs = fs.readFileSync(
-        path.join(fresh.backDir, 'src/adm/graph/services/products/baseTypeDefs.ts'),
-        'utf-8',
-      )
+      const typeDefs = readTypeDefs(fresh.backDir, 'products')
       const createMatch = typeDefs.match(/createProduct\(([^)]+)\)/s)
       expect(createMatch).toBeTruthy()
       expect(createMatch?.[1]).not.toContain('price')
@@ -582,7 +546,7 @@ describe('e2e schema change: remove entity', () => {
   })
 
   it('initial schema has both Category and Article models', () => {
-    const schema = fs.readFileSync(path.join(fresh.backDir, 'prisma/schema.prisma'), 'utf-8')
+    const schema = readSchema(fresh.backDir)
     expect(schema).toContain('model Category {')
     expect(schema).toContain('model Article {')
   })
@@ -617,12 +581,12 @@ describe('e2e schema change: remove entity', () => {
     })
 
     it('Prisma schema no longer contains Article model', () => {
-      const schema = fs.readFileSync(path.join(fresh.backDir, 'prisma/schema.prisma'), 'utf-8')
+      const schema = readSchema(fresh.backDir)
       expect(schema).not.toContain('model Article {')
     })
 
     it('Category model is preserved', () => {
-      const schema = fs.readFileSync(path.join(fresh.backDir, 'prisma/schema.prisma'), 'utf-8')
+      const schema = readSchema(fresh.backDir)
       expect(schema).toContain('model Category {')
     })
 
@@ -682,15 +646,12 @@ describe('e2e schema change: change field type', () => {
   })
 
   it('initial price field is Float', () => {
-    const schema = fs.readFileSync(path.join(fresh.backDir, 'prisma/schema.prisma'), 'utf-8')
+    const schema = readSchema(fresh.backDir)
     expect(schema).toMatch(/price\s+Float/)
   })
 
   it('initial GraphQL price is Float!', () => {
-    const typeDefs = fs.readFileSync(
-      path.join(fresh.backDir, 'src/adm/graph/services/products/baseTypeDefs.ts'),
-      'utf-8',
-    )
+    const typeDefs = readTypeDefs(fresh.backDir, 'products')
     expect(typeDefs).toContain('price: Float!')
   })
 
@@ -720,16 +681,13 @@ describe('e2e schema change: change field type', () => {
     })
 
     it('Prisma schema shows price as Int', () => {
-      const schema = fs.readFileSync(path.join(fresh.backDir, 'prisma/schema.prisma'), 'utf-8')
+      const schema = readSchema(fresh.backDir)
       expect(schema).toMatch(/price\s+Int/)
       expect(schema).not.toMatch(/price\s+Float/)
     })
 
     it('GraphQL typeDefs show price as Int!', () => {
-      const typeDefs = fs.readFileSync(
-        path.join(fresh.backDir, 'src/adm/graph/services/products/baseTypeDefs.ts'),
-        'utf-8',
-      )
+      const typeDefs = readTypeDefs(fresh.backDir, 'products')
       expect(typeDefs).toContain('price: Int!')
       expect(typeDefs).not.toContain('price: Float!')
     })
@@ -752,10 +710,7 @@ describe('e2e schema change: toggle required/optional', () => {
   })
 
   it('initially title is required', () => {
-    const typeDefs = fs.readFileSync(
-      path.join(fresh.backDir, 'src/adm/graph/services/products/baseTypeDefs.ts'),
-      'utf-8',
-    )
+    const typeDefs = readTypeDefs(fresh.backDir, 'products')
     expect(typeDefs).toContain('title: String!')
   })
 
@@ -786,15 +741,12 @@ describe('e2e schema change: toggle required/optional', () => {
     })
 
     it('Prisma schema shows title as optional', () => {
-      const schema = fs.readFileSync(path.join(fresh.backDir, 'prisma/schema.prisma'), 'utf-8')
+      const schema = readSchema(fresh.backDir)
       expect(schema).toMatch(/title\s+String\?/)
     })
 
     it('GraphQL type shows title without !', () => {
-      const typeDefs = fs.readFileSync(
-        path.join(fresh.backDir, 'src/adm/graph/services/products/baseTypeDefs.ts'),
-        'utf-8',
-      )
+      const typeDefs = readTypeDefs(fresh.backDir, 'products')
       // Should be 'title: String' (no !) — but not 'title: String!'
       expect(typeDefs).not.toContain('title: String!')
       expect(typeDefs).toContain('title: String')
@@ -820,15 +772,12 @@ describe('e2e schema change: toggle required/optional', () => {
     })
 
     it('Prisma schema shows title as required again', () => {
-      const schema = fs.readFileSync(path.join(fresh.backDir, 'prisma/schema.prisma'), 'utf-8')
+      const schema = readSchema(fresh.backDir)
       expect(schema).toMatch(/title\s+String[^?]/)
     })
 
     it('GraphQL type shows title: String! again', () => {
-      const typeDefs = fs.readFileSync(
-        path.join(fresh.backDir, 'src/adm/graph/services/products/baseTypeDefs.ts'),
-        'utf-8',
-      )
+      const typeDefs = readTypeDefs(fresh.backDir, 'products')
       expect(typeDefs).toContain('title: String!')
     })
   })
@@ -926,30 +875,24 @@ describe('e2e schema change: add relation', () => {
     })
 
     it('Prisma schema has Tag model', () => {
-      const schema = fs.readFileSync(path.join(fresh.backDir, 'prisma/schema.prisma'), 'utf-8')
+      const schema = readSchema(fresh.backDir)
       expect(schema).toContain('model Tag {')
       expect(schema).toMatch(/label\s+String/)
     })
 
     it('Product has tagId with @relation', () => {
-      const schema = fs.readFileSync(path.join(fresh.backDir, 'prisma/schema.prisma'), 'utf-8')
+      const schema = readSchema(fresh.backDir)
       expect(schema).toMatch(/tagId\s+String\?/)
       expect(schema).toContain('@relation')
     })
 
     it('Product GraphQL typeDefs include tagId', () => {
-      const typeDefs = fs.readFileSync(
-        path.join(fresh.backDir, 'src/adm/graph/services/products/baseTypeDefs.ts'),
-        'utf-8',
-      )
+      const typeDefs = readTypeDefs(fresh.backDir, 'products')
       expect(typeDefs).toContain('tagId')
     })
 
     it('Product filter has link filter fields', () => {
-      const typeDefs = fs.readFileSync(
-        path.join(fresh.backDir, 'src/adm/graph/services/products/baseTypeDefs.ts'),
-        'utf-8',
-      )
+      const typeDefs = readTypeDefs(fresh.backDir, 'products')
       expect(typeDefs).toContain('tagId: String')
       expect(typeDefs).toContain('tagId_in: [String]')
       expect(typeDefs).toContain('tagId_not_in: [String]')
