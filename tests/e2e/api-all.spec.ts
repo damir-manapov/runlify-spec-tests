@@ -627,6 +627,42 @@ describe('e2e API: linked entities (with-relations)', () => {
       )
     })
   })
+
+  describe('referential integrity', () => {
+    it('creating article with non-existent categoryId returns error', async () => {
+      const r = await articles.create({
+        id: 'fk-bad',
+        title: 'Orphan',
+        categoryId: 'does-not-exist',
+      })
+      expect(r.errors).toBeDefined()
+    })
+
+    it('deleting category with articles nullifies the link (SET NULL)', async () => {
+      await createCategory({ id: 'fk-parent', name: 'Parent' })
+      await createArticle({ id: 'fk-child', title: 'Child', categoryId: 'fk-parent' })
+
+      // categoryId is optional → Prisma uses SET NULL on delete
+      const r = await categories.remove('fk-parent')
+      expect(r.errors).toBeUndefined()
+
+      // Article still exists but categoryId is now null
+      const check = await articles.findOne('fk-child')
+      expect(check.data?.Article?.title).toBe('Child')
+      expect(check.data?.Article?.categoryId).toBeNull()
+
+      await cleanup({ type: 'article', id: 'fk-child' })
+    })
+
+    it('deleting category succeeds after its articles are removed', async () => {
+      await createCategory({ id: 'fk-safe', name: 'Safe' })
+      await createArticle({ id: 'fk-art', title: 'Removable', categoryId: 'fk-safe' })
+
+      await articles.remove('fk-art')
+      const r = await categories.remove('fk-safe')
+      expect(r.errors).toBeUndefined()
+    })
+  })
 })
 
 // ---------------------------------------------------------------------------

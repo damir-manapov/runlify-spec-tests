@@ -336,6 +336,27 @@ for (const spec of fixtures) {
       })
     })
 
+    it('generated Dockerfile is valid', () => {
+      const dockerfile = fs.readFileSync(path.join(prepared.backDir, 'Dockerfile'), 'utf-8')
+      expect(dockerfile).toContain('FROM')
+      expect(dockerfile).toContain('COPY')
+      expect(dockerfile).toContain('EXPOSE')
+    })
+
+    it('generated Helm chart has required fields', () => {
+      const chart = fs.readFileSync(path.join(prepared.backDir, 'chart', 'Chart.yaml'), 'utf-8')
+      expect(chart).toContain('apiVersion:')
+      expect(chart).toContain('name:')
+      expect(chart).toContain('version:')
+    })
+
+    it('Prisma schema has datasource and generator', () => {
+      const schema = readSchema(getBackDir())
+      expect(schema).toContain('datasource db')
+      expect(schema).toContain('generator client')
+      expect(schema).toContain('provider = "postgresql"')
+    })
+
     // ---------- Prisma schema checks ----------
 
     const prismaChecks = Array.isArray(spec.prisma) ? spec.prisma : [spec.prisma]

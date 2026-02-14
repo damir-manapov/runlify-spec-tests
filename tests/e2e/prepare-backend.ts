@@ -135,6 +135,7 @@ export async function regenBackend(fresh: FreshBackend): Promise<void> {
 
   overlayScaffold(scaffoldDir, fresh.backDir)
   patchEntityEnum(fresh)
+  removeStaleEntityDirs(fresh)
 
   execSync('npx prisma generate', {
     cwd: fresh.backDir,
@@ -194,6 +195,55 @@ function patchEntityEnum(fresh: FreshBackend): void {
   const entityPath = path.join(fresh.backDir, 'src/types/Entity.ts')
   fs.mkdirSync(path.dirname(entityPath), { recursive: true })
   fs.writeFileSync(entityPath, content)
+}
+
+/**
+ * Remove entity service/graph directories that are no longer in metadata.
+ * runlify regen overlays new code but never deletes old artefacts — orphan
+ * dirs cause tsc failures because they import types that no longer exist.
+ */
+function removeStaleEntityDirs(fresh: FreshBackend): void {
+  const metaPath = path.join(fresh.workDir, 'src/meta/metadata.json')
+  const metadata = JSON.parse(fs.readFileSync(metaPath, 'utf-8'))
+
+  const activeEntities = new Set<string>()
+  for (const c of (metadata.catalogs ?? []) as { name: string }[]) {
+    activeEntities.add(c.name)
+  }
+  for (const d of (metadata.documents ?? []) as { name: string }[]) {
+    activeEntities.add(d.name)
+  }
+
+  removeStaleGraphDirs(fresh.backDir, activeEntities)
+  removeStaleServiceDirs(fresh.backDir, activeEntities)
+}
+
+/** Built-in (non-entity) service/graph dirs that must never be removed. */
+const builtInServiceDirs = new Set(['help'])
+const builtInServiceClassDirs = new Set(['HelpService'])
+
+function removeStaleGraphDirs(backDir: string, activeEntities: Set<string>): void {
+  const graphServicesDir = path.join(backDir, 'src/adm/graph/services')
+  if (!fs.existsSync(graphServicesDir)) return
+  for (const dir of fs.readdirSync(graphServicesDir)) {
+    if (builtInServiceDirs.has(dir)) continue
+    if (!activeEntities.has(dir)) {
+      fs.rmSync(path.join(graphServicesDir, dir), { recursive: true, force: true })
+    }
+  }
+}
+
+function removeStaleServiceDirs(backDir: string, activeEntities: Set<string>): void {
+  const servicesDir = path.join(backDir, 'src/adm/services')
+  if (!fs.existsSync(servicesDir)) return
+  for (const entry of fs.readdirSync(servicesDir, { withFileTypes: true })) {
+    if (!entry.isDirectory() || !entry.name.endsWith('Service')) continue
+    if (builtInServiceClassDirs.has(entry.name)) continue
+    const entityPlural = entry.name.replace(/Service$/, '').toLowerCase()
+    if (!activeEntities.has(entityPlural)) {
+      fs.rmSync(path.join(servicesDir, entry.name), { recursive: true, force: true })
+    }
+  }
 }
 
 /** Overlay scaffold stubs and force-overwrite key files. */

@@ -35,6 +35,7 @@ export async function gql<T = Record<string, unknown>>(
 function toGqlLiteral(v: unknown): string {
   if (typeof v === 'string') return JSON.stringify(v)
   if (typeof v === 'number' || typeof v === 'boolean') return String(v)
+  if (typeof v === 'bigint') return String(v)
   if (v === null || v === undefined) return 'null'
   if (Array.isArray(v)) return `[${v.map(toGqlLiteral).join(', ')}]`
   // object → { key: val, … }
