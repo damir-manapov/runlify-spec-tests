@@ -146,10 +146,14 @@ export interface FreshBackend extends PreparedBackend {
 }
 
 /**
- * Like prepareBackend but always creates a new temp dir (no cache).
- * Returns the workDir so callers can mutate metadata.json and re-regen.
+ * Cache of "template" fresh backends keyed by fixture name.
+ * The template is built once (expensive: regen + npm install) and then
+ * cloned cheaply via cp -r for each suite that needs a mutable copy.
  */
-export async function prepareBackendFresh(fixture: string): Promise<FreshBackend> {
+const freshTemplateCache = new Map<string, Promise<FreshBackend>>()
+const resolvedFreshTemplates = new Map<string, FreshBackend>()
+
+async function buildFreshTemplate(fixture: string): Promise<FreshBackend> {
   assertRunlifyAvailable()
 
   const scaffoldDir = path.join(fixturesBaseDir, 'scaffold')
@@ -167,6 +171,38 @@ export async function prepareBackendFresh(fixture: string): Promise<FreshBackend
 
   overlayScaffold(scaffoldDir, backDir)
   installAndGenerate(backDir)
+
+  return { parentDir, backDir, workDir }
+}
+
+function getFreshTemplate(fixture: string): Promise<FreshBackend> {
+  const cached = freshTemplateCache.get(fixture)
+  if (cached) return cached
+
+  const promise = buildFreshTemplate(fixture).then((tpl) => {
+    resolvedFreshTemplates.set(fixture, tpl)
+    return tpl
+  })
+  freshTemplateCache.set(fixture, promise)
+  return promise
+}
+
+/**
+ * Get a fresh (mutable) backend for schema-change tests.
+ *
+ * The expensive work (regen + npm install + prisma generate) is done once
+ * per fixture and cached as a template. Each call clones that template
+ * via cp -r, which is near-instant.
+ */
+export async function prepareBackendFresh(fixture: string): Promise<FreshBackend> {
+  const template = await getFreshTemplate(fixture)
+
+  // Clone the template into a new temp dir
+  const parentDir = fs.mkdtempSync(path.join(os.tmpdir(), 'runlify-e2e-'))
+  fs.cpSync(template.parentDir, parentDir, { recursive: true })
+
+  const workDir = path.join(parentDir, 'project')
+  const backDir = path.join(parentDir, 'test-back')
 
   return { parentDir, backDir, workDir }
 }
@@ -420,6 +456,12 @@ export function cleanupAllPrepared(): void {
   }
   prepareCache.clear()
   resolvedBackends.clear()
+
+  for (const tpl of resolvedFreshTemplates.values()) {
+    fs.rmSync(tpl.parentDir, { recursive: true, force: true })
+  }
+  freshTemplateCache.clear()
+  resolvedFreshTemplates.clear()
 }
 
 // Auto-cleanup cached backends when the process exits
