@@ -1,11 +1,14 @@
-/* Stub: DocumentBaseService — abstract base for document-type entities */
+/* Copied from rlw-back: DocumentBaseService — abstract base for document-type entities */
 import {AllRequestArgs} from '../../../../utils/types';
-import {BaseService, Obj, PrismaLocalDelegation, WithID} from './BaseService';
+import {BaseService, Obj, PrismaLocalDelegation, toLogId, WithID} from './BaseService';
 import {Context, DocumentConfig} from '../../types';
 import {Prisma, PrismaPromise} from '@prisma/client';
 import {DefinedFieldsInRecord, DefinedRecord, PartialFieldsInRecord} from '../../../../types/utils';
+import * as R from 'ramda';
 import {serviceUtils} from './utils';
 import {ServiceErrors} from './ServiceErrors';
+
+export const getRegistrarFields = R.pick(['row', 'registrarTypeId', 'registrarId']);
 
 export abstract class DocumentBaseService<
   Entity extends WithID,
@@ -117,5 +120,117 @@ export abstract class DocumentBaseService<
         }),
       ];
     });
+  }
+
+  async cancel(
+    id: Entity['id'],
+    byUser = false,
+  ): Promise<void> {
+    const data: any = await this.get(id, byUser);
+    if (!data) {
+      throw new Error('Запись не найдена!');
+    }
+
+    if ('cancelled' in data && data.cancelled && data.dateToCancelled) {
+      throw new Error('Документ уже отменен!');
+    }
+
+    await this.update({
+      ...data,
+      cancelled: true,
+      dateToCancelled: new Date(),
+    });
+  }
+
+  override async create(data: MutationCreateArgsWithoutAutodefinable, byUser?: boolean): Promise<Entity> {
+    const createdEntity = await super.create(data, byUser);
+
+    const registries = this.config.registrarDependedRegistries;
+    if (registries.length === 0) {
+      return createdEntity;
+    }
+
+    await this.afterPostHandle(createdEntity, registries, {useCreatedEntries: true});
+
+    return createdEntity;
+  }
+
+  override async update(data: MutationUpdateArgsWithoutAutodefinable, byUser?: boolean): Promise<Entity> {
+    const updatedEntity = await super.update(data, byUser);
+
+    await this.rePost(updatedEntity.id);
+    return updatedEntity;
+  }
+
+  override async createMany(
+    entries: StrictCreateArgsWithoutAutodefinable[],
+    byUser = false,
+  ): Promise<Prisma.BatchPayload> {
+    return super.createMany(entries, byUser);
+  }
+
+  override async delete(
+    params: MutationRemoveArgs,
+    byUser = false,
+  ): Promise<Entity> {
+    await this._hooks.beforeDelete(this.ctx, params);
+
+    const entity = await this.get(params.id, byUser);
+
+    if (!entity) {
+      throw new Error(`There is no entity with "${params.id}" id`);
+    }
+
+    if (!this.allowedToChange(entity, serviceUtils)) {
+      throw new Error(ServiceErrors.DoNotAllowToChange);
+    }
+
+    try {
+      const deleteOperation = this.prismaService.delete({
+        where: {
+          id: params.id,
+        },
+      });
+
+      const operations: PrismaPromise<any>[] = [
+        deleteOperation,
+        ...(await this._hooks.additionalOperationsOnDelete(this.ctx, params)),
+        ...(await this.getUnPostOperations(params.id)),
+      ];
+
+      const [result] = await this.ctx.prisma.$transaction(operations);
+
+      if (!result) {
+        throw new Error('There is no such entity');
+      }
+
+      await this._hooks.afterDelete(this.ctx, entity);
+
+      const registries = this.config.registrarDependedRegistries;
+      if (registries.length === 0) {
+        return entity;
+      }
+
+      await this.afterPostHandle(entity, registries);
+
+      return entity;
+    } catch (error) {
+      throw error;
+    }
+  }
+
+  async afterPostHandle(
+    entity: Entity,
+    registries: string[],
+    _options?: {useCreatedEntries?: boolean},
+  ): Promise<void> {
+    for (const registry of registries) {
+      const registryService = this.ctx.service(registry as any);
+      if (registryService && typeof (registryService as any).afterPost === 'function') {
+        const registryEntries = await this.getRegistryEntries(entity);
+        const entries = (registryEntries as any)[registry];
+        await (registryService as any).afterPost(entries);
+      }
+    }
   }
 }

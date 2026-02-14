@@ -178,6 +178,40 @@ export abstract class BaseService<
     return this.count(params, byUser).then(count => ({count}));
   }
 
+  async countWithGroupBy(
+    filters: QueryAllArgs['filter'],
+    attribute: keyof Omit<Entity, 'id' | '__typename'> | '_all',
+    groupBy: (keyof Omit<Entity, '__typename'>)[],
+  ): Promise<Record<string, number>> {
+    const where = toPrismaWhere(filters);
+
+    const result = await this.prismaService.groupBy({
+      by: groupBy,
+      _count: {
+        [attribute]: true,
+      },
+      where,
+    });
+
+    const groupIdToCountMap: Record<string, number> = {};
+
+    for (const groupFromDb of result) {
+      const resultItem = groupFromDb as any;
+      const groupKey = groupBy.map(key => {
+        if (key === 'date') {
+          return dayjs(resultItem[key]).utc().format('YYYY-MM-DD');
+        }
+
+        return resultItem[key];
+      }).join('_');
+
+      const countValue = resultItem._count?.[attribute];
+      groupIdToCountMap[groupKey] = (groupIdToCountMap[groupKey] || 0) + (typeof countValue === 'number' ? countValue : 0);
+    }
+
+    return groupIdToCountMap;
+  }
+
   async create(
     data: MutationCreateArgsWithoutAutodefinable,
     byUser = false,
@@ -457,5 +491,56 @@ export abstract class BaseService<
   }
   protected async getUnPostOperations(_id: Entity['id']): Promise<PrismaPromise<any>[]> {
     return [];
+  }
+
+  async sum(
+    filters: QueryAllArgs['filter'],
+    attribute: keyof Omit<Entity, 'id' | '__typename'> | '_all',
+    groupBy: (keyof Omit<Entity, '__typename'>)[],
+  ): Promise<Record<string, number>> {
+    const where = toPrismaWhere(filters);
+
+    const result = await this.prismaService.groupBy({
+      by: groupBy,
+      _sum: {
+        [attribute]: true,
+      },
+      where,
+    });
+
+    const groupIdToSumMap: Record<string, number> = {};
+
+    for (const groupFromDb of result) {
+      const resultItem = groupFromDb as any;
+      const groupKey = groupBy.map(key => {
+        if (key === 'date') {
+          return dayjs(resultItem[key]).utc().format('YYYY-MM-DD');
+        }
+
+        return resultItem[key];
+      }).join('_');
+
+      const sumValue = resultItem._sum?.[attribute];
+      groupIdToSumMap[groupKey] = (groupIdToSumMap[groupKey] || 0) + (typeof sumValue === 'number' ? sumValue : 0);
+    }
+
+    return groupIdToSumMap;
+  }
+
+  async sumWithoutGroupBy(
+    filters: QueryAllArgs['filter'],
+    attribute: keyof Omit<Entity, 'id' | '__typename'> | '_all',
+  ): Promise<number> {
+    const where = toPrismaWhere(filters);
+
+    const result = await this.prismaService.aggregate({
+      _sum: {
+        [attribute]: true,
+      },
+      where,
+    });
+
+    const sumValue = result._sum?.[attribute as string];
+    return typeof sumValue === 'number' ? sumValue : 0;
   }
 }
