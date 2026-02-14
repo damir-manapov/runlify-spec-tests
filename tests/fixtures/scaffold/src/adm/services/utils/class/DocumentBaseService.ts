@@ -5,6 +5,7 @@ import {Context, DocumentConfig} from '../../types';
 import {Prisma, PrismaPromise} from '@prisma/client';
 import {DefinedFieldsInRecord, DefinedRecord, PartialFieldsInRecord} from '../../../../types/utils';
 import * as R from 'ramda';
+import pluralize from 'pluralize';
 import {serviceUtils} from './utils';
 import {ServiceErrors} from './ServiceErrors';
 
@@ -225,7 +226,8 @@ export abstract class DocumentBaseService<
     _options?: {useCreatedEntries?: boolean},
   ): Promise<void> {
     for (const registry of registries) {
-      const registryService = this.ctx.service(registry as any);
+      const serviceName = pluralize(registry, 2);
+      const registryService = this.ctx.service(serviceName as any);
       if (registryService && typeof (registryService as any).afterPost === 'function') {
         const registryEntries = await this.getRegistryEntries(entity);
         const entries = (registryEntries as any)[registry];
