@@ -1,8 +1,8 @@
-/* Stub: InfoRegistryService — abstract base for info-registry-type entities */
 import {AllRequestArgs} from '../../../../utils/types';
-import {BaseService, PrismaLocalDelegation, WithID} from './BaseService';
+import {BaseService, Obj, PrismaLocalDelegation, WithID} from './BaseService';
 import {Context, InfoRegistryConfig} from '../../types';
 import {DefinedFieldsInRecord, DefinedRecord, PartialFieldsInRecord} from '../../../../types/utils';
+import {toPrismaRequest} from '../../../../utils/prisma/toPrismaRequest';
 
 export abstract class InfoRegistryService<
   Entity extends WithID,
@@ -16,12 +16,12 @@ export abstract class InfoRegistryService<
   PrismaDelegate extends PrismaLocalDelegation<Entity>,
   AutodefinablePart extends {} = DefinedRecord<Pick<MutationCreateArgs, AutodefinableKeys>>,
   ReliableCreateUserInput extends {} = Omit<MutationCreateArgs, ForbidenForUserKeys> & AutodefinablePart,
-  AllowedForUserCreateInput extends {} = Omit<MutationCreateArgs, ForbidenForUserKeys>,
+  AllowedForUserCreateInput extends Obj = Omit<MutationCreateArgs, ForbidenForUserKeys>,
   StrictCreateArgs extends {} = DefinedFieldsInRecord<MutationCreateArgs, RequiredDbNotUserKeys> & AutodefinablePart,
   StrictUpdateArgs extends WithID = DefinedFieldsInRecord<MutationUpdateArgs, RequiredDbNotUserKeys> & AutodefinablePart,
-  StrictCreateArgsWithoutAutodefinable = PartialFieldsInRecord<MutationCreateArgs, AutodefinableKeys>,
-  MutationCreateArgsWithoutAutodefinable extends {} = PartialFieldsInRecord<MutationCreateArgs, AutodefinableKeys>,
-  MutationUpdateArgsWithoutAutodefinable extends WithID = PartialFieldsInRecord<MutationUpdateArgs, AutodefinableKeys> & Pick<MutationUpdateArgs, 'id'>,
+  StrictCreateArgsWithoutAutodefinable = PartialFieldsInRecord<MutationCreateArgs, AutodefinableKeys>, // todo: StrictCreateArgs instead of MutationCreateArgs
+  MutationCreateArgsWithoutAutodefinable extends Obj = PartialFieldsInRecord<MutationCreateArgs, AutodefinableKeys>,
+  MutationUpdateArgsWithoutAutodefinable extends WithID = PartialFieldsInRecord<MutationUpdateArgs, AutodefinableKeys> & Pick<MutationUpdateArgs, 'id'>, // todo: I added & Pick<MutationUpdateArgs, 'id'>,
 > extends BaseService<
     Entity,
     MutationCreateArgs,
@@ -41,20 +41,48 @@ export abstract class InfoRegistryService<
     MutationCreateArgsWithoutAutodefinable,
     MutationUpdateArgsWithoutAutodefinable
   > {
-
   constructor(
     protected override ctx: Context,
-    public override prismaService: any,
+    public override prismaService: any, // todo: do something about it PrismaClient[keyof PrismaClient],
     public override config: InfoRegistryConfig,
   ) {
     super(ctx, prismaService, config);
+
+    if (config.period === 'notPeriodic') {
+      const offMethod = async () => {
+        throw new Error('Method does not work for notPeriodic info registries');
+      };
+
+      this.sliceOfTheLast = offMethod;
+      this.sliceOfTheFirst = offMethod;
+    }
   }
 
-  async getSlice(_filter: Record<string, unknown>): Promise<Entity[]> {
-    return [];
+  async sliceOfTheLast(
+    date?: Date,
+    filter?: QueryAllArgs['filter'],
+  ): Promise<Entity | null> {
+    return this.prismaService.findFirst(toPrismaRequest({
+      sortField: 'date',
+      sortOrder: 'desc',
+      filter: {
+        ...filter,
+        date_lte: date ?? new Date(),
+      },
+    }, {noId: false}));
   }
 
-  async getLastSlice(_filter: Record<string, unknown>): Promise<Entity | null> {
-    return null;
+  async sliceOfTheFirst(
+    date?: Date,
+    filter?: QueryAllArgs['filter'],
+  ): Promise<Entity | null> {
+    return this.prismaService.findFirst(toPrismaRequest({
+      sortField: 'date',
+      sortOrder: 'asc',
+      filter: {
+        ...filter,
+        date_gte: date ?? new Date(),
+      },
+    }, {noId: false}));
   }
 }

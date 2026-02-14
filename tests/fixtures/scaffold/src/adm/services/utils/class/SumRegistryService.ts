@@ -1,8 +1,6 @@
-/* Stub: SumRegistryService — abstract base for sum-registry-type entities */
 import {AllRequestArgs} from '../../../../utils/types';
-import {BaseService, PrismaLocalDelegation, WithID} from './BaseService';
-import {Context, ServiceConfig} from '../../types';
 import {DefinedFieldsInRecord, DefinedRecord, PartialFieldsInRecord} from '../../../../types/utils';
+import {BaseService, Obj, PrismaLocalDelegation, WithID} from './BaseService';
 
 export abstract class SumRegistryService<
   Entity extends WithID,
@@ -16,12 +14,12 @@ export abstract class SumRegistryService<
   PrismaDelegate extends PrismaLocalDelegation<Entity>,
   AutodefinablePart extends {} = DefinedRecord<Pick<MutationCreateArgs, AutodefinableKeys>>,
   ReliableCreateUserInput extends {} = Omit<MutationCreateArgs, ForbidenForUserKeys> & AutodefinablePart,
-  AllowedForUserCreateInput extends {} = Omit<MutationCreateArgs, ForbidenForUserKeys>,
+  AllowedForUserCreateInput extends Obj = Omit<MutationCreateArgs, ForbidenForUserKeys>,
   StrictCreateArgs extends {} = DefinedFieldsInRecord<MutationCreateArgs, RequiredDbNotUserKeys> & AutodefinablePart,
   StrictUpdateArgs extends WithID = DefinedFieldsInRecord<MutationUpdateArgs, RequiredDbNotUserKeys> & AutodefinablePart,
-  StrictCreateArgsWithoutAutodefinable = PartialFieldsInRecord<MutationCreateArgs, AutodefinableKeys>,
-  MutationCreateArgsWithoutAutodefinable extends {} = PartialFieldsInRecord<MutationCreateArgs, AutodefinableKeys>,
-  MutationUpdateArgsWithoutAutodefinable extends WithID = PartialFieldsInRecord<MutationUpdateArgs, AutodefinableKeys> & Pick<MutationUpdateArgs, 'id'>,
+  StrictCreateArgsWithoutAutodefinable = PartialFieldsInRecord<MutationCreateArgs, AutodefinableKeys>, // todo: StrictCreateArgs instead of MutationCreateArgs
+  MutationCreateArgsWithoutAutodefinable extends Obj = PartialFieldsInRecord<MutationCreateArgs, AutodefinableKeys>,
+  MutationUpdateArgsWithoutAutodefinable extends WithID = PartialFieldsInRecord<MutationUpdateArgs, AutodefinableKeys> & Pick<MutationUpdateArgs, 'id'>, // todo: I added & Pick<MutationUpdateArgs, 'id'>,
 > extends BaseService<
     Entity,
     MutationCreateArgs,
@@ -41,14 +39,5 @@ export abstract class SumRegistryService<
     MutationCreateArgsWithoutAutodefinable,
     MutationUpdateArgsWithoutAutodefinable
   > {
-
-  constructor(
-    protected override ctx: Context,
-    public override prismaService: any,
-    public override config: ServiceConfig,
-  ) {
-    super(ctx, prismaService, config);
-  }
-
-  async afterPost(_postOperations: unknown[]): Promise<void> {}
+  async afterPost(_postOperations: any[]) {}
 }
