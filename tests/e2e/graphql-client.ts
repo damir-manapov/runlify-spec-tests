@@ -117,3 +117,47 @@ export function createCrudClient<T>(
     },
   }
 }
+
+// ---------------------------------------------------------------------------
+// Periodic info-registry client (adds sliceOfTheLast / sliceOfTheFirst)
+// ---------------------------------------------------------------------------
+
+export interface PeriodicClient<T> extends CrudClient<T> {
+  sliceOfTheLast(
+    args?: Record<string, unknown>,
+    fields?: string,
+  ): Promise<GqlResponse<{ [k: string]: T | null }>>
+  sliceOfTheFirst(
+    args?: Record<string, unknown>,
+    fields?: string,
+  ): Promise<GqlResponse<{ [k: string]: T | null }>>
+}
+
+/**
+ * Create a CRUD client extended with `sliceOfTheLast` / `sliceOfTheFirst`
+ * queries — for periodic info registries.
+ *
+ * @example
+ * ```ts
+ * const prices = createPeriodicCrudClient<Price>(server, 'Price', 'id date region amount')
+ * await prices.sliceOfTheLast({ date: '2025-03-01', region: 'US' })
+ * await prices.sliceOfTheFirst({ date: '2025-01-01' })
+ * ```
+ */
+export function createPeriodicCrudClient<T>(
+  server: StartedServer,
+  entity: string,
+  defaultFields: string,
+  plural?: string,
+): PeriodicClient<T> {
+  const base = createCrudClient<T>(server, entity, defaultFields, plural)
+  return {
+    ...base,
+    sliceOfTheLast(args, fields = defaultFields) {
+      return gql(server, `query { sliceOfTheLast${entity}${buildArgs(args)} { ${fields} } }`)
+    },
+    sliceOfTheFirst(args, fields = defaultFields) {
+      return gql(server, `query { sliceOfTheFirst${entity}${buildArgs(args)} { ${fields} } }`)
+    },
+  }
+}

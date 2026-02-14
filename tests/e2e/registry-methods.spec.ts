@@ -1,5 +1,5 @@
 import { afterAll, beforeAll, describe, expect, it } from 'vitest'
-import { type CrudClient, createCrudClient, gql } from './graphql-client.js'
+import { type PeriodicClient, createPeriodicCrudClient } from './graphql-client.js'
 import {
   cleanupFresh,
   compileAndStart,
@@ -27,7 +27,7 @@ const PRICE_FIELDS = 'id date region amount'
 describe('e2e registry methods: sliceOfTheLast / sliceOfTheFirst (infoRegistry)', () => {
   let fresh: FreshBackend
   let server: StartedServer
-  let prices: CrudClient<Price>
+  let prices: PeriodicClient<Price>
 
   beforeAll(async () => {
     fresh = await prepareBackendFresh('with-info-registry')
@@ -86,7 +86,7 @@ export default queryResolvers;
 
     const ctx = await compileAndStart(fresh, 'test_registry_slice')
     server = ctx.server
-    prices = createCrudClient<Price>(ctx.server, 'Price', PRICE_FIELDS)
+    prices = createPeriodicCrudClient<Price>(ctx.server, 'Price', PRICE_FIELDS)
   }, 240000)
 
   afterAll(async () => {
@@ -111,22 +111,17 @@ export default queryResolvers;
 
   describe('sliceOfTheLast', () => {
     it('returns the most recent record on or before a date', async () => {
-      const r = await gql<{ sliceOfTheLastPrice: Price }>(
-        server,
-        `query { sliceOfTheLastPrice(date: "2025-02-20") { ${PRICE_FIELDS} } }`,
-      )
+      const r = await prices.sliceOfTheLast({ date: '2025-02-20' })
       expect(r.errors).toBeUndefined()
       // Most recent record on or before Feb 20 (any region): Feb 15 US or EU
-      expect(r.data?.sliceOfTheLastPrice).toBeTruthy()
-      expect(new Date(r.data!.sliceOfTheLastPrice.date).getTime())
+      const rec = r.data?.sliceOfTheLastPrice as Price
+      expect(rec).toBeTruthy()
+      expect(new Date(rec.date).getTime())
         .toBeLessThanOrEqual(new Date('2025-02-20').getTime())
     })
 
     it('filters by region', async () => {
-      const r = await gql<{ sliceOfTheLastPrice: Price }>(
-        server,
-        `query { sliceOfTheLastPrice(date: "2025-12-31", region: "US") { ${PRICE_FIELDS} } }`,
-      )
+      const r = await prices.sliceOfTheLast({ date: '2025-12-31', region: 'US' })
       expect(r.errors).toBeUndefined()
       // Latest US record is Mar 20
       expect(r.data?.sliceOfTheLastPrice?.region).toBe('US')
@@ -134,10 +129,7 @@ export default queryResolvers;
     })
 
     it('returns null when no records exist before date', async () => {
-      const r = await gql<{ sliceOfTheLastPrice: Price | null }>(
-        server,
-        `query { sliceOfTheLastPrice(date: "2020-01-01") { ${PRICE_FIELDS} } }`,
-      )
+      const r = await prices.sliceOfTheLast({ date: '2020-01-01' })
       expect(r.errors).toBeUndefined()
       expect(r.data?.sliceOfTheLastPrice).toBeNull()
     })
@@ -145,22 +137,17 @@ export default queryResolvers;
 
   describe('sliceOfTheFirst', () => {
     it('returns the earliest record on or after a date', async () => {
-      const r = await gql<{ sliceOfTheFirstPrice: Price }>(
-        server,
-        `query { sliceOfTheFirstPrice(date: "2025-02-01") { ${PRICE_FIELDS} } }`,
-      )
+      const r = await prices.sliceOfTheFirst({ date: '2025-02-01' })
       expect(r.errors).toBeUndefined()
       // Earliest record on or after Feb 1: Feb 15 (US or EU)
-      expect(r.data?.sliceOfTheFirstPrice).toBeTruthy()
-      expect(new Date(r.data!.sliceOfTheFirstPrice.date).getTime())
+      const rec = r.data?.sliceOfTheFirstPrice as Price
+      expect(rec).toBeTruthy()
+      expect(new Date(rec.date).getTime())
         .toBeGreaterThanOrEqual(new Date('2025-02-01').getTime())
     })
 
     it('filters by region', async () => {
-      const r = await gql<{ sliceOfTheFirstPrice: Price }>(
-        server,
-        `query { sliceOfTheFirstPrice(date: "2025-01-01", region: "EU") { ${PRICE_FIELDS} } }`,
-      )
+      const r = await prices.sliceOfTheFirst({ date: '2025-01-01', region: 'EU' })
       expect(r.errors).toBeUndefined()
       // First EU record on or after Jan 1: Jan 10
       expect(r.data?.sliceOfTheFirstPrice?.region).toBe('EU')
@@ -168,10 +155,7 @@ export default queryResolvers;
     })
 
     it('returns null when no records exist after date', async () => {
-      const r = await gql<{ sliceOfTheFirstPrice: Price | null }>(
-        server,
-        `query { sliceOfTheFirstPrice(date: "2030-01-01") { ${PRICE_FIELDS} } }`,
-      )
+      const r = await prices.sliceOfTheFirst({ date: '2030-01-01' })
       expect(r.errors).toBeUndefined()
       expect(r.data?.sliceOfTheFirstPrice).toBeNull()
     })
