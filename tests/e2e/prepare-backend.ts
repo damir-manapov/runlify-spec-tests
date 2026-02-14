@@ -220,7 +220,6 @@ export async function regenBackend(fresh: FreshBackend): Promise<void> {
   }
 
   overlayScaffold(scaffoldDir, fresh.backDir)
-  patchEntityEnum(fresh)
   removeStaleEntityDirs(fresh)
 
   execSync('npx prisma generate', {
@@ -240,47 +239,6 @@ export async function regenBackend(fresh: FreshBackend): Promise<void> {
 export function cleanupFresh(fresh: FreshBackend | undefined): void {
   if (!fresh?.parentDir) return
   fs.rmSync(fresh.parentDir, { recursive: true, force: true })
-}
-
-/**
- * Patch Entity.ts enum so it includes every entity from metadata.json.
- * The scaffold stub has a fixed set of names; after adding a new entity via
- * schema mutation the generated service references Entity.<Name> which must
- * exist in the enum.
- */
-function patchEntityEnum(fresh: FreshBackend): void {
-  const metaPath = path.join(fresh.workDir, 'src/meta/metadata.json')
-  const metadata = JSON.parse(fs.readFileSync(metaPath, 'utf-8'))
-
-  const names = new Set<string>()
-  for (const c of (metadata.catalogs ?? []) as { title: { en: { singular: string } } }[]) {
-    names.add(c.title.en.singular)
-  }
-  for (const d of (metadata.documents ?? []) as { title: { en: { singular: string } } }[]) {
-    names.add(d.title.en.singular)
-  }
-
-  // Merge with the hardcoded scaffold entities so existing fixtures keep working
-  for (const n of [
-    'Article',
-    'Category',
-    'Counter',
-    'Entry',
-    'Item',
-    'Order',
-    'Product',
-    'Ticket',
-  ]) {
-    names.add(n)
-  }
-
-  const sorted = [...names].sort()
-  const entries = sorted.map((n) => `  ${n} = '${n.toLowerCase()}'`).join(',\n')
-  const content = `/* Auto-patched Entity enum */\nenum Entity {\n${entries},\n}\n\nexport default Entity;\n`
-
-  const entityPath = path.join(fresh.backDir, 'src/types/Entity.ts')
-  fs.mkdirSync(path.dirname(entityPath), { recursive: true })
-  fs.writeFileSync(entityPath, content)
 }
 
 /**
@@ -341,7 +299,6 @@ function overlayScaffold(scaffoldDir: string, backDir: string): void {
     'src/index.ts',
     'src/config/config.ts',
     'src/config/index.ts',
-    'src/types/Entity.ts',
     'src/adm/services/types.ts',
     'src/adm/services/context.ts',
     'src/adm/services/utils/class/DocumentBaseService.ts',
