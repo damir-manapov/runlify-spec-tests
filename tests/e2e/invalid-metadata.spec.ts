@@ -1,37 +1,10 @@
 import fs from 'node:fs'
-import os from 'node:os'
 import path from 'node:path'
 import { afterAll, describe, expect, it } from 'vitest'
 import { assertRunlifyAvailable, runRunlify } from '../../src/runner/index.js'
+import { makeTempProject } from './prepare-backend.js'
 
 const fixturesBaseDir = path.resolve(import.meta.dirname, '../fixtures')
-
-// ---------------------------------------------------------------------------
-// Helpers
-// ---------------------------------------------------------------------------
-
-/** Create a temp project dir with given metadata and the with-catalog options.json */
-function makeTempProject(metadata: Record<string, unknown>): {
-  parentDir: string
-  workDir: string
-} {
-  const parentDir = fs.mkdtempSync(path.join(os.tmpdir(), 'runlify-e2e-neg-'))
-  const workDir = path.join(parentDir, 'project')
-  fs.mkdirSync(workDir)
-
-  const metaDir = path.join(workDir, 'src', 'meta')
-  fs.mkdirSync(metaDir, { recursive: true })
-
-  fs.writeFileSync(path.join(metaDir, 'metadata.json'), JSON.stringify(metadata, null, 2))
-  // Reuse options.json from with-catalog
-  fs.copyFileSync(
-    path.join(fixturesBaseDir, 'with-catalog', 'options.json'),
-    path.join(metaDir, 'options.json'),
-  )
-  fs.writeFileSync(path.join(workDir, '.gitignore'), '')
-
-  return { parentDir, workDir }
-}
 
 /** Load the valid with-catalog metadata as a base */
 function validBase(): Record<string, unknown> {
@@ -58,7 +31,7 @@ describe('e2e: invalid metadata handling', () => {
 
   it('valid metadata generates successfully (baseline)', async () => {
     const base = validBase()
-    const { parentDir, workDir } = makeTempProject(base)
+    const { parentDir, workDir } = makeTempProject('with-catalog', base)
     tempDirs.push(parentDir)
 
     const result = await runRunlify(['regen', '--back-only'], workDir)
@@ -66,7 +39,7 @@ describe('e2e: invalid metadata handling', () => {
   })
 
   it('completely empty metadata object fails or produces no output', async () => {
-    const { parentDir, workDir } = makeTempProject({})
+    const { parentDir, workDir } = makeTempProject('with-catalog', {})
     tempDirs.push(parentDir)
 
     const result = await runRunlify(['regen', '--back-only'], workDir)
@@ -84,7 +57,7 @@ describe('e2e: invalid metadata handling', () => {
     const base = validBase()
     base.catalogs = []
     base.documents = []
-    const { parentDir, workDir } = makeTempProject(base)
+    const { parentDir, workDir } = makeTempProject('with-catalog', base)
     tempDirs.push(parentDir)
 
     const result = await runRunlify(['regen', '--back-only'], workDir)
@@ -100,7 +73,7 @@ describe('e2e: invalid metadata handling', () => {
     const fields = product.fields as Array<Record<string, unknown>>
     product.fields = fields.filter((f) => f.name === 'id' || f.name === 'search')
 
-    const { parentDir, workDir } = makeTempProject(base)
+    const { parentDir, workDir } = makeTempProject('with-catalog', base)
     tempDirs.push(parentDir)
 
     const result = await runRunlify(['regen', '--back-only'], workDir)
@@ -117,7 +90,7 @@ describe('e2e: invalid metadata handling', () => {
     const product = catalogs[0] as Record<string, unknown>
     delete product.name
 
-    const { parentDir, workDir } = makeTempProject(base)
+    const { parentDir, workDir } = makeTempProject('with-catalog', base)
     tempDirs.push(parentDir)
 
     const result = await runRunlify(['regen', '--back-only'], workDir)
@@ -130,7 +103,7 @@ describe('e2e: invalid metadata handling', () => {
     const product = catalogs[0] as Record<string, unknown>
     delete product.title
 
-    const { parentDir, workDir } = makeTempProject(base)
+    const { parentDir, workDir } = makeTempProject('with-catalog', base)
     tempDirs.push(parentDir)
 
     const result = await runRunlify(['regen', '--back-only'], workDir)
@@ -164,7 +137,7 @@ describe('e2e: invalid metadata handling', () => {
       showInShow: true,
     })
 
-    const { parentDir, workDir } = makeTempProject(base)
+    const { parentDir, workDir } = makeTempProject('with-catalog', base)
     tempDirs.push(parentDir)
 
     const result = await runRunlify(['regen', '--back-only'], workDir)

@@ -17,6 +17,41 @@ export interface StartedServer {
   baseUrl: string
 }
 
+export interface TempProject {
+  parentDir: string
+  workDir: string
+}
+
+/**
+ * Create a temp directory with the standard project layout
+ * (src/meta/metadata.json, src/meta/options.json, .gitignore).
+ *
+ * Two call styles:
+ *  - `makeTempProject(fixture)` — copy metadata + options from the named fixture.
+ *  - `makeTempProject(fixture, metadata)` — write the supplied metadata object;
+ *    options.json is still copied from the fixture.
+ */
+export function makeTempProject(fixture: string, metadata?: Record<string, unknown>): TempProject {
+  const fixturesDir = path.join(fixturesBaseDir, fixture)
+
+  const parentDir = fs.mkdtempSync(path.join(os.tmpdir(), 'runlify-e2e-'))
+  const workDir = path.join(parentDir, 'project')
+  fs.mkdirSync(workDir)
+
+  const metaDir = path.join(workDir, 'src', 'meta')
+  fs.mkdirSync(metaDir, { recursive: true })
+
+  if (metadata) {
+    fs.writeFileSync(path.join(metaDir, 'metadata.json'), JSON.stringify(metadata, null, 2))
+  } else {
+    fs.copyFileSync(path.join(fixturesDir, 'metadata.json'), path.join(metaDir, 'metadata.json'))
+  }
+  fs.copyFileSync(path.join(fixturesDir, 'options.json'), path.join(metaDir, 'options.json'))
+  fs.writeFileSync(path.join(workDir, '.gitignore'), '')
+
+  return { parentDir, workDir }
+}
+
 /**
  * Generate a backend with --back-only, overlay scaffold stubs,
  * install dependencies and generate Prisma client.
@@ -46,18 +81,8 @@ export function prepareBackend(fixture = 'minimal'): Promise<PreparedBackend> {
 async function doPrepare(fixture: string): Promise<PreparedBackend> {
   assertRunlifyAvailable()
 
-  const fixturesDir = path.join(fixturesBaseDir, fixture)
   const scaffoldDir = path.join(fixturesBaseDir, 'scaffold')
-
-  const parentDir = fs.mkdtempSync(path.join(os.tmpdir(), 'runlify-e2e-'))
-  const workDir = path.join(parentDir, 'project')
-  fs.mkdirSync(workDir)
-
-  const metaDir = path.join(workDir, 'src', 'meta')
-  fs.mkdirSync(metaDir, { recursive: true })
-  fs.copyFileSync(path.join(fixturesDir, 'metadata.json'), path.join(metaDir, 'metadata.json'))
-  fs.copyFileSync(path.join(fixturesDir, 'options.json'), path.join(metaDir, 'options.json'))
-  fs.writeFileSync(path.join(workDir, '.gitignore'), '')
+  const { parentDir, workDir } = makeTempProject(fixture)
 
   const result = await runRunlify(['regen', '--back-only'], workDir)
   if (result.exitCode !== 0) {
@@ -92,18 +117,8 @@ export interface FreshBackend extends PreparedBackend {
 export async function prepareBackendFresh(fixture: string): Promise<FreshBackend> {
   assertRunlifyAvailable()
 
-  const fixturesDir = path.join(fixturesBaseDir, fixture)
   const scaffoldDir = path.join(fixturesBaseDir, 'scaffold')
-
-  const parentDir = fs.mkdtempSync(path.join(os.tmpdir(), 'runlify-e2e-'))
-  const workDir = path.join(parentDir, 'project')
-  fs.mkdirSync(workDir)
-
-  const metaDir = path.join(workDir, 'src', 'meta')
-  fs.mkdirSync(metaDir, { recursive: true })
-  fs.copyFileSync(path.join(fixturesDir, 'metadata.json'), path.join(metaDir, 'metadata.json'))
-  fs.copyFileSync(path.join(fixturesDir, 'options.json'), path.join(metaDir, 'options.json'))
-  fs.writeFileSync(path.join(workDir, '.gitignore'), '')
+  const { parentDir, workDir } = makeTempProject(fixture)
 
   const result = await runRunlify(['regen', '--back-only'], workDir)
   if (result.exitCode !== 0) {
