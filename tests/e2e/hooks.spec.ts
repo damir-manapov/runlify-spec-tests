@@ -548,6 +548,19 @@ export const additionalOperationsOnCreate = async (
     expect(r.data?.Product?.title).toBe('Original (copy)')
     expect(r.data?.Product?.price).toBe(25)
   })
+
+  it('transaction rolls back both records on conflict', async () => {
+    // Pre-create the would-be companion so the hook's create conflicts
+    await products.create({ id: 'aoc-dup-copy', title: 'Blocker', price: 1 })
+
+    // Now create 'aoc-dup' — the hook tries to create 'aoc-dup-copy' which already exists
+    const r = await products.create({ id: 'aoc-dup', title: 'Should rollback', price: 50 })
+    expect(r.errors).toBeDefined()
+
+    // The main record should NOT exist either (transaction rolled back)
+    const check = await products.findOne('aoc-dup')
+    expect(check.data?.Product).toBeNull()
+  })
 })
 
 // ===========================================================================
