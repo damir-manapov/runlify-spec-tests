@@ -1,7 +1,7 @@
 import fs from 'node:fs'
 import path from 'node:path'
 import { afterAll, beforeAll, describe, expect, it } from 'vitest'
-import { type CrudClient, createCrudClient, databaseUrl } from './graphql-client.js'
+import { type CrudClient, createCrudClient, databaseUrl, gql } from './graphql-client.js'
 import {
   cleanupFresh,
   type FreshBackend,
@@ -32,6 +32,13 @@ const PRODUCT_FIELDS = 'id title price'
  */
 function writeHook(fresh: FreshBackend, hookFile: string, code: string): void {
   const fullPath = path.join(fresh.backDir, 'src/adm/services/ProductsService', hookFile)
+  fs.mkdirSync(path.dirname(fullPath), { recursive: true })
+  fs.writeFileSync(fullPath, code)
+}
+
+/** Write a file at an arbitrary path relative to the backend root. */
+function writeBackFile(fresh: FreshBackend, relPath: string, code: string): void {
+  const fullPath = path.join(fresh.backDir, relPath)
   fs.mkdirSync(path.dirname(fullPath), { recursive: true })
   fs.writeFileSync(fullPath, code)
 }
@@ -323,10 +330,11 @@ export const changeListFilter = async <T extends QueryAllProductsArgs = QueryAll
 })
 
 // ===========================================================================
-// 5. afterCreate + afterUpdate + afterDelete — verify they fire without error
+// 5. afterCreate + afterUpdate + afterDelete — verify hooks fire with
+//    observable side-effects (each hook creates a "log" product record)
 // ===========================================================================
 
-describe('e2e hooks: after* hooks — logging side-effects', () => {
+describe('e2e hooks: after* hooks — side-effect records', () => {
   let fresh: FreshBackend
   let server: StartedServer
   let products: CrudClient<Product>
@@ -334,7 +342,7 @@ describe('e2e hooks: after* hooks — logging side-effects', () => {
   beforeAll(async () => {
     fresh = await prepareBackendFresh('with-catalog')
 
-    // afterCreate: log to console (proves it fires without breaking the flow)
+    // afterCreate: create a side-effect product proving the hook fired
     writeHook(
       fresh,
       'hooks/afterCreate.ts',
@@ -343,14 +351,22 @@ import {Product} from '../../../../generated/graphql';
 import {Context} from '../../types';
 
 export const afterCreate = async (
-  _ctx: Context,
+  ctx: Context,
   data: Product,
 ): Promise<void> => {
-  console.log('HOOK afterCreate fired for', data.id);
+  await ctx.prisma.product.create({
+    data: {
+      id: data.id + '-after-create',
+      title: 'created by afterCreate hook',
+      price: 0,
+      search: '',
+    },
+  });
 };
 `,
     )
 
+    // afterUpdate: create a side-effect product proving the hook fired
     writeHook(
       fresh,
       'hooks/afterUpdate.ts',
@@ -359,14 +375,22 @@ import {Product} from '../../../../generated/graphql';
 import {Context} from '../../types';
 
 export const afterUpdate = async (
-  _ctx: Context,
+  ctx: Context,
   data: Product,
 ): Promise<void> => {
-  console.log('HOOK afterUpdate fired for', data.id);
+  await ctx.prisma.product.create({
+    data: {
+      id: data.id + '-after-update',
+      title: 'created by afterUpdate hook',
+      price: 0,
+      search: '',
+    },
+  });
 };
 `,
     )
 
+    // afterDelete: create a side-effect product proving the hook fired
     writeHook(
       fresh,
       'hooks/afterDelete.ts',
@@ -375,10 +399,17 @@ import {Product} from '../../../../generated/graphql';
 import {Context} from '../../types';
 
 export const afterDelete = async (
-  _ctx: Context,
+  ctx: Context,
   data: Product,
 ): Promise<void> => {
-  console.log('HOOK afterDelete fired for', data.id);
+  await ctx.prisma.product.create({
+    data: {
+      id: data.id + '-after-delete',
+      title: 'created by afterDelete hook',
+      price: 0,
+      search: '',
+    },
+  });
 };
 `,
     )
@@ -393,36 +424,52 @@ export const afterDelete = async (
     cleanupFresh(fresh)
   })
 
-  it('afterCreate fires — create succeeds', async () => {
+  it('afterCreate fires — side-effect record is created', async () => {
     const r = await products.create({ id: 'ac-1', title: 'AfterTest', price: 42 })
     expect(r.errors).toBeUndefined()
     expect(r.data?.createProduct?.id).toBe('ac-1')
+
+    // The afterCreate hook should have created a companion record
+    const log = await products.findOne('ac-1-after-create')
+    expect(log.errors).toBeUndefined()
+    expect(log.data?.Product?.title).toBe('created by afterCreate hook')
   })
 
-  it('afterUpdate fires — update succeeds', async () => {
+  it('afterUpdate fires — side-effect record is created', async () => {
     const r = await products.update({ id: 'ac-1', title: 'AfterUpdated', price: 43 })
     expect(r.errors).toBeUndefined()
     expect(r.data?.updateProduct?.title).toBe('AfterUpdated')
+
+    // The afterUpdate hook should have created a companion record
+    const log = await products.findOne('ac-1-after-update')
+    expect(log.errors).toBeUndefined()
+    expect(log.data?.Product?.title).toBe('created by afterUpdate hook')
   })
 
-  it('afterDelete fires — delete succeeds', async () => {
+  it('afterDelete fires — side-effect record is created', async () => {
     const r = await products.remove('ac-1')
     expect(r.errors).toBeUndefined()
+
+    // The afterDelete hook should have created a companion record
+    const log = await products.findOne('ac-1-after-delete')
+    expect(log.errors).toBeUndefined()
+    expect(log.data?.Product?.title).toBe('created by afterDelete hook')
   })
 })
 
 // ===========================================================================
-// 6. beforeUpsert — verify hook compiles and wires without breaking service
+// 6. beforeUpsert — expose upsert via custom GraphQL mutation and verify
+//    the hook transforms data on both create and update paths
 // ===========================================================================
 
-describe('e2e hooks: beforeUpsert — compiles and wires correctly', () => {
+describe('e2e hooks: beforeUpsert — transforms data via custom upsert mutation', () => {
   let fresh: FreshBackend
   let server: StartedServer
-  let products: CrudClient<Product>
 
   beforeAll(async () => {
     fresh = await prepareBackendFresh('with-catalog')
 
+    // beforeUpsert: normalize whitespace in the title
     writeHook(
       fresh,
       'hooks/beforeUpsert.ts',
@@ -462,9 +509,40 @@ export const beforeUpsert = async (
 `,
     )
 
+    // Expose upsert via a custom GraphQL mutation
+    writeBackFile(
+      fresh,
+      'src/adm/graph/services/products/additionalTypeDefs.ts',
+      `
+import {gql} from 'apollo-server';
+
+export default gql\`
+  extend type Mutation {
+    upsertProduct(id: ID!, title: String!, price: Float!): Product
+  }
+\`;
+`,
+    )
+
+    writeBackFile(
+      fresh,
+      'src/adm/graph/services/products/additionalResolvers.ts',
+      `
+import {Context} from '../../../services/types';
+
+const queryResolvers = {
+  Mutation: {
+    upsertProduct: (_: unknown, params: {id: string; title: string; price: number}, {context}: {context: Context}) =>
+      context.service('products').upsert(params, true),
+  },
+};
+
+export default queryResolvers;
+`,
+    )
+
     const ctx = await compileAndStart(fresh, 'test_hook_before_upsert')
     server = ctx.server
-    products = createCrudClient<Product>(server, 'Product', PRODUCT_FIELDS)
   }, 240000)
 
   afterAll(async () => {
@@ -472,20 +550,25 @@ export const beforeUpsert = async (
     cleanupFresh(fresh)
   })
 
-  // upsert is not exposed via GraphQL — it's an internal service method.
-  // We verify the hook compiles, wires into the service constructor,
-  // and doesn't break standard CRUD operations.
-
-  it('create still works with beforeUpsert hook wired', async () => {
-    const r = await products.create({ id: 'up-1', title: 'Upsert test', price: 10 })
+  it('upsert create path — beforeUpsert normalizes whitespace', async () => {
+    const r = await gql<{ upsertProduct: Product }>(
+      server,
+      `mutation { upsertProduct(id: "up-1", title: "  hello   world  ", price: 10) { ${PRODUCT_FIELDS} } }`,
+    )
     expect(r.errors).toBeUndefined()
-    expect(r.data?.createProduct?.title).toBe('Upsert test')
+    expect(r.data?.upsertProduct?.id).toBe('up-1')
+    expect(r.data?.upsertProduct?.title).toBe('hello world')
   })
 
-  it('update still works with beforeUpsert hook wired', async () => {
-    const r = await products.update({ id: 'up-1', title: 'Updated', price: 20 })
+  it('upsert update path — beforeUpsert normalizes whitespace', async () => {
+    const r = await gql<{ upsertProduct: Product }>(
+      server,
+      `mutation { upsertProduct(id: "up-1", title: "  updated   title  ", price: 20) { ${PRODUCT_FIELDS} } }`,
+    )
     expect(r.errors).toBeUndefined()
-    expect(r.data?.updateProduct?.title).toBe('Updated')
+    expect(r.data?.upsertProduct?.id).toBe('up-1')
+    expect(r.data?.upsertProduct?.title).toBe('updated title')
+    expect(r.data?.upsertProduct?.price).toBe(20)
   })
 })
 
