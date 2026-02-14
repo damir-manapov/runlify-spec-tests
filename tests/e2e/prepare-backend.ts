@@ -294,15 +294,14 @@ function removeStaleServiceDirs(backDir: string, activeEntities: Set<string>): v
 function overlayScaffold(scaffoldDir: string, backDir: string): void {
   copyDirRecursive(scaffoldDir, backDir, false)
 
+  // Only files where runlify generates a different version need force-overwrite.
+  // Scaffold-only files (types.ts, context.ts, DocumentBaseService.ts,
+  // test-server.ts, config/index.ts) are already placed by copyDirRecursive
+  // since runlify doesn't generate them — no conflict to resolve.
   const forceOverwriteFiles = [
     'src/tracing.ts',
     'src/index.ts',
     'src/config/config.ts',
-    'src/config/index.ts',
-    'src/adm/services/types.ts',
-    'src/adm/services/context.ts',
-    'src/adm/services/utils/class/DocumentBaseService.ts',
-    'src/test-server.ts',
     'src/init/common/initEntities.ts',
   ]
   for (const rel of forceOverwriteFiles) {
