@@ -1,6 +1,7 @@
 import { afterAll, beforeAll, describe, expect, it } from 'vitest'
-import { type CrudClient, createCrudClient, gql } from './graphql-client.js'
-import { type SetupServerResult, setupServer, teardownServer } from './prepare-backend.js'
+import { getBackend } from '../backend-under-test.js'
+import { type CrudClient, createCrudClient, gql } from '../graphql-client.js'
+import type { StartedServer } from '../prepare-backend.js'
 
 interface Product {
   id: string
@@ -8,17 +9,19 @@ interface Product {
   price: number
 }
 
-describe('e2e: GraphQL API for catalog entity', () => {
-  let ctx: SetupServerResult
+const backend = getBackend()
+
+describe(`shared e2e [${backend.name}]: GraphQL API for catalog entity`, () => {
+  let server: StartedServer
   let products: CrudClient<Product>
 
   beforeAll(async () => {
-    ctx = await setupServer('with-catalog', 'test_graphql_api')
-    products = createCrudClient<Product>(ctx.server, 'Product', 'id title price')
+    server = await backend.start('with-catalog', 'test_graphql_api')
+    products = createCrudClient<Product>(server, 'Product', 'id title price')
   }, 240000)
 
   afterAll(async () => {
-    await teardownServer(ctx)
+    await backend.stop(server)
   })
 
   // ---------------------------------------------------------------------------
@@ -233,7 +236,7 @@ describe('e2e: GraphQL API for catalog entity', () => {
 
     it('count with filter', async () => {
       const r = await gql<{ _allProductsMeta: { count: number } }>(
-        ctx.server,
+        server,
         `query { _allProductsMeta(filter: { q: "watch" }) { count } }`,
       )
       expect(r.errors).toBeUndefined()
@@ -295,7 +298,7 @@ describe('e2e: GraphQL API for catalog entity', () => {
         'id',
       )
       const meta = await gql<{ _allProductsMeta: { count: number } }>(
-        ctx.server,
+        server,
         `query { _allProductsMeta(filter: { q: "page item" }) { count } }`,
       )
 
@@ -414,7 +417,7 @@ describe('e2e: GraphQL API for catalog entity', () => {
 
     it('create without required field title returns error', async () => {
       const r = await gql<unknown>(
-        ctx.server,
+        server,
         `mutation { createProduct(id: "no-title", price: 1) { id } }`,
       )
       expect(r.errors).toBeDefined()
@@ -422,7 +425,7 @@ describe('e2e: GraphQL API for catalog entity', () => {
 
     it('create without required field price returns error', async () => {
       const r = await gql<unknown>(
-        ctx.server,
+        server,
         `mutation { createProduct(id: "no-price", title: "X") { id } }`,
       )
       expect(r.errors).toBeDefined()
@@ -430,7 +433,7 @@ describe('e2e: GraphQL API for catalog entity', () => {
 
     it('create without id returns error', async () => {
       const r = await gql<unknown>(
-        ctx.server,
+        server,
         `mutation { createProduct(title: "No ID", price: 1) { id } }`,
       )
       expect(r.errors).toBeDefined()
@@ -479,12 +482,12 @@ describe('e2e: GraphQL API for catalog entity', () => {
 
   describe('GraphQL protocol', () => {
     it('malformed GraphQL returns errors', async () => {
-      const r = await gql<unknown>(ctx.server, '{ this is not valid graphql !!!}')
+      const r = await gql<unknown>(server, '{ this is not valid graphql !!!}')
       expect(r.errors).toBeDefined()
     })
 
     it('empty query body returns error status', async () => {
-      const res = await fetch(`${ctx.server.baseUrl}/graphql`, {
+      const res = await fetch(`${server.baseUrl}/graphql`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({}),
@@ -495,7 +498,7 @@ describe('e2e: GraphQL API for catalog entity', () => {
 
     it('introspection query returns schema', async () => {
       const r = await gql<{ __schema: { types: Array<{ name: string }> } }>(
-        ctx.server,
+        server,
         '{ __schema { types { name } } }',
       )
       expect(r.errors).toBeUndefined()
@@ -508,7 +511,7 @@ describe('e2e: GraphQL API for catalog entity', () => {
     it('introspection lists Product fields', async () => {
       const r = await gql<{
         __type: { fields: Array<{ name: string; type: { name: string | null; kind: string } }> }
-      }>(ctx.server, '{ __type(name: "Product") { fields { name type { name kind } } } }')
+      }>(server, '{ __type(name: "Product") { fields { name type { name kind } } } }')
 
       expect(r.errors).toBeUndefined()
       const fieldNames = r.data?.__type?.fields?.map((f) => f.name) ?? []
@@ -518,7 +521,7 @@ describe('e2e: GraphQL API for catalog entity', () => {
     })
 
     it('requesting unknown field returns error', async () => {
-      const r = await gql<unknown>(ctx.server, '{ Product(id: "gql-1") { id nonExistentField } }')
+      const r = await gql<unknown>(server, '{ Product(id: "gql-1") { id nonExistentField } }')
       expect(r.errors).toBeDefined()
     })
   })
