@@ -7,6 +7,7 @@ import com.runlify.schema.SchemaGenerator;
 import org.springframework.stereotype.Component;
 
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -105,27 +106,65 @@ public class GraphqlSchemaBuilder {
     // Filter input
     // -----------------------------------------------------------------------
 
+    /** Field types that get automatic _lte/_gte/_lt/_gt range filters. */
+    private static final List<String> RANGE_TYPES = List.of("int", "float", "bigint", "datetime", "date");
+
+    /** Field types that get automatic _in/_not_in list filters. */
+    private static final List<String> LIST_TYPES = List.of("string", "int", "float");
+
     private String buildFilterInput(EntityMetadata entity, String singular) {
         var sb = new StringBuilder();
         sb.append("input %sFilter {\n".formatted(singular));
 
         for (var field : entity.fields()) {
             if (field.isHidden()) continue;
+
+            var declared = new HashSet<>(field.filters());
+
+            // --- Metadata-declared filters ---
             for (var filter : field.filters()) {
                 switch (filter) {
-                    case "equal" -> sb.append("  %s: %s\n".formatted(
+                    case "equal"  -> sb.append("  %s: %s\n".formatted(
                         field.name(), field.graphqlType()));
-                    case "lte" -> sb.append("  %s_lte: %s\n".formatted(
+                    case "lte"    -> sb.append("  %s_lte: %s\n".formatted(
                         field.name(), field.graphqlType()));
-                    case "gte" -> sb.append("  %s_gte: %s\n".formatted(
+                    case "gte"    -> sb.append("  %s_gte: %s\n".formatted(
                         field.name(), field.graphqlType()));
-                    case "in" -> sb.append("  %s_in: [%s]\n".formatted(
+                    case "lt"     -> sb.append("  %s_lt: %s\n".formatted(
+                        field.name(), field.graphqlType()));
+                    case "gt"     -> sb.append("  %s_gt: %s\n".formatted(
+                        field.name(), field.graphqlType()));
+                    case "in"     -> sb.append("  %s_in: [%s]\n".formatted(
                         field.name(), field.graphqlType()));
                     case "not_in" -> sb.append("  %s_not_in: [%s]\n".formatted(
                         field.name(), field.graphqlType()));
                     default -> { /* skip unknown filters */ }
                 }
             }
+
+            // --- Auto-generated type-based filters (matching TS behaviour) ---
+            var type = field.type();
+
+            // _in / _not_in for string, int, float
+            if (LIST_TYPES.contains(type)) {
+                if (!declared.contains("in"))
+                    sb.append("  %s_in: [%s]\n".formatted(field.name(), field.graphqlType()));
+                if (!declared.contains("not_in"))
+                    sb.append("  %s_not_in: [%s]\n".formatted(field.name(), field.graphqlType()));
+            }
+
+            // _lte / _gte / _lt / _gt for numeric and date types
+            if (RANGE_TYPES.contains(type)) {
+                if (!declared.contains("lte"))
+                    sb.append("  %s_lte: %s\n".formatted(field.name(), field.graphqlType()));
+                if (!declared.contains("gte"))
+                    sb.append("  %s_gte: %s\n".formatted(field.name(), field.graphqlType()));
+                if (!declared.contains("lt"))
+                    sb.append("  %s_lt: %s\n".formatted(field.name(), field.graphqlType()));
+                if (!declared.contains("gt"))
+                    sb.append("  %s_gt: %s\n".formatted(field.name(), field.graphqlType()));
+            }
+
             // _defined filter for optional link fields
             if (field.isLink() && !field.isRequired()) {
                 sb.append("  %s_defined: Boolean\n".formatted(field.name()));

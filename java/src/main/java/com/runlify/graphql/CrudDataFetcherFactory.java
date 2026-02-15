@@ -180,12 +180,15 @@ public class CrudDataFetcherFactory {
 
     public DataFetcher<Map<String, Object>> remove(EntityMetadata entity) {
         var table = SchemaGenerator.tableName(entity);
+        var singular = GraphqlSchemaBuilder.singularName(entity);
         return env -> {
             var id = env.getArgument("id");
             // Fetch row before deleting (to return it)
             var rows = jdbc.queryForList(
                 "SELECT * FROM \"%s\" WHERE \"id\" = ?".formatted(table), id);
-            if (rows.isEmpty()) return null;
+            if (rows.isEmpty()) {
+                throw new RuntimeException("%s not found: %s".formatted(singular, id));
+            }
             jdbc.update("DELETE FROM \"%s\" WHERE \"id\" = ?".formatted(table), id);
             return rows.get(0);
         };
@@ -235,6 +238,14 @@ public class CrudDataFetcherFactory {
             } else if (key.endsWith("_gte")) {
                 var col = key.substring(0, key.length() - 4);
                 conditions.add("\"%s\" >= ?".formatted(col));
+                params.add(value);
+            } else if (key.endsWith("_lt")) {
+                var col = key.substring(0, key.length() - 3);
+                conditions.add("\"%s\" < ?".formatted(col));
+                params.add(value);
+            } else if (key.endsWith("_gt")) {
+                var col = key.substring(0, key.length() - 3);
+                conditions.add("\"%s\" > ?".formatted(col));
                 params.add(value);
             } else if (key.endsWith("_in")) {
                 var col = key.substring(0, key.length() - 3);
