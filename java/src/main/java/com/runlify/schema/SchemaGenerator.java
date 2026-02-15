@@ -133,7 +133,7 @@ public class SchemaGenerator {
     /**
      * Singularize + PascalCase: "items" → "Item", "invoiceTotals" → "InvoiceTotal"
      */
-    static String pascalSingular(String name) {
+    public static String pascalSingular(String name) {
         // Simple singularize: strip trailing 's' (handles most cases)
         var singular = singularize(name);
         // Ensure first letter is uppercase (the rest is already camelCase from metadata)
