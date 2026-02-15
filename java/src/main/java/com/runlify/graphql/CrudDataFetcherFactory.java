@@ -4,8 +4,6 @@ import com.runlify.metadata.EntityMetadata;
 import com.runlify.metadata.EntityNames;
 import graphql.schema.DataFetcher;
 import graphql.schema.DataFetchingEnvironment;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Component;
 
@@ -18,8 +16,6 @@ import java.util.stream.Collectors;
  */
 @Component
 public class CrudDataFetcherFactory {
-
-    private static final Logger log = LoggerFactory.getLogger(CrudDataFetcherFactory.class);
 
     private final JdbcTemplate jdbc;
 
@@ -182,13 +178,11 @@ public class CrudDataFetcherFactory {
         var singular = EntityNames.singularName(entity);
         return env -> {
             var id = env.getArgument("id");
-            // Fetch row before deleting (to return it)
-            var rows = jdbc.queryForList(
-                "SELECT * FROM \"%s\" WHERE \"id\" = ?".formatted(table), id);
+            var sql = "DELETE FROM \"%s\" WHERE \"id\" = ? RETURNING *".formatted(table);
+            var rows = jdbc.queryForList(sql, id);
             if (rows.isEmpty()) {
                 throw new RuntimeException("%s not found: %s".formatted(singular, id));
             }
-            jdbc.update("DELETE FROM \"%s\" WHERE \"id\" = ?".formatted(table), id);
             return rows.get(0);
         };
     }

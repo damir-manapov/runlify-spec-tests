@@ -2,6 +2,7 @@ package com.runlify.graphql;
 
 import com.runlify.metadata.EntityMetadata;
 import com.runlify.metadata.EntityNames;
+import com.runlify.metadata.MetadataLoader;
 import com.runlify.metadata.ProjectMetadata;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -27,8 +28,7 @@ public class DocumentPostingService {
     private final JdbcTemplate jdbc;
     private final ProjectMetadata metadata;
 
-    public DocumentPostingService(JdbcTemplate jdbc,
-                                  com.runlify.metadata.MetadataLoader metadataLoader) {
+    public DocumentPostingService(JdbcTemplate jdbc, MetadataLoader metadataLoader) {
         this.jdbc = jdbc;
         this.metadata = metadataLoader.getMetadata();
     }

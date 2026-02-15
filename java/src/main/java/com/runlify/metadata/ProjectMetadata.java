@@ -1,9 +1,8 @@
 package com.runlify.metadata;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
-import com.fasterxml.jackson.annotation.JsonProperty;
 import java.util.List;
-import java.util.Map;
+import java.util.stream.Stream;
 
 /**
  * Root model for metadata.json — the single source of truth
@@ -28,11 +27,8 @@ public record ProjectMetadata(
 
     /** All entities across all types, for convenient iteration. */
     public List<EntityMetadata> allEntities() {
-        var all = new java.util.ArrayList<EntityMetadata>();
-        all.addAll(catalogs);
-        all.addAll(documents);
-        all.addAll(infoRegistries);
-        all.addAll(sumRegistries);
-        return List.copyOf(all);
+        return Stream.of(catalogs, documents, infoRegistries, sumRegistries)
+            .flatMap(List::stream)
+            .toList();
     }
 }

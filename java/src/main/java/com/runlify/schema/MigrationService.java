@@ -51,8 +51,8 @@ public class MigrationService implements CommandLineRunner {
      * If the JDBC URL contains a ?schema= parameter, create and set that schema.
      */
     private void ensureSchema() {
-        try {
-            var url = dataSource.getConnection().getMetaData().getURL();
+        try (var conn = dataSource.getConnection()) {
+            var url = conn.getMetaData().getURL();
             var schema = extractSchema(url);
             if (schema != null && !schema.isEmpty() && !"public".equals(schema)) {
                 log.info("Creating and switching to schema: {}", schema);
