@@ -1,7 +1,7 @@
 package com.runlify.metadata;
 
-import com.fasterxml.jackson.databind.DeserializationFeature;
-import com.fasterxml.jackson.databind.ObjectMapper;
+import tools.jackson.databind.DeserializationFeature;
+import tools.jackson.databind.json.JsonMapper;
 import org.junit.jupiter.api.Test;
 
 import java.io.File;
@@ -10,8 +10,9 @@ import static org.junit.jupiter.api.Assertions.*;
 
 class MetadataDeserializationTest {
 
-    private static final ObjectMapper mapper = new ObjectMapper()
-        .configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
+    private static final JsonMapper mapper = JsonMapper.builder()
+        .disable(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES)
+        .build();
 
     private static final String FIXTURES_BASE = "../tests/fixtures";
 

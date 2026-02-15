@@ -1,7 +1,7 @@
 package com.runlify.graphql;
 
-import com.fasterxml.jackson.databind.DeserializationFeature;
-import com.fasterxml.jackson.databind.ObjectMapper;
+import tools.jackson.databind.DeserializationFeature;
+import tools.jackson.databind.json.JsonMapper;
 import com.runlify.metadata.ProjectMetadata;
 import graphql.schema.idl.SchemaParser;
 import graphql.schema.idl.TypeDefinitionRegistry;
@@ -13,8 +13,9 @@ import static org.junit.jupiter.api.Assertions.*;
 
 class GraphqlSchemaBuilderTest {
 
-    private static final ObjectMapper mapper = new ObjectMapper()
-        .configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
+    private static final JsonMapper mapper = JsonMapper.builder()
+        .disable(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES)
+        .build();
     private static final String FIXTURES_BASE = "../tests/fixtures";
     private final GraphqlSchemaBuilder builder = new GraphqlSchemaBuilder();
 
@@ -61,8 +62,8 @@ class GraphqlSchemaBuilderTest {
     void withAutoId_validSdl() throws Exception {
         var sdl = builder.buildSdl(load("with-auto-id"));
         var registry = parse(sdl);
-        assertNotNull(registry.getType("Item").orElse(null), "Type Item should exist");
-        assertNotNull(registry.getType("ListMetadata").orElse(null));
+        assertTrue(registry.hasType("Item"), "Type Item should exist");
+        assertTrue(registry.hasType("ListMetadata"), "Type ListMetadata should exist");
     }
 
     @Test
@@ -104,8 +105,8 @@ class GraphqlSchemaBuilderTest {
     void withDocumentRegistry_validSdl() throws Exception {
         var sdl = builder.buildSdl(load("with-document-registry"));
         var registry = parse(sdl);
-        assertNotNull(registry.getType("Invoice").orElse(null));
-        assertNotNull(registry.getType("InvoiceTotal").orElse(null));
+        assertTrue(registry.hasType("Invoice"), "Type Invoice should exist");
+        assertTrue(registry.hasType("InvoiceTotal"), "Type InvoiceTotal should exist");
     }
 
     @Test
@@ -132,7 +133,7 @@ class GraphqlSchemaBuilderTest {
     void withInfoRegistry_validSdl() throws Exception {
         var sdl = builder.buildSdl(load("with-info-registry"));
         var registry = parse(sdl);
-        assertNotNull(registry.getType("Price").orElse(null));
+        assertTrue(registry.hasType("Price"), "Type Price should exist");
     }
 
     // -----------------------------------------------------------------------
