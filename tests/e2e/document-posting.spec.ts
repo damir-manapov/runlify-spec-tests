@@ -160,7 +160,7 @@ export class AdditionalInvoicesService extends InvoicesService {
     })
   })
 
-  it('re-post does not affect other documents\' entries', async () => {
+  it("re-post does not affect other documents' entries", async () => {
     const entries = await registry.findAll({ filter: { registrarId: 'inv-2' } })
     const list = Object.values(entries.data!)[0] as InvoiceTotal[]
     expect(list).toHaveLength(1)
@@ -181,7 +181,7 @@ export class AdditionalInvoicesService extends InvoicesService {
     expect(list).toHaveLength(0)
   })
 
-  it('delete does not affect other documents\' entries', async () => {
+  it("delete does not affect other documents' entries", async () => {
     const entries = await registry.findAll({ filter: { registrarId: 'inv-2' } })
     const list = Object.values(entries.data!)[0] as InvoiceTotal[]
     expect(list).toHaveLength(1)

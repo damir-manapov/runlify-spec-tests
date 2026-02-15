@@ -1,5 +1,5 @@
 import { afterAll, beforeAll, describe, expect, it } from 'vitest'
-import { type PeriodicClient, createPeriodicCrudClient } from './graphql-client.js'
+import { createPeriodicCrudClient, type PeriodicClient } from './graphql-client.js'
 import {
   cleanupFresh,
   compileAndStart,
@@ -116,8 +116,7 @@ export default queryResolvers;
       // Most recent record on or before Feb 20 (any region): Feb 15 US or EU
       const rec = r.data?.sliceOfTheLastPrice as Price
       expect(rec).toBeTruthy()
-      expect(new Date(rec.date).getTime())
-        .toBeLessThanOrEqual(new Date('2025-02-20').getTime())
+      expect(new Date(rec.date).getTime()).toBeLessThanOrEqual(new Date('2025-02-20').getTime())
     })
 
     it('filters by region', async () => {
@@ -142,8 +141,7 @@ export default queryResolvers;
       // Earliest record on or after Feb 1: Feb 15 (US or EU)
       const rec = r.data?.sliceOfTheFirstPrice as Price
       expect(rec).toBeTruthy()
-      expect(new Date(rec.date).getTime())
-        .toBeGreaterThanOrEqual(new Date('2025-02-01').getTime())
+      expect(new Date(rec.date).getTime()).toBeGreaterThanOrEqual(new Date('2025-02-01').getTime())
     })
 
     it('filters by region', async () => {

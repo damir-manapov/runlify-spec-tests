@@ -243,10 +243,7 @@ const fixtures: FixtureSpec[] = [
     prisma: {
       model: 'Total',
       idType: 'String',
-      extraFields: [
-        { pattern: /region\s+String/ },
-        { pattern: /amount\s+Float/ },
-      ],
+      extraFields: [{ pattern: /region\s+String/ }, { pattern: /amount\s+Float/ }],
     },
     typeDefs: {
       entity: 'Total',

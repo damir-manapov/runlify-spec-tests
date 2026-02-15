@@ -358,7 +358,12 @@ describe('e2e API: auto-generated int id (with-auto-id)', () => {
     })
 
     it('filters items with non-null description', async () => {
-      const a = await createOk({ name: 'WithDesc', quantity: 1, active: true, description: 'present' })
+      const a = await createOk({
+        name: 'WithDesc',
+        quantity: 1,
+        active: true,
+        description: 'present',
+      })
       const b = await createOk({ name: 'Without', quantity: 1, active: true })
 
       const r = await items.findAll({ filter: { description_defined: true } })

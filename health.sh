@@ -17,4 +17,8 @@ echo "=== Checking for outdated dependencies ==="
 ./renovate-check.sh
 
 echo ""
+echo "=== Java dependency check ==="
+(cd java && gradle dependencies --configuration runtimeClasspath | tail -20)
+
+echo ""
 echo "=== Health check passed ==="

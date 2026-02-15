@@ -37,11 +37,7 @@
       "needFor": "Секрет для подписи JWT-токенов приложения админки",
       "default": "admSecret",
       "required": false,
-      "scopes": [
-        "back",
-        "worker",
-        "telegramBot"
-      ],
+      "scopes": ["back", "worker", "telegramBot"],
       "hidden": true,
       "editable": false
     },
@@ -51,9 +47,7 @@
       "needFor": "Публичный токен рекапчи приложения админки",
       "default": "",
       "required": false,
-      "scopes": [
-        "admin-app"
-      ],
+      "scopes": ["admin-app"],
       "hidden": false,
       "editable": true
     },
@@ -63,11 +57,7 @@
       "needFor": "Требуемый уровень доверия к пользователю",
       "default": 0.7,
       "required": false,
-      "scopes": [
-        "back",
-        "worker",
-        "telegramBot"
-      ],
+      "scopes": ["back", "worker", "telegramBot"],
       "hidden": false,
       "editable": true
     },
@@ -77,11 +67,7 @@
       "needFor": "Секретный токен рекапчи приложения админки",
       "default": "",
       "required": false,
-      "scopes": [
-        "back",
-        "worker",
-        "telegramBot"
-      ],
+      "scopes": ["back", "worker", "telegramBot"],
       "hidden": true,
       "editable": false
     },
@@ -91,11 +77,7 @@
       "needFor": "Урл административного интерфейса (без конечного слеша)",
       "default": "http://localhost:8080",
       "required": false,
-      "scopes": [
-        "back",
-        "worker",
-        "telegramBot"
-      ],
+      "scopes": ["back", "worker", "telegramBot"],
       "hidden": false,
       "editable": true
     },
@@ -105,11 +87,7 @@
       "needFor": "Название окружения",
       "default": "dev",
       "required": true,
-      "scopes": [
-        "back",
-        "worker",
-        "telegramBot"
-      ],
+      "scopes": ["back", "worker", "telegramBot"],
       "hidden": false,
       "editable": true
     },
@@ -119,11 +97,7 @@
       "needFor": "Секрет для подписи JWT-токенов приложения пользователей",
       "default": "appSecret",
       "required": false,
-      "scopes": [
-        "back",
-        "worker",
-        "telegramBot"
-      ],
+      "scopes": ["back", "worker", "telegramBot"],
       "hidden": true,
       "editable": false
     },
@@ -133,11 +107,7 @@
       "needFor": "Техническое название приложения",
       "default": "",
       "required": true,
-      "scopes": [
-        "back",
-        "worker",
-        "telegramBot"
-      ],
+      "scopes": ["back", "worker", "telegramBot"],
       "hidden": false,
       "editable": true
     },
@@ -147,11 +117,7 @@
       "needFor": "Пользовательское название приложения",
       "default": "",
       "required": false,
-      "scopes": [
-        "back",
-        "worker",
-        "telegramBot"
-      ],
+      "scopes": ["back", "worker", "telegramBot"],
       "hidden": false,
       "editable": true
     },
@@ -161,11 +127,7 @@
       "needFor": "Урл интерфейса конечного пользователя (без конечного слеша)",
       "default": "http://localhost:4000",
       "required": false,
-      "scopes": [
-        "back",
-        "worker",
-        "telegramBot"
-      ],
+      "scopes": ["back", "worker", "telegramBot"],
       "hidden": false,
       "editable": true
     },
@@ -175,11 +137,7 @@
       "needFor": "Проверка авторизации на бекенде включены",
       "default": false,
       "required": false,
-      "scopes": [
-        "back",
-        "worker",
-        "telegramBot"
-      ],
+      "scopes": ["back", "worker", "telegramBot"],
       "hidden": false,
       "editable": true
     },
@@ -189,11 +147,7 @@
       "needFor": "Подготавливать окружеине при запуске",
       "default": false,
       "required": false,
-      "scopes": [
-        "back",
-        "worker",
-        "telegramBot"
-      ],
+      "scopes": ["back", "worker", "telegramBot"],
       "hidden": false,
       "editable": true
     },
@@ -203,10 +157,7 @@
       "needFor": "Проверка авторизации во фрейме включена",
       "default": false,
       "required": false,
-      "scopes": [
-        "back",
-        "admin-app"
-      ],
+      "scopes": ["back", "admin-app"],
       "hidden": false,
       "editable": true
     },
@@ -216,9 +167,7 @@
       "needFor": "Публичный токен рекапчи приложения пользователя",
       "default": "",
       "required": false,
-      "scopes": [
-        "cutomer-app"
-      ],
+      "scopes": ["cutomer-app"],
       "hidden": false,
       "editable": true
     },
@@ -228,11 +177,7 @@
       "needFor": "Требуемый уровень доверия к пользователю",
       "default": "0.7",
       "required": false,
-      "scopes": [
-        "back",
-        "worker",
-        "telegramBot"
-      ],
+      "scopes": ["back", "worker", "telegramBot"],
       "hidden": false,
       "editable": true
     },
@@ -242,11 +187,7 @@
       "needFor": "Секретный токен рекапчи приложения пользователя",
       "default": "",
       "required": false,
-      "scopes": [
-        "back",
-        "worker",
-        "telegramBot"
-      ],
+      "scopes": ["back", "worker", "telegramBot"],
       "hidden": true,
       "editable": false
     },
@@ -256,11 +197,7 @@
       "needFor": "Строка подключения к основной базе для миграций (должна быть прямой строкой подключения к бд минуя pgbouncer, если он используется)",
       "default": "postgresql://postgres:password@localhost:5432",
       "required": true,
-      "scopes": [
-        "back",
-        "worker",
-        "telegramBot"
-      ],
+      "scopes": ["back", "worker", "telegramBot"],
       "hidden": true,
       "editable": false
     },
@@ -270,11 +207,7 @@
       "needFor": "Включена ли работа с запросами на чтение через отдельное подключение",
       "default": false,
       "required": true,
-      "scopes": [
-        "back",
-        "worker",
-        "telegramBot"
-      ],
+      "scopes": ["back", "worker", "telegramBot"],
       "hidden": false,
       "editable": true
     },
@@ -284,11 +217,7 @@
       "needFor": "Строка подключения к основной базе только для чтения",
       "default": "postgresql://postgres:password@localhost:5432",
       "required": false,
-      "scopes": [
-        "back",
-        "worker",
-        "telegramBot"
-      ],
+      "scopes": ["back", "worker", "telegramBot"],
       "hidden": true,
       "editable": false
     },
@@ -298,11 +227,7 @@
       "needFor": "Строка подключения к основной базе данных для записи",
       "default": "postgresql://postgres:password@localhost:5432",
       "required": true,
-      "scopes": [
-        "back",
-        "worker",
-        "telegramBot"
-      ],
+      "scopes": ["back", "worker", "telegramBot"],
       "hidden": true,
       "editable": false
     },
@@ -312,9 +237,7 @@
       "needFor": "Docker registry domain",
       "default": "",
       "required": false,
-      "scopes": [
-        "ci"
-      ],
+      "scopes": ["ci"],
       "hidden": false,
       "editable": true
     },
@@ -324,9 +247,7 @@
       "needFor": "Docker registry password",
       "default": "",
       "required": false,
-      "scopes": [
-        "ci"
-      ],
+      "scopes": ["ci"],
       "hidden": false,
       "editable": true
     },
@@ -336,9 +257,7 @@
       "needFor": "Docker registry username",
       "default": "",
       "required": false,
-      "scopes": [
-        "ci"
-      ],
+      "scopes": ["ci"],
       "hidden": false,
       "editable": true
     },
@@ -348,9 +267,7 @@
       "needFor": "Путь к бекенду",
       "default": "",
       "required": false,
-      "scopes": [
-        "admin-app"
-      ],
+      "scopes": ["admin-app"],
       "hidden": false,
       "editable": true
     },
@@ -360,11 +277,7 @@
       "needFor": "Идентификатор аккаунта в облачном сервисе ElasticSearch",
       "default": "",
       "required": false,
-      "scopes": [
-        "back",
-        "worker",
-        "telegramBot"
-      ],
+      "scopes": ["back", "worker", "telegramBot"],
       "hidden": false,
       "editable": true
     },
@@ -374,11 +287,7 @@
       "needFor": "Эластик включен",
       "default": false,
       "required": false,
-      "scopes": [
-        "back",
-        "worker",
-        "telegramBot"
-      ],
+      "scopes": ["back", "worker", "telegramBot"],
       "hidden": false,
       "editable": true
     },
@@ -388,11 +297,7 @@
       "needFor": "Нода эластика",
       "default": "http://localhost:9200",
       "required": false,
-      "scopes": [
-        "back",
-        "worker",
-        "telegramBot"
-      ],
+      "scopes": ["back", "worker", "telegramBot"],
       "hidden": false,
       "editable": true
     },
@@ -402,11 +307,7 @@
       "needFor": "Пароль для авторизации в облачном сервисе ElasticSearch",
       "default": "",
       "required": false,
-      "scopes": [
-        "back",
-        "worker",
-        "telegramBot"
-      ],
+      "scopes": ["back", "worker", "telegramBot"],
       "hidden": true,
       "editable": false
     },
@@ -416,11 +317,7 @@
       "needFor": "Запрещать невалидный ssl сертификат",
       "default": false,
       "required": false,
-      "scopes": [
-        "back",
-        "worker",
-        "telegramBot"
-      ],
+      "scopes": ["back", "worker", "telegramBot"],
       "hidden": false,
       "editable": true
     },
@@ -430,11 +327,7 @@
       "needFor": "Пользователь для авторизации в облачном сервисе ElasticSearch",
       "default": "",
       "required": false,
-      "scopes": [
-        "back",
-        "worker",
-        "telegramBot"
-      ],
+      "scopes": ["back", "worker", "telegramBot"],
       "hidden": false,
       "editable": true
     },
@@ -444,11 +337,7 @@
       "needFor": "Включение graphql playground (true | false)",
       "default": true,
       "required": false,
-      "scopes": [
-        "back",
-        "worker",
-        "telegramBot"
-      ],
+      "scopes": ["back", "worker", "telegramBot"],
       "hidden": false,
       "editable": true
     },
@@ -458,11 +347,7 @@
       "needFor": "Включена проверка аутентификации",
       "default": true,
       "required": true,
-      "scopes": [
-        "back",
-        "worker",
-        "telegramBot"
-      ],
+      "scopes": ["back", "worker", "telegramBot"],
       "hidden": false,
       "editable": true
     },
@@ -472,11 +357,7 @@
       "needFor": "Список kafka блокеров",
       "default": "localhost:29092;localhost:29094",
       "required": false,
-      "scopes": [
-        "back",
-        "worker",
-        "telegramBot"
-      ],
+      "scopes": ["back", "worker", "telegramBot"],
       "hidden": false,
       "editable": true
     },
@@ -486,11 +367,7 @@
       "needFor": "Кафка включена",
       "default": false,
       "required": false,
-      "scopes": [
-        "back",
-        "worker",
-        "telegramBot"
-      ],
+      "scopes": ["back", "worker", "telegramBot"],
       "hidden": false,
       "editable": true
     },
@@ -500,11 +377,7 @@
       "needFor": "Пароль доступа в kafka",
       "default": "",
       "required": false,
-      "scopes": [
-        "back",
-        "worker",
-        "telegramBot"
-      ],
+      "scopes": ["back", "worker", "telegramBot"],
       "hidden": true,
       "editable": false
     },
@@ -514,11 +387,7 @@
       "needFor": "`-1`(all) все несинхронизированные реплики должны подтвердить (по умолчанию), `0` нет подтверждений, `1` только ждет подтверждения лидера",
       "default": 1,
       "required": false,
-      "scopes": [
-        "back",
-        "worker",
-        "telegramBot"
-      ],
+      "scopes": ["back", "worker", "telegramBot"],
       "hidden": false,
       "editable": true
     },
@@ -528,11 +397,7 @@
       "needFor": "Время паузы после первой ошибки, например 20000 мс, потом оно увеличивается экспоненциально с мультипликатором 1.5",
       "default": 20000,
       "required": false,
-      "scopes": [
-        "back",
-        "worker",
-        "telegramBot"
-      ],
+      "scopes": ["back", "worker", "telegramBot"],
       "hidden": false,
       "editable": true
     },
@@ -542,11 +407,7 @@
       "needFor": "Максимальное количество попыток обработки ошибки на сообщение",
       "default": 10,
       "required": false,
-      "scopes": [
-        "back",
-        "worker",
-        "telegramBot"
-      ],
+      "scopes": ["back", "worker", "telegramBot"],
       "hidden": false,
       "editable": true
     },
@@ -556,11 +417,7 @@
       "needFor": "Количество сообщений, обрабатываемых параллельно",
       "default": 3,
       "required": false,
-      "scopes": [
-        "back",
-        "worker",
-        "telegramBot"
-      ],
+      "scopes": ["back", "worker", "telegramBot"],
       "hidden": false,
       "editable": true
     },
@@ -570,11 +427,7 @@
       "needFor": "Поддерживаемые версии сообщения",
       "default": "1;2",
       "required": false,
-      "scopes": [
-        "back",
-        "worker",
-        "telegramBot"
-      ],
+      "scopes": ["back", "worker", "telegramBot"],
       "hidden": false,
       "editable": true
     },
@@ -584,11 +437,7 @@
       "needFor": "Время паузы в очереди ожидания, когда она прошла все сообщения, это чтобы она не крутила сообщения покругу без остановки ",
       "default": 60000,
       "required": false,
-      "scopes": [
-        "back",
-        "worker",
-        "telegramBot"
-      ],
+      "scopes": ["back", "worker", "telegramBot"],
       "hidden": false,
       "editable": true
     },
@@ -598,11 +447,7 @@
       "needFor": "SASL mechanism",
       "default": "plain",
       "required": true,
-      "scopes": [
-        "back",
-        "worker",
-        "telegramBot"
-      ],
+      "scopes": ["back", "worker", "telegramBot"],
       "hidden": false,
       "editable": true
     },
@@ -612,11 +457,7 @@
       "needFor": "Включена работа по ssl",
       "default": true,
       "required": true,
-      "scopes": [
-        "back",
-        "worker",
-        "telegramBot"
-      ],
+      "scopes": ["back", "worker", "telegramBot"],
       "hidden": false,
       "editable": true
     },
@@ -626,11 +467,7 @@
       "needFor": "Запрещать невалидный ssl сертификат",
       "default": false,
       "required": false,
-      "scopes": [
-        "back",
-        "worker",
-        "telegramBot"
-      ],
+      "scopes": ["back", "worker", "telegramBot"],
       "hidden": false,
       "editable": true
     },
@@ -640,11 +477,7 @@
       "needFor": "Username доступа в kafka",
       "default": "",
       "required": false,
-      "scopes": [
-        "back",
-        "worker",
-        "telegramBot"
-      ],
+      "scopes": ["back", "worker", "telegramBot"],
       "hidden": false,
       "editable": true
     },
@@ -654,11 +487,7 @@
       "needFor": "Клиент для доступа в api keycloak админки",
       "default": "backend-api",
       "required": false,
-      "scopes": [
-        "back",
-        "worker",
-        "telegramBot"
-      ],
+      "scopes": ["back", "worker", "telegramBot"],
       "hidden": false,
       "editable": true
     },
@@ -668,11 +497,7 @@
       "needFor": "Секрет для доступа в api keycloak админки",
       "default": "",
       "required": false,
-      "scopes": [
-        "back",
-        "worker",
-        "telegramBot"
-      ],
+      "scopes": ["back", "worker", "telegramBot"],
       "hidden": false,
       "editable": true
     },
@@ -682,11 +507,7 @@
       "needFor": "Клиент для доступа в api keycloak приложения пользователя",
       "default": "backend-api",
       "required": false,
-      "scopes": [
-        "back",
-        "worker",
-        "telegramBot"
-      ],
+      "scopes": ["back", "worker", "telegramBot"],
       "hidden": false,
       "editable": true
     },
@@ -696,11 +517,7 @@
       "needFor": "Секрет для доступа в api keycloak приложения пользователя",
       "default": "",
       "required": false,
-      "scopes": [
-        "back",
-        "worker",
-        "telegramBot"
-      ],
+      "scopes": ["back", "worker", "telegramBot"],
       "hidden": false,
       "editable": true
     },
@@ -710,11 +527,7 @@
       "needFor": "Формат логов (plain | json)",
       "default": "plain",
       "required": false,
-      "scopes": [
-        "back",
-        "worker",
-        "telegramBot"
-      ],
+      "scopes": ["back", "worker", "telegramBot"],
       "hidden": false,
       "editable": true
     },
@@ -724,11 +537,7 @@
       "needFor": "Урл для доступа в Loki. Используется для запроса бизнес-логов",
       "default": "",
       "required": false,
-      "scopes": [
-        "back",
-        "worker",
-        "telegramBot"
-      ],
+      "scopes": ["back", "worker", "telegramBot"],
       "hidden": false,
       "editable": true
     },
@@ -738,9 +547,7 @@
       "needFor": "Идентификатор клиента oidc для админки",
       "default": "",
       "required": false,
-      "scopes": [
-        "admin-app"
-      ],
+      "scopes": ["admin-app"],
       "hidden": false,
       "editable": true
     },
@@ -750,10 +557,7 @@
       "needFor": "Issuer oidc для админки",
       "default": "",
       "required": false,
-      "scopes": [
-        "back",
-        "admin-app"
-      ],
+      "scopes": ["back", "admin-app"],
       "hidden": false,
       "editable": true
     },
@@ -763,11 +567,7 @@
       "needFor": "Запрещать невалидный ssl сертификат",
       "default": false,
       "required": false,
-      "scopes": [
-        "back",
-        "worker",
-        "telegramBot"
-      ],
+      "scopes": ["back", "worker", "telegramBot"],
       "hidden": false,
       "editable": true
     },
@@ -777,9 +577,7 @@
       "needFor": "Uri jwks oidc для проверки авторизации админки",
       "default": "",
       "required": false,
-      "scopes": [
-        "back"
-      ],
+      "scopes": ["back"],
       "hidden": false,
       "editable": true
     },
@@ -789,9 +587,7 @@
       "needFor": "Тип выхода админки",
       "default": "",
       "required": false,
-      "scopes": [
-        "admin-app"
-      ],
+      "scopes": ["admin-app"],
       "hidden": false,
       "editable": true
     },
@@ -801,10 +597,7 @@
       "needFor": "Реалм oidc для админки",
       "default": "",
       "required": false,
-      "scopes": [
-        "back",
-        "admin-app"
-      ],
+      "scopes": ["back", "admin-app"],
       "hidden": false,
       "editable": true
     },
@@ -814,10 +607,7 @@
       "needFor": "Хост oidc для админки",
       "default": "",
       "required": false,
-      "scopes": [
-        "back",
-        "admin-app"
-      ],
+      "scopes": ["back", "admin-app"],
       "hidden": false,
       "editable": true
     },
@@ -827,9 +617,7 @@
       "needFor": "Идентификатор клиента oidc для приложения пользователя",
       "default": "",
       "required": false,
-      "scopes": [
-        "cutomer-app"
-      ],
+      "scopes": ["cutomer-app"],
       "hidden": false,
       "editable": true
     },
@@ -839,10 +627,7 @@
       "needFor": "Реалм oidc для приложения пользователя",
       "default": "",
       "required": false,
-      "scopes": [
-        "back",
-        "cutomer-app"
-      ],
+      "scopes": ["back", "cutomer-app"],
       "hidden": false,
       "editable": true
     },
@@ -852,10 +637,7 @@
       "needFor": "Хост oidc для приложения пользователя",
       "default": "",
       "required": false,
-      "scopes": [
-        "back",
-        "cutomer-app"
-      ],
+      "scopes": ["back", "cutomer-app"],
       "hidden": false,
       "editable": true
     },
@@ -865,11 +647,7 @@
       "needFor": "Идентификатор доступа для авторизации в S3",
       "default": "",
       "required": true,
-      "scopes": [
-        "back",
-        "worker",
-        "telegramBot"
-      ],
+      "scopes": ["back", "worker", "telegramBot"],
       "hidden": false,
       "editable": true
     },
@@ -879,11 +657,7 @@
       "needFor": "Имя бакета для хранения файлов, отправленных на почту",
       "default": "",
       "required": true,
-      "scopes": [
-        "back",
-        "worker",
-        "telegramBot"
-      ],
+      "scopes": ["back", "worker", "telegramBot"],
       "hidden": false,
       "editable": true
     },
@@ -893,11 +667,7 @@
       "needFor": "Имя бакета для хранения временных файлов, созданных для скачивания пользователями",
       "default": "",
       "required": true,
-      "scopes": [
-        "back",
-        "worker",
-        "telegramBot"
-      ],
+      "scopes": ["back", "worker", "telegramBot"],
       "hidden": false,
       "editable": true
     },
@@ -907,11 +677,7 @@
       "needFor": "Эндпоинт S3, который использует бекенд",
       "default": "s3.eu-central-1.wasabisys.com",
       "required": true,
-      "scopes": [
-        "back",
-        "worker",
-        "telegramBot"
-      ],
+      "scopes": ["back", "worker", "telegramBot"],
       "hidden": true,
       "editable": false
     },
@@ -921,11 +687,7 @@
       "needFor": "Эндпоинт S3, доступный для фронтенда",
       "default": "",
       "required": false,
-      "scopes": [
-        "back",
-        "worker",
-        "telegramBot"
-      ],
+      "scopes": ["back", "worker", "telegramBot"],
       "hidden": true,
       "editable": false
     },
@@ -935,11 +697,7 @@
       "needFor": "Идентификатор доступа для авторизации в S3",
       "default": "eu-central-1",
       "required": true,
-      "scopes": [
-        "back",
-        "worker",
-        "telegramBot"
-      ],
+      "scopes": ["back", "worker", "telegramBot"],
       "hidden": false,
       "editable": true
     },
@@ -949,11 +707,7 @@
       "needFor": "Секретный ключ для авторизации в S3",
       "default": "",
       "required": true,
-      "scopes": [
-        "back",
-        "worker",
-        "telegramBot"
-      ],
+      "scopes": ["back", "worker", "telegramBot"],
       "hidden": true,
       "editable": false
     },
@@ -963,11 +717,7 @@
       "needFor": "Sentry dsn",
       "default": "",
       "required": false,
-      "scopes": [
-        "back",
-        "worker",
-        "telegramBot"
-      ],
+      "scopes": ["back", "worker", "telegramBot"],
       "hidden": false,
       "editable": true
     }
@@ -1015,9 +765,7 @@
           "category": "id",
           "type": "string",
           "stringType": "plain",
-          "filters": [
-            "equal"
-          ]
+          "filters": ["equal"]
         },
         {
           "name": "region",
@@ -1041,9 +789,7 @@
           "type": "string",
           "category": "scalar",
           "stringType": "plain",
-          "filters": [
-            "equal"
-          ]
+          "filters": ["equal"]
         },
         {
           "name": "amount",
@@ -1066,17 +812,11 @@
           "array": false,
           "type": "float",
           "category": "scalar",
-          "filters": [
-            "equal"
-          ],
+          "filters": ["equal"],
           "numberType": "base"
         }
       ],
-      "uniqueConstraints": [
-        [
-          "region"
-        ]
-      ],
+      "uniqueConstraints": [["region"]],
       "indexes": [],
       "forms": {
         "list": {
@@ -1279,10 +1019,7 @@
           "async": false
         }
       ],
-      "labels": [
-        "catalogs.totals.title.plural",
-        "catalogs.totals.title.singular"
-      ],
+      "labels": ["catalogs.totals.title.plural", "catalogs.totals.title.singular"],
       "type": "sumRegistry",
       "registrarDepended": false,
       "dimensions": [
@@ -1308,9 +1045,7 @@
           "type": "string",
           "category": "scalar",
           "stringType": "plain",
-          "filters": [
-            "equal"
-          ]
+          "filters": ["equal"]
         }
       ],
       "resources": [
@@ -1335,9 +1070,7 @@
           "array": false,
           "type": "float",
           "category": "scalar",
-          "filters": [
-            "equal"
-          ],
+          "filters": ["equal"],
           "numberType": "base"
         }
       ]
