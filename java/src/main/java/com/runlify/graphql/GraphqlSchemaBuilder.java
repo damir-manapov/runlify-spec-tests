@@ -1,9 +1,9 @@
 package com.runlify.graphql;
 
 import com.runlify.metadata.EntityMetadata;
+import com.runlify.metadata.EntityNames;
 import com.runlify.metadata.FieldMetadata;
 import com.runlify.metadata.ProjectMetadata;
-import com.runlify.schema.SchemaGenerator;
 import org.springframework.stereotype.Component;
 
 import java.util.ArrayList;
@@ -43,8 +43,8 @@ public class GraphqlSchemaBuilder {
         sb.append("type ListMetadata {\n  count: Int\n}\n\n");
 
         for (var entity : metadata.allEntities()) {
-            var singular = singularName(entity);
-            var plural = pluralName(entity);
+            var singular = EntityNames.singularName(entity);
+            var plural = EntityNames.pluralName(entity);
 
             // Object type
             sb.append(buildObjectType(entity, singular));
@@ -57,7 +57,7 @@ public class GraphqlSchemaBuilder {
             // Query fields
             queryFields.add(buildFindOneQuery(entity, singular));
             queryFields.add(buildFindAllQuery(singular, plural));
-            queryFields.add(buildCountQuery(plural));
+            queryFields.add(buildCountQuery(singular, plural));
 
             // Slice queries for periodic info registries
             if (entity.isInfoRegistry() && entity.period() != null) {
@@ -118,68 +118,56 @@ public class GraphqlSchemaBuilder {
 
         for (var field : entity.fields()) {
             if (field.isHidden()) continue;
-
-            var declared = new HashSet<>(field.filters());
-
-            // --- Metadata-declared filters ---
-            for (var filter : field.filters()) {
-                switch (filter) {
-                    case "equal"  -> sb.append("  %s: %s\n".formatted(
-                        field.name(), field.graphqlType()));
-                    case "lte"    -> sb.append("  %s_lte: %s\n".formatted(
-                        field.name(), field.graphqlType()));
-                    case "gte"    -> sb.append("  %s_gte: %s\n".formatted(
-                        field.name(), field.graphqlType()));
-                    case "lt"     -> sb.append("  %s_lt: %s\n".formatted(
-                        field.name(), field.graphqlType()));
-                    case "gt"     -> sb.append("  %s_gt: %s\n".formatted(
-                        field.name(), field.graphqlType()));
-                    case "in"     -> sb.append("  %s_in: [%s]\n".formatted(
-                        field.name(), field.graphqlType()));
-                    case "not_in" -> sb.append("  %s_not_in: [%s]\n".formatted(
-                        field.name(), field.graphqlType()));
-                    default -> { /* skip unknown filters */ }
-                }
-            }
-
-            // --- Auto-generated type-based filters (matching TS behaviour) ---
-            var type = field.type();
-
-            // _in / _not_in for string, int, float
-            if (LIST_TYPES.contains(type)) {
-                if (!declared.contains("in"))
-                    sb.append("  %s_in: [%s]\n".formatted(field.name(), field.graphqlType()));
-                if (!declared.contains("not_in"))
-                    sb.append("  %s_not_in: [%s]\n".formatted(field.name(), field.graphqlType()));
-            }
-
-            // _lte / _gte / _lt / _gt for numeric and date types
-            if (RANGE_TYPES.contains(type)) {
-                if (!declared.contains("lte"))
-                    sb.append("  %s_lte: %s\n".formatted(field.name(), field.graphqlType()));
-                if (!declared.contains("gte"))
-                    sb.append("  %s_gte: %s\n".formatted(field.name(), field.graphqlType()));
-                if (!declared.contains("lt"))
-                    sb.append("  %s_lt: %s\n".formatted(field.name(), field.graphqlType()));
-                if (!declared.contains("gt"))
-                    sb.append("  %s_gt: %s\n".formatted(field.name(), field.graphqlType()));
-            }
-
-            // _defined filter for optional link fields
-            if (field.isLink() && !field.isRequired()) {
-                sb.append("  %s_defined: Boolean\n".formatted(field.name()));
-            }
+            emitFieldFilters(sb, field);
         }
 
-        // Global filters
         if (entity.isSearchEnabled()) {
             sb.append("  q: String\n");
         }
-        var idField = entity.idField();
-        sb.append("  ids: [%s]\n".formatted(idField.graphqlType()));
-
+        sb.append("  ids: [%s]\n".formatted(entity.idField().graphqlType()));
         sb.append("}\n");
         return sb.toString();
+    }
+
+    /** Emit all filter fields for a single entity field (metadata-declared + auto-generated). */
+    private void emitFieldFilters(StringBuilder sb, FieldMetadata field) {
+        var type = field.type();
+        var emitted = new HashSet<String>();
+
+        // Metadata-declared filters
+        for (var f : field.filters()) {
+            if (emitted.add(f)) emitFilter(sb, field, f);
+        }
+
+        // Auto-generated: _in / _not_in for string, int, float
+        if (LIST_TYPES.contains(type)) {
+            if (emitted.add("in"))     emitFilter(sb, field, "in");
+            if (emitted.add("not_in")) emitFilter(sb, field, "not_in");
+        }
+
+        // Auto-generated: _lte / _gte / _lt / _gt for numeric and date types
+        if (RANGE_TYPES.contains(type)) {
+            for (var f : List.of("lte", "gte", "lt", "gt")) {
+                if (emitted.add(f)) emitFilter(sb, field, f);
+            }
+        }
+
+        // _defined for optional link fields
+        if (field.isLink() && !field.isRequired()) {
+            sb.append("  %s_defined: Boolean\n".formatted(field.name()));
+        }
+    }
+
+    /** Emit a single filter field in SDL. */
+    private void emitFilter(StringBuilder sb, FieldMetadata field, String filter) {
+        var name = field.name();
+        var gql = field.graphqlType();
+        switch (filter) {
+            case "equal"  -> sb.append("  %s: %s\n".formatted(name, gql));
+            case "in"     -> sb.append("  %s_in: [%s]\n".formatted(name, gql));
+            case "not_in" -> sb.append("  %s_not_in: [%s]\n".formatted(name, gql));
+            default       -> sb.append("  %s_%s: %s\n".formatted(name, filter, gql));
+        }
     }
 
     // -----------------------------------------------------------------------
@@ -196,9 +184,9 @@ public class GraphqlSchemaBuilder {
             .formatted(plural, singular, singular);
     }
 
-    private String buildCountQuery(String plural) {
+    private String buildCountQuery(String singular, String plural) {
         return "_all%sMeta(filter: %sFilter): ListMetadata"
-            .formatted(plural, singularFromPlural(plural));
+            .formatted(plural, singular);
     }
 
     private String buildSliceQuery(String prefix, EntityMetadata entity, String singular) {
@@ -242,24 +230,4 @@ public class GraphqlSchemaBuilder {
         return "remove%s(id: %s!): %s".formatted(singular, idField.graphqlType(), singular);
     }
 
-    // -----------------------------------------------------------------------
-    // Naming helpers
-    // -----------------------------------------------------------------------
-
-    /** PascalCase singular: "items" → "Item" */
-    public static String singularName(EntityMetadata entity) {
-        return SchemaGenerator.pascalSingular(entity.name());
-    }
-
-    /** PascalCase plural (= capitalize the entity name as-is): "items" → "Items" */
-    public static String pluralName(EntityMetadata entity) {
-        var name = entity.name();
-        return Character.toUpperCase(name.charAt(0)) + name.substring(1);
-    }
-
-    /** Reverse: "Items" → "Item" (for the filter input reference in count query) */
-    private String singularFromPlural(String plural) {
-        // We stored singular names in the type, so just singularize the plural
-        return SchemaGenerator.pascalSingular(plural.substring(0, 1).toLowerCase() + plural.substring(1));
-    }
 }

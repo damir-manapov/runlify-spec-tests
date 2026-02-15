@@ -1,14 +1,15 @@
 package com.runlify.graphql;
 
 import com.runlify.metadata.EntityMetadata;
+import com.runlify.metadata.EntityNames;
 import com.runlify.metadata.ProjectMetadata;
-import com.runlify.schema.SchemaGenerator;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Service;
 
 import java.util.*;
+import java.util.stream.Collectors;
 
 /**
  * Handles the document → registry posting lifecycle:
@@ -61,7 +62,7 @@ public class DocumentPostingService {
      * Un-post a document: delete all registry entries for this document.
      */
     public void unPost(EntityMetadata docEntity, Object docId) {
-        var singular = SchemaGenerator.pascalSingular(docEntity.name());
+        var singular = EntityNames.pascalSingular(docEntity.name());
         // registrarTypeId uses the singular lowercase form (e.g., "invoice")
         var registrarType = Character.toLowerCase(singular.charAt(0)) + singular.substring(1);
 
@@ -69,7 +70,7 @@ public class DocumentPostingService {
             var registry = findRegistry(registryName);
             if (registry == null) continue;
 
-            var table = SchemaGenerator.tableName(registry);
+            var table = EntityNames.tableName(registry);
             var deleted = jdbc.update(
                 "DELETE FROM \"%s\" WHERE \"registrarTypeId\" = ? AND \"registrarId\" = ?"
                     .formatted(table),
@@ -86,7 +87,7 @@ public class DocumentPostingService {
     private List<Map<String, Object>> computeEntries(
         EntityMetadata docEntity, Map<String, Object> docData, EntityMetadata registry
     ) {
-        var singular = SchemaGenerator.pascalSingular(docEntity.name());
+        var singular = EntityNames.pascalSingular(docEntity.name());
         var registrarType = Character.toLowerCase(singular.charAt(0)) + singular.substring(1);
 
         var entry = new LinkedHashMap<String, Object>();
@@ -124,13 +125,13 @@ public class DocumentPostingService {
     }
 
     private void insertEntry(EntityMetadata registry, Map<String, Object> entry) {
-        var table = SchemaGenerator.tableName(registry);
+        var table = EntityNames.tableName(registry);
         var columns = entry.keySet().stream()
             .map(c -> "\"%s\"".formatted(c))
-            .collect(java.util.stream.Collectors.joining(", "));
+            .collect(Collectors.joining(", "));
         var placeholders = entry.keySet().stream()
             .map(c -> "?")
-            .collect(java.util.stream.Collectors.joining(", "));
+            .collect(Collectors.joining(", "));
         var sql = "INSERT INTO \"%s\" (%s) VALUES (%s)".formatted(table, columns, placeholders);
         jdbc.update(sql, entry.values().toArray());
     }

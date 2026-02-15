@@ -1,8 +1,7 @@
 package com.runlify.graphql;
 
 import com.runlify.metadata.EntityMetadata;
-import com.runlify.metadata.FieldMetadata;
-import com.runlify.schema.SchemaGenerator;
+import com.runlify.metadata.EntityNames;
 import graphql.schema.DataFetcher;
 import graphql.schema.DataFetchingEnvironment;
 import org.slf4j.Logger;
@@ -33,7 +32,7 @@ public class CrudDataFetcherFactory {
     // -----------------------------------------------------------------------
 
     public DataFetcher<Map<String, Object>> findOne(EntityMetadata entity) {
-        var table = SchemaGenerator.tableName(entity);
+        var table = EntityNames.tableName(entity);
         return env -> {
             var id = env.getArgument("id");
             var sql = "SELECT * FROM \"%s\" WHERE \"id\" = ? LIMIT 1".formatted(table);
@@ -47,7 +46,7 @@ public class CrudDataFetcherFactory {
     // -----------------------------------------------------------------------
 
     public DataFetcher<List<Map<String, Object>>> findAll(EntityMetadata entity) {
-        var table = SchemaGenerator.tableName(entity);
+        var table = EntityNames.tableName(entity);
         return env -> {
             var where = buildWhereClause(entity, env);
             var sql = new StringBuilder("SELECT * FROM \"%s\"".formatted(table));
@@ -85,7 +84,7 @@ public class CrudDataFetcherFactory {
     // -----------------------------------------------------------------------
 
     public DataFetcher<Map<String, Object>> count(EntityMetadata entity) {
-        var table = SchemaGenerator.tableName(entity);
+        var table = EntityNames.tableName(entity);
         return env -> {
             var where = buildWhereClause(entity, env);
             var sql = new StringBuilder("SELECT COUNT(*) as count FROM \"%s\"".formatted(table));
@@ -102,7 +101,7 @@ public class CrudDataFetcherFactory {
     // -----------------------------------------------------------------------
 
     public DataFetcher<Map<String, Object>> create(EntityMetadata entity) {
-        var table = SchemaGenerator.tableName(entity);
+        var table = EntityNames.tableName(entity);
         return env -> {
             var args = collectArgs(entity, env, false);
 
@@ -141,7 +140,7 @@ public class CrudDataFetcherFactory {
     // -----------------------------------------------------------------------
 
     public DataFetcher<Map<String, Object>> update(EntityMetadata entity) {
-        var table = SchemaGenerator.tableName(entity);
+        var table = EntityNames.tableName(entity);
         return env -> {
             var id = env.getArgument("id");
             var args = collectArgs(entity, env, true);
@@ -179,8 +178,8 @@ public class CrudDataFetcherFactory {
     // -----------------------------------------------------------------------
 
     public DataFetcher<Map<String, Object>> remove(EntityMetadata entity) {
-        var table = SchemaGenerator.tableName(entity);
-        var singular = GraphqlSchemaBuilder.singularName(entity);
+        var table = EntityNames.tableName(entity);
+        var singular = EntityNames.singularName(entity);
         return env -> {
             var id = env.getArgument("id");
             // Fetch row before deleting (to return it)

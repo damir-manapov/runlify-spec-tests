@@ -1,7 +1,7 @@
 package com.runlify.graphql;
 
 import com.runlify.metadata.EntityMetadata;
-import com.runlify.schema.SchemaGenerator;
+import com.runlify.metadata.EntityNames;
 import graphql.schema.DataFetcher;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Component;
@@ -41,7 +41,7 @@ public class SliceDataFetcherFactory {
     private DataFetcher<Map<String, Object>> buildSliceFetcher(
         EntityMetadata entity, String dateOp, String sortDir
     ) {
-        var table = SchemaGenerator.tableName(entity);
+        var table = EntityNames.tableName(entity);
         return env -> {
             var conditions = new ArrayList<String>();
             var params = new ArrayList<Object>();

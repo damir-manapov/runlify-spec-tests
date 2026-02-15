@@ -1,6 +1,7 @@
 package com.runlify.graphql;
 
 import com.runlify.metadata.EntityMetadata;
+import com.runlify.metadata.EntityNames;
 import com.runlify.metadata.MetadataLoader;
 import graphql.schema.idl.RuntimeWiring;
 import org.slf4j.Logger;
@@ -65,8 +66,8 @@ public class GraphqlConfiguration {
         SliceDataFetcherFactory sliceFactory,
         DocumentPostingService postingService
     ) {
-        var singular = GraphqlSchemaBuilder.singularName(entity);
-        var plural = GraphqlSchemaBuilder.pluralName(entity);
+        var singular = EntityNames.singularName(entity);
+        var plural = EntityNames.pluralName(entity);
 
         // Query data fetchers
         wiring.type("Query", builder -> builder

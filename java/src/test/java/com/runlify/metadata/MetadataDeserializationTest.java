@@ -1,30 +1,15 @@
 package com.runlify.metadata;
 
-import tools.jackson.databind.DeserializationFeature;
-import tools.jackson.databind.json.JsonMapper;
+import com.runlify.TestFixtureLoader;
 import org.junit.jupiter.api.Test;
-
-import java.io.File;
 
 import static org.junit.jupiter.api.Assertions.*;
 
 class MetadataDeserializationTest {
 
-    private static final JsonMapper mapper = JsonMapper.builder()
-        .disable(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES)
-        .build();
-
-    private static final String FIXTURES_BASE = "../tests/fixtures";
-
-    private ProjectMetadata load(String fixture) throws Exception {
-        var file = new File(FIXTURES_BASE + "/" + fixture + "/metadata.json");
-        assertTrue(file.exists(), "Fixture not found: " + file.getAbsolutePath());
-        return mapper.readValue(file, ProjectMetadata.class);
-    }
-
     @Test
     void withAutoId_catalog() throws Exception {
-        var meta = load("with-auto-id");
+        var meta = TestFixtureLoader.load("with-auto-id");
         assertEquals("test", meta.name());
         assertEquals("tst", meta.prefix());
         assertEquals(1, meta.catalogs().size());
@@ -43,7 +28,7 @@ class MetadataDeserializationTest {
 
     @Test
     void withRelations_linkField() throws Exception {
-        var meta = load("with-relations");
+        var meta = TestFixtureLoader.load("with-relations");
         assertEquals(2, meta.catalogs().size());
 
         var articles = meta.catalogs().stream()
@@ -62,7 +47,7 @@ class MetadataDeserializationTest {
 
     @Test
     void withDocumentRegistry_documentAndSumRegistry() throws Exception {
-        var meta = load("with-document-registry");
+        var meta = TestFixtureLoader.load("with-document-registry");
         assertEquals(1, meta.documents().size());
         assertEquals(1, meta.sumRegistries().size());
 
@@ -86,7 +71,7 @@ class MetadataDeserializationTest {
 
     @Test
     void withInfoRegistry_periodicRegistry() throws Exception {
-        var meta = load("with-info-registry");
+        var meta = TestFixtureLoader.load("with-info-registry");
         assertEquals(1, meta.infoRegistries().size());
 
         var prices = meta.infoRegistries().get(0);
@@ -120,7 +105,7 @@ class MetadataDeserializationTest {
 
     @Test
     void allEntities_combinesAllTypes() throws Exception {
-        var meta = load("with-document-registry");
+        var meta = TestFixtureLoader.load("with-document-registry");
         var all = meta.allEntities();
         assertEquals(meta.catalogs().size() + meta.documents().size()
             + meta.infoRegistries().size() + meta.sumRegistries().size(), all.size());

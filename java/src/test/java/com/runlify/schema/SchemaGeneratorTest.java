@@ -1,27 +1,14 @@
 package com.runlify.schema;
 
-import tools.jackson.databind.DeserializationFeature;
-import tools.jackson.databind.json.JsonMapper;
-import com.runlify.metadata.ProjectMetadata;
+import com.runlify.TestFixtureLoader;
+import com.runlify.metadata.EntityNames;
 import org.junit.jupiter.api.Test;
-
-import java.io.File;
 
 import static org.junit.jupiter.api.Assertions.*;
 
 class SchemaGeneratorTest {
 
-    private static final JsonMapper mapper = JsonMapper.builder()
-        .disable(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES)
-        .build();
-    private static final String FIXTURES_BASE = "../tests/fixtures";
     private final SchemaGenerator generator = new SchemaGenerator();
-
-    private ProjectMetadata load(String fixture) throws Exception {
-        return mapper.readValue(
-            new File(FIXTURES_BASE + "/" + fixture + "/metadata.json"),
-            ProjectMetadata.class);
-    }
 
     // -----------------------------------------------------------------------
     // Table naming (pascalSingular)
@@ -29,27 +16,27 @@ class SchemaGeneratorTest {
 
     @Test
     void tableName_items() {
-        assertEquals("Item", SchemaGenerator.pascalSingular("items"));
+        assertEquals("Item", EntityNames.pascalSingular("items"));
     }
 
     @Test
     void tableName_invoiceTotals() {
-        assertEquals("InvoiceTotal", SchemaGenerator.pascalSingular("invoiceTotals"));
+        assertEquals("InvoiceTotal", EntityNames.pascalSingular("invoiceTotals"));
     }
 
     @Test
     void tableName_categories() {
-        assertEquals("Category", SchemaGenerator.pascalSingular("categories"));
+        assertEquals("Category", EntityNames.pascalSingular("categories"));
     }
 
     @Test
     void tableName_prices() {
-        assertEquals("Price", SchemaGenerator.pascalSingular("prices"));
+        assertEquals("Price", EntityNames.pascalSingular("prices"));
     }
 
     @Test
     void tableName_articles() {
-        assertEquals("Article", SchemaGenerator.pascalSingular("articles"));
+        assertEquals("Article", EntityNames.pascalSingular("articles"));
     }
 
     // -----------------------------------------------------------------------
@@ -58,7 +45,7 @@ class SchemaGeneratorTest {
 
     @Test
     void withAutoId_generatesSerialPrimaryKey() throws Exception {
-        var meta = load("with-auto-id");
+        var meta = TestFixtureLoader.load("with-auto-id");
         var ddl = generator.generateCreateTable(meta.catalogs().get(0));
 
         assertTrue(ddl.contains("\"id\" SERIAL PRIMARY KEY"), "Should use SERIAL for autoincrement int id");
@@ -67,7 +54,7 @@ class SchemaGeneratorTest {
 
     @Test
     void withAutoId_hasSearchColumn() throws Exception {
-        var meta = load("with-auto-id");
+        var meta = TestFixtureLoader.load("with-auto-id");
         var ddl = generator.generateCreateTable(meta.catalogs().get(0));
 
         assertTrue(ddl.contains("\"search\" TEXT"), "Should have hidden search column");
@@ -75,7 +62,7 @@ class SchemaGeneratorTest {
 
     @Test
     void withAutoId_hasNotNullForRequired() throws Exception {
-        var meta = load("with-auto-id");
+        var meta = TestFixtureLoader.load("with-auto-id");
         var ddl = generator.generateCreateTable(meta.catalogs().get(0));
 
         assertTrue(ddl.contains("\"name\" TEXT NOT NULL"), "Required string field should be NOT NULL");
@@ -87,7 +74,7 @@ class SchemaGeneratorTest {
 
     @Test
     void withDocumentRegistry_documentTable() throws Exception {
-        var meta = load("with-document-registry");
+        var meta = TestFixtureLoader.load("with-document-registry");
         var ddl = generator.generateCreateTable(meta.documents().get(0));
 
         assertTrue(ddl.contains("CREATE TABLE \"Invoice\""), "Document table name");
@@ -98,7 +85,7 @@ class SchemaGeneratorTest {
 
     @Test
     void withDocumentRegistry_registryTable() throws Exception {
-        var meta = load("with-document-registry");
+        var meta = TestFixtureLoader.load("with-document-registry");
         var ddl = generator.generateCreateTable(meta.sumRegistries().get(0));
 
         assertTrue(ddl.contains("CREATE TABLE \"InvoiceTotal\""), "Registry table name");
@@ -113,7 +100,7 @@ class SchemaGeneratorTest {
 
     @Test
     void withInfoRegistry_hasDateColumn() throws Exception {
-        var meta = load("with-info-registry");
+        var meta = TestFixtureLoader.load("with-info-registry");
         var ddl = generator.generateCreateTable(meta.infoRegistries().get(0));
 
         assertTrue(ddl.contains("CREATE TABLE \"Price\""), "Info registry table name");
@@ -126,7 +113,7 @@ class SchemaGeneratorTest {
 
     @Test
     void withRelations_linkFieldIsText() throws Exception {
-        var meta = load("with-relations");
+        var meta = TestFixtureLoader.load("with-relations");
         var articles = meta.catalogs().stream()
             .filter(e -> "articles".equals(e.name()))
             .findFirst().orElseThrow();
@@ -141,7 +128,7 @@ class SchemaGeneratorTest {
 
     @Test
     void generateDdl_includesDropAndCreate() throws Exception {
-        var meta = load("with-document-registry");
+        var meta = TestFixtureLoader.load("with-document-registry");
         var ddl = generator.generateDdl(meta);
 
         // 2 entities (invoice + invoiceTotal) × 2 statements (drop + create)
