@@ -152,8 +152,8 @@ public class GraphqlSchemaBuilder {
             }
         }
 
-        // _defined for optional link fields
-        if (field.isLink() && !field.isRequired()) {
+        // _defined for optional fields (both scalar and link)
+        if (!field.isRequired() && !field.isId()) {
             sb.append("  %s_defined: Boolean\n".formatted(field.name()));
         }
     }

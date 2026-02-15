@@ -142,7 +142,9 @@ public class CrudDataFetcherFactory {
             var args = collectArgs(entity, env, true);
 
             // Re-populate search if any searchable field was updated
-            if (hasSearchableField(entity, args.keySet())) {
+            boolean hasSearchField = entity.fields().stream()
+                .anyMatch(f -> "search".equals(f.name()));
+            if (hasSearchField && hasSearchableField(entity, args.keySet())) {
                 // Need to merge with existing data for full search text
                 var existing = jdbc.queryForMap(
                     "SELECT * FROM \"%s\" WHERE \"id\" = ?".formatted(table), id);
@@ -240,6 +242,16 @@ public class CrudDataFetcherFactory {
                 var col = key.substring(0, key.length() - 3);
                 conditions.add("\"%s\" > ?".formatted(col));
                 params.add(value);
+            } else if (key.endsWith("_not_in")) {
+                // Must check _not_in before _in (both end with "_in")
+                var col = key.substring(0, key.length() - 7);
+                @SuppressWarnings("unchecked")
+                var list = (List<Object>) value;
+                if (!list.isEmpty()) {
+                    var placeholders = list.stream().map(i -> "?").collect(Collectors.joining(", "));
+                    conditions.add("\"%s\" NOT IN (%s)".formatted(col, placeholders));
+                    params.addAll(list);
+                }
             } else if (key.endsWith("_in")) {
                 var col = key.substring(0, key.length() - 3);
                 @SuppressWarnings("unchecked")
@@ -247,15 +259,6 @@ public class CrudDataFetcherFactory {
                 if (!list.isEmpty()) {
                     var placeholders = list.stream().map(i -> "?").collect(Collectors.joining(", "));
                     conditions.add("\"%s\" IN (%s)".formatted(col, placeholders));
-                    params.addAll(list);
-                }
-            } else if (key.endsWith("_not_in")) {
-                var col = key.substring(0, key.length() - 7);
-                @SuppressWarnings("unchecked")
-                var list = (List<Object>) value;
-                if (!list.isEmpty()) {
-                    var placeholders = list.stream().map(i -> "?").collect(Collectors.joining(", "));
-                    conditions.add("\"%s\" NOT IN (%s)".formatted(col, placeholders));
                     params.addAll(list);
                 }
             } else if (key.endsWith("_defined")) {
@@ -279,7 +282,7 @@ public class CrudDataFetcherFactory {
     // Helpers
     // -----------------------------------------------------------------------
 
-    /** Collect non-null arguments from the GraphQL environment, skipping id on update. */
+    /** Collect arguments from the GraphQL environment, skipping id on update. */
     private LinkedHashMap<String, Object> collectArgs(
         EntityMetadata entity, DataFetchingEnvironment env, boolean isUpdate
     ) {
@@ -289,7 +292,9 @@ public class CrudDataFetcherFactory {
             if (isUpdate && field.isId()) continue;
             if (env.containsArgument(field.name())) {
                 var value = env.getArgument(field.name());
-                if (value != null) {
+                // On update: include explicit nulls (to set field to NULL)
+                // On create: skip nulls (let DB default apply)
+                if (value != null || isUpdate) {
                     args.put(field.name(), value);
                 }
             }
@@ -299,6 +304,11 @@ public class CrudDataFetcherFactory {
 
     /** Build the search field value from all searchable fields. */
     static void populateSearch(EntityMetadata entity, Map<String, Object> data) {
+        // Only populate if the entity has a "search" field
+        boolean hasSearchField = entity.fields().stream()
+            .anyMatch(f -> "search".equals(f.name()));
+        if (!hasSearchField) return;
+
         var searchParts = new ArrayList<String>();
         for (var field : entity.fields()) {
             if (field.isSearchable() && data.containsKey(field.name())) {

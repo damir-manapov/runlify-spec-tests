@@ -126,6 +126,7 @@ class CrudDataFetcherFactoryTest {
     void populateSearch_combinesSearchableFields() {
         var entity = entityWithFields(List.of(
             idField(),
+            hiddenSearchField(),
             searchable("name", "string"),
             searchable("code", "string")
         ));
@@ -142,6 +143,7 @@ class CrudDataFetcherFactoryTest {
     void populateSearch_ignoresNonSearchable() {
         var entity = entityWithFields(List.of(
             idField(),
+            hiddenSearchField(),
             searchable("name", "string"),
             scalar("price", "float")
         ));
@@ -158,6 +160,7 @@ class CrudDataFetcherFactoryTest {
     void populateSearch_handlesNullValues() {
         var entity = entityWithFields(List.of(
             idField(),
+            hiddenSearchField(),
             searchable("name", "string"),
             searchable("code", "string")
         ));
@@ -174,6 +177,7 @@ class CrudDataFetcherFactoryTest {
     void populateSearch_emptyWhenNoSearchableFields() {
         var entity = entityWithFields(List.of(
             idField(),
+            hiddenSearchField(),
             scalar("name", "string")
         ));
         var data = new LinkedHashMap<String, Object>();
@@ -182,6 +186,25 @@ class CrudDataFetcherFactoryTest {
         CrudDataFetcherFactory.populateSearch(entity, data);
 
         assertEquals("", data.get("search"));
+    }
+
+    // -----------------------------------------------------------------------
+    // Helpers
+    // -----------------------------------------------------------------------
+
+    @Test
+    void populateSearch_skipsWhenNoSearchField() {
+        var entity = entityWithFields(List.of(
+            idField(),
+            scalar("name", "string")
+        ));
+        var data = new LinkedHashMap<String, Object>();
+        data.put("name", "Widget");
+
+        CrudDataFetcherFactory.populateSearch(entity, data);
+
+        // Should not add "search" key when entity has no search field
+        assertFalse(data.containsKey("search"));
     }
 
     // -----------------------------------------------------------------------
@@ -205,6 +228,13 @@ class CrudDataFetcherFactoryTest {
     private static FieldMetadata searchable(String name, String type) {
         return new FieldMetadata(name, type, "scalar",
             null, null, null, null, null, true, null,
+            null, null, null, null, null, null,
+            null, null, null, null, null);
+    }
+
+    private static FieldMetadata hiddenSearchField() {
+        return new FieldMetadata("search", "string", "scalar",
+            null, null, null, null, true, null, null,
             null, null, null, null, null, null,
             null, null, null, null, null);
     }
