@@ -298,7 +298,7 @@ public class CrudDataFetcherFactory {
     }
 
     /** Build the search field value from all searchable fields. */
-    private void populateSearch(EntityMetadata entity, Map<String, Object> data) {
+    static void populateSearch(EntityMetadata entity, Map<String, Object> data) {
         var searchParts = new ArrayList<String>();
         for (var field : entity.fields()) {
             if (field.isSearchable() && data.containsKey(field.name())) {
@@ -318,7 +318,7 @@ public class CrudDataFetcherFactory {
     }
 
     /** Apply default backend value expressions for missing fields. */
-    private void applyDefaults(EntityMetadata entity, Map<String, Object> args) {
+    static void applyDefaults(EntityMetadata entity, Map<String, Object> args) {
         for (var field : entity.fields()) {
             if (args.containsKey(field.name())) continue;
             if (field.isId()) continue;
