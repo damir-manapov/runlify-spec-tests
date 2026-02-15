@@ -27,6 +27,12 @@ export async function gql<T = Record<string, unknown>>(
   return res.json() as Promise<GqlResponse<T>>
 }
 
+/** Extract the first array value from a GqlResponse.data (avoids non-null assertions). */
+export function extractList<T>(data: Record<string, unknown> | undefined): T[] {
+  if (!data) return []
+  return Object.values(data)[0] as T[]
+}
+
 // ---------------------------------------------------------------------------
 // Generic CRUD client for runlify-generated GraphQL entities
 // ---------------------------------------------------------------------------

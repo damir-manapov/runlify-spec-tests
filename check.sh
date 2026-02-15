@@ -10,7 +10,7 @@ pnpm typecheck
 echo "=== Tests ==="
 pnpm test:run
 
-echo "=== Java Build ==="
-(cd java && gradle build)
+echo "=== Java Build & Tests ==="
+(cd java && gradle build test)
 
 echo "=== All checks passed ==="

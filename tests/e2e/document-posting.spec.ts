@@ -1,5 +1,5 @@
 import { afterAll, beforeAll, describe, expect, it } from 'vitest'
-import { type CrudClient, createCrudClient } from './graphql-client.js'
+import { type CrudClient, createCrudClient, extractList } from './graphql-client.js'
 import {
   cleanupFresh,
   compileAndStart,
@@ -100,7 +100,7 @@ export class AdditionalInvoicesService extends InvoicesService {
 
     const entries = await registry.findAll({ filter: { registrarId: 'inv-1' } })
     expect(entries.errors).toBeUndefined()
-    const list = Object.values(entries.data!)[0] as InvoiceTotal[]
+    const list = extractList<InvoiceTotal>(entries.data)
     expect(list).toHaveLength(1)
     expect(list[0]).toMatchObject({
       registrarTypeId: 'invoice',
@@ -123,13 +123,13 @@ export class AdditionalInvoicesService extends InvoicesService {
 
     // Verify inv-2 entries
     const entries2 = await registry.findAll({ filter: { registrarId: 'inv-2' } })
-    const list2 = Object.values(entries2.data!)[0] as InvoiceTotal[]
+    const list2 = extractList<InvoiceTotal>(entries2.data)
     expect(list2).toHaveLength(1)
     expect(list2[0]).toMatchObject({ region: 'EU', amount: 200 })
 
     // Verify inv-1 entries still intact
     const entries1 = await registry.findAll({ filter: { registrarId: 'inv-1' } })
-    const list1 = Object.values(entries1.data!)[0] as InvoiceTotal[]
+    const list1 = extractList<InvoiceTotal>(entries1.data)
     expect(list1).toHaveLength(1)
     expect(list1[0]).toMatchObject({ region: 'US', amount: 100.5 })
   })
@@ -150,7 +150,7 @@ export class AdditionalInvoicesService extends InvoicesService {
 
     const entries = await registry.findAll({ filter: { registrarId: 'inv-1' } })
     expect(entries.errors).toBeUndefined()
-    const list = Object.values(entries.data!)[0] as InvoiceTotal[]
+    const list = extractList<InvoiceTotal>(entries.data)
     expect(list).toHaveLength(1)
     expect(list[0]).toMatchObject({
       registrarTypeId: 'invoice',
@@ -162,7 +162,7 @@ export class AdditionalInvoicesService extends InvoicesService {
 
   it("re-post does not affect other documents' entries", async () => {
     const entries = await registry.findAll({ filter: { registrarId: 'inv-2' } })
-    const list = Object.values(entries.data!)[0] as InvoiceTotal[]
+    const list = extractList<InvoiceTotal>(entries.data)
     expect(list).toHaveLength(1)
     expect(list[0]).toMatchObject({ region: 'EU', amount: 200 })
   })
@@ -177,13 +177,13 @@ export class AdditionalInvoicesService extends InvoicesService {
 
     const entries = await registry.findAll({ filter: { registrarId: 'inv-1' } })
     expect(entries.errors).toBeUndefined()
-    const list = Object.values(entries.data!)[0] as InvoiceTotal[]
+    const list = extractList<InvoiceTotal>(entries.data)
     expect(list).toHaveLength(0)
   })
 
   it("delete does not affect other documents' entries", async () => {
     const entries = await registry.findAll({ filter: { registrarId: 'inv-2' } })
-    const list = Object.values(entries.data!)[0] as InvoiceTotal[]
+    const list = extractList<InvoiceTotal>(entries.data)
     expect(list).toHaveLength(1)
     expect(list[0]).toMatchObject({ region: 'EU', amount: 200 })
   })
